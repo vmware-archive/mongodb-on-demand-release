@@ -1,0 +1,27 @@
+{
+	"ImportPath": "mongodb-service-adapter",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v63",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/pivotal-cf/on-demand-service-broker-sdk/bosh",
+			"Rev": "f5c9bf3e816ce5d7a6f604a06d8a1303dcf6002f"
+		},
+		{
+			"ImportPath": "github.com/pivotal-cf/on-demand-service-broker-sdk/serviceadapter",
+			"Rev": "f5c9bf3e816ce5d7a6f604a06d8a1303dcf6002f"
+		},
+		{
+			"ImportPath": "gopkg.in/go-playground/validator.v8",
+			"Comment": "v8.17.1",
+			"Rev": "014792cf3e266caff1e916876be12282b33059e0"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "53feefa2559fb8dfa8d81baad31be332c97d6c77"
+		}
+	]
+}
