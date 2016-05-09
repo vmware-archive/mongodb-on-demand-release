@@ -1,0 +1,9 @@
+---
+name: mongodb_service_adapter
+
+packages:
+  - mongodb-service-adapter
+
+templates: {}
+
+properties: {}
