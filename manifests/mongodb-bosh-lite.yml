@@ -20,10 +20,15 @@ update:
 
 instance_groups:
   - name: mongod_node
-    instances: 1
+    instances: 3
     jobs:
       - name: mongod_node
         release: mongodb
+        consumes:
+          mongod_node: {from: mongod_node}
+        provides:
+          mongod_node: {as: mongod_node}
+
     vm_type: default
     stemcell: default
     persistent_disk_type: default

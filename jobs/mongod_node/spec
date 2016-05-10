@@ -9,6 +9,12 @@ templates:
 packages:
   - mongod-node
 
+provides:
+  - {name: mongod_node, type: node}
+
+consumes:
+  - {name: mongod_node, type: node}
+
 properties:
   mongo_ops.url:
     description: "Mongo Ops Manager URL"

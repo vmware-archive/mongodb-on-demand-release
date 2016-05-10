@@ -16,3 +16,11 @@ set -e
   mkdir -p  /var/vcap/packages/mongod-node/bin
   cp -f ${TMP_DIR}/**/mongodb-mms-automation-agent /var/vcap/packages/mongod-node/bin
 <% end %>
+
+<%
+  this_host = "#{spec.name.gsub('_', '-')}-#{spec.index}"
+  hosts = link("mongod_node").instances.collect{ |x| "#{x.address} #{x.name.gsub('_', '-')}-#{x.index}" }.join("\\n")
+%>
+
+hostname <%= this_host %>
+sed -i '1i<%= hosts %>' /etc/hosts
