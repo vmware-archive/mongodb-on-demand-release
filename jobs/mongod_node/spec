@@ -1,0 +1,18 @@
+---
+name: mongod_node
+
+templates:
+  config/local.conf.erb: config/local.conf
+  bin/pre-start.erb: bin/pre-start
+  bin/mongod_agent_ctl.erb: bin/mongod_agent_ctl
+
+packages:
+  - mongod-node
+
+properties:
+  mongo_ops.url:
+    description: "Mongo Ops Manager URL"
+  mongo_ops.api_key:
+   description: "API Key for Ops Manager"
+  mongo_ops.group_id:
+   description: "Group Id"

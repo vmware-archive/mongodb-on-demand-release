@@ -1,6 +1,0 @@
----
-name: mongod-node
-
-templates:
-  conf/local.conf.erb: conf/local.conf
-  bin/pre-start.conf.erb: bin/pre-start

@@ -1,0 +1,37 @@
+---
+name: mongodb
+director_uuid: b7e651e2-3afe-471f-9bca-93048fa591f4
+
+releases:
+  - name: mongodb
+    version: latest
+
+stemcells:
+  - alias: default
+    name: bosh-warden-boshlite-ubuntu-trusty-go_agent
+    version: latest
+
+update:
+  canaries: 1
+  max_in_flight: 32
+  canary_watch_time: 1000-100000
+  update_watch_time: 1000-100000
+  serial: false
+
+instance_groups:
+  - name: mongod_node
+    instances: 1
+    jobs:
+      - name: mongod_node
+        release: mongodb
+    vm_type: default
+    stemcell: default
+    persistent_disk_type: default
+    networks:
+      - name: default
+
+properties:
+  mongo_ops:
+    url: http://ec2-54-175-81-192.compute-1.amazonaws.com:8080
+    api_key: e12bf17c1360685abd280a2d7011a59c
+    group_id: 5730aebae4b00c8c02d1d07a

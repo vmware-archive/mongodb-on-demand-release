@@ -4,7 +4,7 @@
 # Enter your Group Id - It can be found in the Ops Manager UI under Settings ->
 # Group Settings.
 #
-mmsGroupId=
+mmsGroupId=<%= p('mongo_ops.group_id') %>
 
 
 #
@@ -13,7 +13,7 @@ mmsGroupId=
 # Enter your API key - It can be found in the Ops Manager UI under Settings ->
 # Group Settings.
 #
-mmsApiKey=
+mmsApiKey=<%= p('mongo_ops.api_key') %>
 
 #
 # Hostname of the Ops Manager web server. The hostname will match what is used
@@ -21,17 +21,17 @@ mmsApiKey=
 # is 8080.
 #
 # ex. http://opsmanaager.<company>.com:8080
-mmsBaseUrl=
+mmsBaseUrl=<%= p('mongo_ops.url') %>
 
 #
 # Path to log file
 #
-logFile=/var/log/mongodb-mms-automation/automation-agent.log
+logFile=/var/vcap/sys/log/mongod_node/automation-agent.log
 
 #
 # Path to backup cluster config to
 #
-mmsConfigBackup=/var/lib/mongodb-mms-automation/mms-cluster-config-backup.json
+mmsConfigBackup=/var/vcap/sys/tmp/mongod_node/mms-cluster-config-backup.json
 
 #
 # Lowest log level to log.  Can be (in order): DEBUG, ROUTINE, INFO, WARN, ERROR, DOOM

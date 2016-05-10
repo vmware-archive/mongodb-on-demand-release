@@ -1,0 +1,5 @@
+check process mongod_node
+  with pidfile /var/vcap/sys/run/mongod_node/mongo_agent.pid
+  start program "/var/vcap/jobs/mongod_node/bin/mongod_agent_ctl start"
+  stop program "/var/vcap/jobs/mongod_node/bin/mongod_agent_ctl stop"
+  group vcap

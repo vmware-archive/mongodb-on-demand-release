@@ -5,4 +5,4 @@ dependencies:
   - golang
 
 files:
-  - spark-service-adapter/**/*
+  - mongodb-service-adapter/**/*

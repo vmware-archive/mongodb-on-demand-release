@@ -55,8 +55,6 @@ func (a Adapter) GenerateManifest(
 		return bosh.BoshManifest{}, fmt.Errorf("no networks definition found for instance group '%s'", MongodInstanceGroupName)
 	}
 
-
-
 	mongodProperties, err := mongodProperties(boshInfo.Name, plan.Properties, arbitraryParams, previousManifest)
 	if err != nil {
 		return bosh.BoshManifest{}, err

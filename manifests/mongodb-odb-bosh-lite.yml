@@ -1,6 +1,6 @@
 ---
 name: mongodb
-director_uuid: CHANGE-ME
+director_uuid: b7e651e2-3afe-471f-9bca-93048fa591f4
 
 releases:
   - name: mongodb
@@ -30,6 +30,7 @@ instance_groups:
         release: on-demand-service-broker
       - name: mongodb_service_adapter
         release: mongodb
+
     vm_type: default
     persistent_disk_type: default
     stemcell: default
@@ -89,7 +90,7 @@ properties:
     disable_ssl_cert_verification: true
     bosh:
       url: https://192.168.50.4:25555
-      director_uuid: CHANGE-ME
+      director_uuid: b7e651e2-3afe-471f-9bca-93048fa591f4
       authentication:
         basic:
           username: admin
@@ -100,7 +101,7 @@ properties:
       releases:
         - name: mongodb
           version: 1
-          jobs: [mongod-node]
+          jobs: [mongod_node]
       stemcell:
         os: ubuntu-trusty
         version: latest
@@ -125,11 +126,16 @@ properties:
           quotas:
             service_instance_limit: 10
           instance_groups:
-            - name: mongod-node
+            - name: mongod_node
               instances: 1
               vm_type: default
               networks:
                 - default
+              properties:
+                mongo_ops:
+                  url: http://ec2-54-175-81-192.compute-1.amazonaws.com:8080
+                  api_key: 420c1966-0be7-44ba-ae3c-a61dd636e7a7
+
 
         - name: replica-set
           plan_id: fee3933e-42cb-4964-b66e-79498f94e968
@@ -140,11 +146,12 @@ properties:
           quotas:
             service_instance_limit: 10
           instance_groups:
-            - name: mongod-node
+            - name: mongod_node
               instances: 3
               vm_type: default
               networks:
                 - default
+
 
         - name: sharded-cluster
           plan_id: 477a196a-9e28-4103-87d3-593767448c9f
@@ -155,7 +162,7 @@ properties:
           quotas:
             service_instance_limit: 10
           instance_groups:
-            - name: mongod-node
+            - name: mongod_node
               instances: 9
               vm_type: default
               networks:
