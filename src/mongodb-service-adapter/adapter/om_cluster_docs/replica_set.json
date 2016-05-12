@@ -1,0 +1,120 @@
+{
+    options: {
+        downloadBase: "/var/lib/mongodb-mms-automation",
+        downloadBaseWindows: "C:\mongodb-mms-automation"
+    },
+    mongoDbVersions: [{
+        name: "3.0.1"
+    }, {
+        name: "3.0.2"
+    }],
+    backupVersions: [{
+        hostname: "mongod-node-0",
+        logPath: "/var/vcap/sys/log/mongodb-mms-automation/backup-agent.log",
+        logRotate: {
+            sizeThresholdMB: 1000,
+            timeThresholdHrs: 24
+        }
+    }],
+    monitoringVersions: [{
+        hostname: "mongod-node-0",
+        logPath: "/var/vcap/sys/log/mongodb-mms-automation/monitoring-agent.log",
+        logRotate: {
+            sizeThresholdMB: 1000,
+            timeThresholdHrs: 24
+        }
+    }],
+    processes: [{
+        args2_6: {
+            net: {
+                port: 28000
+            },
+            replication: {
+                replSetName: "pcf_rset"
+            },
+            storage: {
+                dbPath: "/var/vcap/store/pcf_rset"
+            },
+            systemLog: {
+                destination: "file",
+                path: "/var/vcap/sys/log/mongodb/mongodb.log"
+            }
+        },
+        hostname: "mongod-node-0",
+        logRotate: {
+            sizeThresholdMB: 1000,
+            timeThresholdHrs: 24
+        },
+        name: "pcf_rset_0",
+        processType: "mongod",
+        version: "3.0.1",
+        authSchemaVersion: 3
+    }, {
+        args2_6: {
+            net: {
+                port: 28000
+            },
+            replication: {
+                replSetName: "pcf_rset"
+            },
+            storage: {
+                dbPath: "/var/vcap/store/pcf_rset"
+            },
+            systemLog: {
+                destination: "file",
+                path: "/var/vcap/sys/log/mongodb/mongodb.log"
+            }
+        },
+        hostname: "mongod-node-1",
+        logRotate: {
+            sizeThresholdMB: 1000,
+            timeThresholdHrs: 24
+        },
+        name: "pcf_rset_1",
+        processType: "mongod",
+        version: "3.0.1",
+        authSchemaVersion: 3
+    }, {
+        args2_6: {
+            net: {
+                port: 28000
+            },
+            replication: {
+                replSetName: "pcf_rset"
+            },
+            storage: {
+                dbPath: "/var/vcap/store/pcf_rset"
+            },
+            systemLog: {
+                destination: "file",
+                path: "/var/vcap/sys/log/mongodb/mongodb.log"
+            }
+        },
+        hostname: "mongod-node-2",
+        logRotate: {
+            sizeThresholdMB: 1000,
+            timeThresholdHrs: 24
+        },
+        name: "pcf_rset_2",
+        processType: "mongod",
+        version: "3.0.1",
+        authSchemaVersion: 3
+    }],
+    replicaSets: [{
+        _id: "pcf_rset",
+        members: [{
+            _id: 0,
+            host: "pcf_rset_0"
+        }, {
+            _id: 1,
+            host: "pcf_rset_1"
+        }, {
+            _id: 2,
+            arbiterOnly: true,
+            host: "pcf_rset_2",
+            priority: 0
+        }]
+    }],
+    roles: [],
+    sharding: []
+}

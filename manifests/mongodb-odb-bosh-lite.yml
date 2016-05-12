@@ -117,7 +117,8 @@ properties:
         - mongodb
         - pivotal
       plans:
-        - name: standalone
+
+        - name: single_node
           plan_id: f40cf0fa-4eb9-446c-a429-0b1ea2ae6ae7
           description: Standalone Instance
           metadata:
@@ -131,13 +132,15 @@ properties:
               vm_type: default
               networks:
                 - default
-              properties:
-                mongo_ops:
-                  url: http://ec2-54-175-81-192.compute-1.amazonaws.com:8080
-                  api_key: 420c1966-0be7-44ba-ae3c-a61dd636e7a7
+          properties:
+            id: single_node
+            mongo_ops:
+              url: http://ec2-54-175-81-192.compute-1.amazonaws.com:8080
+              username: dhigham@pivotal.io
+              api_key: 420c1966-0be7-44ba-ae3c-a61dd636e7a7
 
 
-        - name: replica-set
+        - name: single_replica_set
           plan_id: fee3933e-42cb-4964-b66e-79498f94e968
           description: Replica Set
           metadata:
@@ -151,9 +154,15 @@ properties:
               vm_type: default
               networks:
                 - default
+          properties:
+            id: single_replica_set
+            mongo_ops:
+              url: http://ec2-54-175-81-192.compute-1.amazonaws.com:8080
+              username: dhigham@pivotal.io
+              api_key: 420c1966-0be7-44ba-ae3c-a61dd636e7a7
 
 
-        - name: sharded-cluster
+        - name: sharded_cluster
           plan_id: 477a196a-9e28-4103-87d3-593767448c9f
           description: Sharded Cluster
           metadata:
@@ -167,6 +176,13 @@ properties:
               vm_type: default
               networks:
                 - default
+          properties:
+            id: sharded_cluster
+            mongo_ops:
+              url: http://ec2-54-175-81-192.compute-1.amazonaws.com:8080
+              username: dhigham@pivotal.io
+              api_key: 420c1966-0be7-44ba-ae3c-a61dd636e7a7
+
   cf:
     api_url: https://api.local.pcfdev.io
     admin_username: admin

@@ -3,6 +3,8 @@ package adapter
 import (
 	"fmt"
 	"strings"
+	"log"
+	"os"
 
 	"github.com/pivotal-cf/on-demand-service-broker-sdk/bosh"
 	"github.com/pivotal-cf/on-demand-service-broker-sdk/serviceadapter"
@@ -18,8 +20,7 @@ var (
 	MongodJobs = []string{MongodJobName}
 )
 
-type Adapter struct {
-}
+type Adapter struct { }
 
 func (a Adapter) GenerateManifest(
 	boshInfo serviceadapter.BoshInfo,
@@ -28,6 +29,26 @@ func (a Adapter) GenerateManifest(
 	arbitraryParams map[string]interface{},
 	previousManifest *bosh.BoshManifest,
 ) (bosh.BoshManifest, error) {
+
+	logger := log.New(os.Stderr, "[mongodb-service-adapter] ", log.LstdFlags)
+
+	// doc := oc.LoadDoc(plan.Properties["id"].(string))
+
+	mongoOps := plan.Properties["mongo_ops"].(map[string]interface{})
+
+	username := mongoOps["username"].(string)
+	apiKey := mongoOps["api_key"].(string)
+	address := mongoOps["address"].(string)
+	scheme := mongoOps["scheme"].(string)
+	port := mongoOps["port"].(float64)
+
+	url := fmt.Sprintf("%s://%s:%g", scheme, address, port)
+
+	oc := &OMClient { Url: url, Username: username, ApiKey: apiKey }
+
+	group, _ := oc.CreateGroup()
+	logger.Printf("created group %s (%s)", group.Name, group.ID)
+	// url, groupID, apiKey := oc.CreateCluster()
 
 	releases := []bosh.Release{}
 	for _, release := range serviceReleases {

@@ -20,7 +20,7 @@ update:
 
 instance_groups:
   - name: mongod_node
-    instances: 3
+    instances: 5
     jobs:
       - name: mongod_node
         release: mongodb

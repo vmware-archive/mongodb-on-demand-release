@@ -1,0 +1,10 @@
+[
+   {
+      "name":"kafka",
+      "version":"dev.42",
+      "jobs":[
+         "kafka_node",
+         "zookeeper"
+      ]
+   }
+]
