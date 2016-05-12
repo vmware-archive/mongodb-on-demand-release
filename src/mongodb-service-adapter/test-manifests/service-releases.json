@@ -1,10 +1,9 @@
 [
    {
-      "name":"kafka",
-      "version":"dev.42",
+      "name":"mongodb",
+      "version":"latest",
       "jobs":[
-         "kafka_node",
-         "zookeeper"
+         "mongod_node"
       ]
    }
 ]

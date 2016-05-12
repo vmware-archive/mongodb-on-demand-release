@@ -2,9 +2,9 @@ package adapter
 
 import (
 	"fmt"
-	"strings"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/pivotal-cf/on-demand-service-broker-sdk/bosh"
 	"github.com/pivotal-cf/on-demand-service-broker-sdk/serviceadapter"
@@ -20,7 +20,7 @@ var (
 	MongodJobs = []string{MongodJobName}
 )
 
-type Adapter struct { }
+type Adapter struct{}
 
 func (a Adapter) GenerateManifest(
 	boshInfo serviceadapter.BoshInfo,
@@ -32,23 +32,27 @@ func (a Adapter) GenerateManifest(
 
 	logger := log.New(os.Stderr, "[mongodb-service-adapter] ", log.LstdFlags)
 
-	// doc := oc.LoadDoc(plan.Properties["id"].(string))
-
 	mongoOps := plan.Properties["mongo_ops"].(map[string]interface{})
 
 	username := mongoOps["username"].(string)
 	apiKey := mongoOps["api_key"].(string)
-	address := mongoOps["address"].(string)
-	scheme := mongoOps["scheme"].(string)
-	port := mongoOps["port"].(float64)
+	url := mongoOps["url"].(string)
 
-	url := fmt.Sprintf("%s://%s:%g", scheme, address, port)
+	oc := &OMClient{Url: url, Username: username, ApiKey: apiKey}
 
-	oc := &OMClient { Url: url, Username: username, ApiKey: apiKey }
+	group, err := oc.CreateGroup()
+	if err != nil {
+		return bosh.BoshManifest{}, fmt.Errorf("could not create new group (%s)", err.Error())
+	}
 
-	group, _ := oc.CreateGroup()
 	logger.Printf("created group %s (%s)", group.Name, group.ID)
-	// url, groupID, apiKey := oc.CreateCluster()
+
+	doc := oc.LoadDoc(plan.Properties["id"].(string))
+	err = oc.ConfigureGroup(doc, group.ID)
+
+	if err != nil {
+		return bosh.BoshManifest{}, fmt.Errorf("could not configure group '%s' (%s)", group.Name, err.Error())
+	}
 
 	releases := []bosh.Release{}
 	for _, release := range serviceReleases {
@@ -77,6 +81,11 @@ func (a Adapter) GenerateManifest(
 	}
 
 	mongodProperties, err := mongodProperties(boshInfo.Name, plan.Properties, arbitraryParams, previousManifest)
+	if err != nil {
+		return bosh.BoshManifest{}, err
+	}
+
+	manifestProperties, err := manifestProperties(boshInfo.Name, group, plan.Properties)
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
@@ -110,7 +119,7 @@ func (a Adapter) GenerateManifest(
 			UpdateWatchTime: "3000-180000",
 			MaxInFlight:     4,
 		},
-		Properties: map[string]interface{}{},
+		Properties: manifestProperties,
 	}, nil
 }
 
@@ -133,6 +142,7 @@ func findInstanceGroup(plan serviceadapter.Plan, jobName string) *serviceadapter
 }
 
 func gatherJobs(releases serviceadapter.ServiceReleases, requiredJobs []string) ([]bosh.Job, error) {
+
 	jobs := []bosh.Job{}
 
 	for _, requiredJob := range requiredJobs {
@@ -141,7 +151,18 @@ func gatherJobs(releases serviceadapter.ServiceReleases, requiredJobs []string) 
 			return nil, err
 		}
 
-		jobs = append(jobs, bosh.Job{Name: requiredJob, Release: release.Name})
+		job := bosh.Job{
+			Name:    requiredJob,
+			Release: release.Name,
+			Provides: map[string]bosh.ProvidesLink{
+				"mongod_node": bosh.ProvidesLink{As: "mongod_node"},
+			},
+			Consumes: map[string]bosh.ConsumesLink{
+				"mongod_node": bosh.ConsumesLink{From: "mongod_node"},
+			},
+		}
+
+		jobs = append(jobs, job)
 	}
 
 	return jobs, nil
@@ -176,9 +197,23 @@ func findReleaseForJob(releases serviceadapter.ServiceReleases, requiredJob stri
 
 func mongodProperties(deploymentName string, planProperties serviceadapter.Properties, arbitraryParams map[string]interface{}, previousManifest *bosh.BoshManifest) (map[string]interface{}, error) {
 	return map[string]interface{}{
-		// "spark_master": map[interface{}]interface{}{
-		// 	"port":       SparkMasterPort,
-		// 	"webui_port": SparkMasterWebUIPort,
-		// },
+	// "mongo_ops": mongoOps,
+	// "spark_master": map[interface{}]interface{}{
+	// 	"port":       SparkMasterPort,
+	// 	"webui_port": SparkMasterWebUIPort,
+	// },
+	}, nil
+}
+
+func manifestProperties(deploymentName string, group Group, planProperties serviceadapter.Properties) (map[string]interface{}, error) {
+	mongoOps := planProperties["mongo_ops"].(map[string]interface{})
+	url := mongoOps["url"].(string)
+
+	return map[string]interface{}{
+		"mongoOps": map[string]string{
+			"url":      url,
+			"api_key":  group.AgentAPIKey,
+			"group_id": group.ID,
+		},
 	}, nil
 }

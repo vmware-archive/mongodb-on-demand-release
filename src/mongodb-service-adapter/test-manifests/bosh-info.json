@@ -1,5 +1,5 @@
 {
-   "name":"a-name",
+   "name":"mongodb",
    "stemcell_os":"BeOS",
-   "stemcell_version":"2"
+   "stemcell_version":"latest"
 }

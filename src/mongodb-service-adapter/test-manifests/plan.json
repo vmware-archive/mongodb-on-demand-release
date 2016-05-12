@@ -2,7 +2,7 @@
   "instance_groups": [
     {
       "name": "mongod_node",
-      "instances": 1,
+      "instances": 3,
       "vm_type": "default",
       "networks": [
         "default"
@@ -10,11 +10,9 @@
     }
   ],
   "properties": {
-    "id": "single_node",
+    "id": "single_replica_set",
     "mongo_ops": {
-      "address": "ec2-54-175-81-192.compute-1.amazonaws.com",
-      "scheme": "http",
-      "port": 8080,
+      "url": "http://ec2-54-175-81-192.compute-1.amazonaws.com:8080",
       "username": "dhigham@pivotal.io",
       "api_key": "420c1966-0be7-44ba-ae3c-a61dd636e7a7"
     }

@@ -27,7 +27,7 @@ type Group struct {
 func (oc OMClient) LoadDoc(key string) string {
   docs := map[string]string {
     "single_node": "om_cluster_docs/3_2_cluster.json",
-    "single_replica_set": "om_cluster_docs/replica-set.json",
+    "single_replica_set": "om_cluster_docs/replica_set.json",
     "sharded_cluster": "om_cluster_docs/3_2_cluster.json",
   }
 
@@ -47,7 +47,6 @@ func (oc OMClient) CreateGroup() (Group, error) {
 	resp, err := oc.doRequest("POST", "/api/public/v1.0/groups", body)
 
   if err != nil {
-    log.Fatalf("could not post: %v", err)
 		return group, err
   }
 
@@ -56,6 +55,20 @@ func (oc OMClient) CreateGroup() (Group, error) {
   err = json.Unmarshal(b, &group)
 
   return group, nil
+}
+
+func (oc OMClient) ConfigureGroup(configurationDoc string, groupId string) (error) {
+
+	url := fmt.Sprintf("/api/public/v1.0/groups/%s/automationConfig", groupId)
+	body := strings.NewReader(configurationDoc)
+
+	_, err := oc.doRequest("PUT", url, body)
+
+	if err != nil {
+		return err
+  }
+
+	return nil
 }
 
 func (oc OMClient) doRequest(method string, path string, body io.Reader) (*http.Response, error) {
