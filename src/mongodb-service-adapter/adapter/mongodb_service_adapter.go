@@ -50,6 +50,8 @@ func (a Adapter) GenerateManifest(
 	doc := oc.LoadDoc(plan.Properties["id"].(string))
 	err = oc.ConfigureGroup(doc, group.ID)
 
+	logger.Printf("configured group %s (%s)", group.Name, group.ID)
+
 	if err != nil {
 		return bosh.BoshManifest{}, fmt.Errorf("could not configure group '%s' (%s)", group.Name, err.Error())
 	}
@@ -210,7 +212,7 @@ func manifestProperties(deploymentName string, group Group, planProperties servi
 	url := mongoOps["url"].(string)
 
 	return map[string]interface{}{
-		"mongoOps": map[string]string{
+		"mongo_ops": map[string]string{
 			"url":      url,
 			"api_key":  group.AgentAPIKey,
 			"group_id": group.ID,

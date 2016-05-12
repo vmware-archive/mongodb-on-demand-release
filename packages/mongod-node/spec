@@ -3,4 +3,3 @@ name: mongod-node
 
 files:
   - common/utils.sh
-  - common/setup_host_file.py

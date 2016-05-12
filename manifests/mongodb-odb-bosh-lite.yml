@@ -100,14 +100,14 @@ properties:
     service_deployment:
       releases:
         - name: mongodb
-          version: 1
+          version: latest
           jobs: [mongod_node]
       stemcell:
         os: ubuntu-trusty
         version: latest
     service_catalog:
       id: 671ad39e-d95f-428d-8f6b-523c2df3b83b
-      service_name: monogodb
+      service_name: mongodb
       service_description: Dedicated MongoDB
       bindable: true
       plan_updatable: true
