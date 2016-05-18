@@ -1,11 +1,16 @@
 package adapter
 
 import (
+	"crypto/md5"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 
+	"gopkg.in/mgo.v2"
+
+	// "gopkg.in/mgo.v2/bson"
 	"github.com/pivotal-cf/on-demand-service-broker-sdk/bosh"
 	"github.com/pivotal-cf/on-demand-service-broker-sdk/serviceadapter"
 )
@@ -47,7 +52,21 @@ func (a Adapter) GenerateManifest(
 
 	logger.Printf("created group %s (%s)", group.Name, group.ID)
 
-	doc := oc.LoadDoc(plan.Properties["id"].(string))
+	// generate context
+	ctx := map[string]string{
+		"auto_user":      "mms-automation",
+		"auto_password":  "Sy4oBX9ei0amvupBAN8lVQhj",
+		"key":            "GrSLAAsHGXmJOrvElJ2AHTGauvH4O0EFT1r8byvb0G9sTU0viVX21PwUMqBjyXB9WrZP9QvEmCQIF1wOqJofyWmx7wWZqpO69dnc9GUWcpGQLr7eVyKTs99WAPXR3kXpF4MVrHdBMEDfRfhytgomgAso96urN6eC8RaUpjX4Bf9HcAEJwfddZshin97XKJDmqCaqAfORNnf1e8hkfTIwYg1tvIpwemmEF4TkmOgK09N5dINyejyWMU8iWG8FqW5MfQ8A2DrtIdyGSKLH05s7H1dXyADjDECaC77QqLXTx7gWyHca3I0K92PuVFoOs5385vzqTYN3kVgFotSdXgoM8Zt5QIoj2lX4PYqm2TWsVp0s15JELikH8bNVIIMGiSSWJEWGU1PVEXD7V7cYepDb88korMjr3wbh6kZ76Q7F2RtfJqkd4hKw7B5OCX04b5eppkjL598iCpSUUx3X9C6fFavWj2DrHsv9DY86iCWBlcG08DRPKs9EPizCW4jNZtJcm3T7WlcI0MZMKOtsKOCWBZA0C9YnttNrp4eTsQ1U43StiIRPqp2K8rrQAu6etURH0RHedazHeeukTWI7iTG1dZpYk9EyittZ72qKXLNLhi5vJ9TlYw8O91vihB1nJwwA3B1WbiYhkqqRzoL0cQpXJMUsUlsoSP6Q70IMU92vEHbUmna5krESPLeJfQBKGQPNVVE63XYBh2TnvFTdi6koitu209wMFUnHZrzWj3UWGqsyTqqHbPl4RhRLFe24seRwV2SbUuLygBIdptKHnA3kutAbHzsWTT8UxOaiQzFV4auxounrgXj7MoMWEVKKS8AHkELPILGqFVFC8BZsfPC0WacSN5Rg5SaCvfs74hcsCQ3ghq9PyxEb2fbHUiaCjnsBcXqzQw9AjZJG4yX0ubEwicP0bKB6y3w4PUQqdouxH5y16OgkUjrZgodJfRLgP9vqGbHNDpj4yBuswluvCFBh38gBoSIQu11qtQmk43n4G8Dskn0DrJ32l2Gz35q5LaKT",
+		"admin_password": "password",
+	}
+
+	doc, err := oc.LoadDoc(plan.Properties["id"].(string), ctx)
+	if err != nil {
+		return bosh.BoshManifest{}, err
+	}
+
+	logger.Println(doc)
+
 	err = oc.ConfigureGroup(doc, group.ID)
 
 	logger.Printf("configured group %s (%s)", group.Name, group.ID)
@@ -87,7 +106,7 @@ func (a Adapter) GenerateManifest(
 		return bosh.BoshManifest{}, err
 	}
 
-	manifestProperties, err := manifestProperties(boshInfo.Name, group, plan.Properties)
+	manifestProperties, err := manifestProperties(boshInfo.Name, group, plan.Properties, ctx["admin_password"])
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
@@ -127,7 +146,59 @@ func (a Adapter) GenerateManifest(
 
 func (a Adapter) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest) (map[string]interface{}, error) {
 
-	return map[string]interface{}{}, nil
+	// create an admin level user
+	username := fmt.Sprintf("pcf_%v", encodeID(bindingID))
+	password := OMClient{}.RandomString(32)
+
+	properties := manifest.Properties["mongo_ops"].(map[interface{}]interface{})
+	adminPassword := properties["admin_password"].(string)
+
+	servers := make([]string, len(deploymentTopology["mongod_node"]))
+	for i, node := range deploymentTopology["mongod_node"] {
+		servers[i] = fmt.Sprintf("%s:28000", node)
+	}
+
+	dialInfo := &mgo.DialInfo{
+		Addrs:     servers,
+		Username:  "admin",
+		Password:  adminPassword,
+		Mechanism: "SCRAM-SHA-1",
+		Database:  "admin",
+		FailFast:  true,
+	}
+
+	session, err := mgo.DialWithInfo(dialInfo)
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+
+	adminDB := session.DB("admin")
+
+	// add user to admin database with admin priveleges
+	user := &mgo.User{
+		Username: username,
+		Password: password,
+		Roles: []mgo.Role{
+			mgo.RoleUserAdmin,
+			mgo.RoleDBAdmin,
+			mgo.RoleReadWrite,
+		},
+		OtherDBRoles: map[string][]mgo.Role{
+			username: []mgo.Role{
+				mgo.RoleUserAdmin,
+				mgo.RoleDBAdmin,
+				mgo.RoleReadWrite,
+			},
+		},
+	}
+	adminDB.UpsertUser(user)
+
+	return map[string]interface{}{
+		"username": username,
+		"password": password,
+		"database": username,
+	}, nil
 }
 
 func (a Adapter) DeleteBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest) error {
@@ -207,15 +278,22 @@ func mongodProperties(deploymentName string, planProperties serviceadapter.Prope
 	}, nil
 }
 
-func manifestProperties(deploymentName string, group Group, planProperties serviceadapter.Properties) (map[string]interface{}, error) {
+func manifestProperties(deploymentName string, group Group, planProperties serviceadapter.Properties, adminPassword string) (map[string]interface{}, error) {
 	mongoOps := planProperties["mongo_ops"].(map[string]interface{})
 	url := mongoOps["url"].(string)
 
 	return map[string]interface{}{
 		"mongo_ops": map[string]string{
-			"url":      url,
-			"api_key":  group.AgentAPIKey,
-			"group_id": group.ID,
+			"url":            url,
+			"api_key":        group.AgentAPIKey,
+			"group_id":       group.ID,
+			"admin_password": adminPassword,
 		},
 	}, nil
+}
+
+func encodeID(id string) string {
+	b64 := base64.StdEncoding.EncodeToString([]byte(id))
+	md5 := md5.Sum([]byte(b64))
+	return fmt.Sprintf("%x", md5)
 }

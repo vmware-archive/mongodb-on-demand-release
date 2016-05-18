@@ -2,71 +2,91 @@ package adapter
 
 import (
 	"encoding/json"
-	"strings"
-  "log"
 	"fmt"
-	"github.com/nu7hatch/gouuid"
-	"github.com/AsGz/httpAuthClient"
-	"net/http"
-	"io/ioutil"
 	"io"
+	"io/ioutil"
+	"log"
+	"math/rand"
+	"net/http"
+	"strings"
+	"time"
+
+	"github.com/AsGz/httpAuthClient"
+	"github.com/aymerick/raymond"
+	"github.com/nu7hatch/gouuid"
 )
 
 type OMClient struct {
-	Url 			string
-	Username 	string
-	ApiKey 		string
+	Url      string
+	Username string
+	ApiKey   string
 }
 
 type Group struct {
-  ID          string `json:"id"`
-  Name        string `json:"name"`
-  AgentAPIKey string `json:"agentApiKey"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	AgentAPIKey string `json:"agentApiKey"`
 }
 
-func (oc OMClient) LoadDoc(key string) string {
-  docs := map[string]string {
-    "single_node": "om_cluster_docs/3_2_cluster.json",
-    "single_replica_set": "om_cluster_docs/replica_set.json",
-    "sharded_cluster": "om_cluster_docs/3_2_cluster.json",
-  }
+func (oc OMClient) LoadDoc(key string, ctx map[string]string) (string, error) {
+	docs := map[string]string{
+		"single_node":        "om_cluster_docs/3_2_cluster.json",
+		"single_replica_set": "om_cluster_docs/replica_set.json",
+		"sharded_cluster":    "om_cluster_docs/3_2_cluster.json",
+	}
 
-  path := docs[key]
-  asset, _ := Asset(path)
-  return string(asset)
+	raymond.RegisterHelper("password", func() string {
+		return oc.RandomString(32)
+	})
+
+	path := docs[key]
+	asset, _ := Asset(path)
+
+	tpl := string(asset)
+	result, err := raymond.Render(tpl, ctx)
+
+	if err != nil {
+		return "", nil
+	}
+
+	return result, nil
 }
 
 func (oc OMClient) CreateGroup() (Group, error) {
 
 	u, err := uuid.NewV4()
 	groupName := fmt.Sprintf("pcf_%s", u)
-  body := strings.NewReader(fmt.Sprintf("{\"name\": \"%s\"}", groupName))
+	body := strings.NewReader(fmt.Sprintf("{\"name\": \"%s\"}", groupName))
 
-  var group Group
+	var group Group
 
 	resp, err := oc.doRequest("POST", "/api/public/v1.0/groups", body)
 
-  if err != nil {
+	if err != nil {
 		return group, err
-  }
+	}
 
 	var b []byte
-  b, err = ioutil.ReadAll(resp.Body)
-  err = json.Unmarshal(b, &group)
+	b, err = ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(b, &group)
 
-  return group, nil
+	return group, nil
 }
 
-func (oc OMClient) ConfigureGroup(configurationDoc string, groupId string) (error) {
+func (oc OMClient) ConfigureGroup(configurationDoc string, groupId string) error {
 
 	url := fmt.Sprintf("/api/public/v1.0/groups/%s/automationConfig", groupId)
 	body := strings.NewReader(configurationDoc)
 
-	_, err := oc.doRequest("PUT", url, body)
+	resp, err := oc.doRequest("PUT", url, body)
+	var b []byte
+	b, err = ioutil.ReadAll(resp.Body)
+
+	log.Println(string(b))
 
 	if err != nil {
 		return err
-  }
+	}
 
 	return nil
 }
@@ -79,18 +99,28 @@ func (oc OMClient) doRequest(method string, path string, body io.Reader) (*http.
 	err = httpAuthClient.ApplyHttpDigestAuth(oc.Username, oc.ApiKey, fmt.Sprintf("%s%s", oc.Url, path), req)
 
 	if err != nil {
-    log.Fatal(err)
+		log.Fatal(err)
 		return nil, err
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 
-  if err != nil {
-    log.Fatalf("could not post: %v", err)
+	if err != nil {
+		log.Fatalf("could not post: %v", err)
 		return nil, err
-  }
+	}
 
 	return resp, nil
+}
+
+func (oc OMClient) RandomString(strlen int) string {
+	rand.Seed(time.Now().UTC().UnixNano())
+	const chars = "abcdefghijklmnopqrstuvwxyz0123456789"
+	result := make([]byte, strlen)
+	for i := 0; i < strlen; i++ {
+		result[i] = chars[rand.Intn(len(chars))]
+	}
+	return string(result)
 }
 
 // func (oc OMClient) PostDoc(url string, username string, apiKey string) {

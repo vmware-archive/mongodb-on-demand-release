@@ -38,5 +38,5 @@ instance_groups:
 properties:
   mongo_ops:
     url: http://ec2-54-175-81-192.compute-1.amazonaws.com:8080
-    api_key: e12bf17c1360685abd280a2d7011a59c
-    group_id: 5730aebae4b00c8c02d1d07a
+    api_key: cb73851e617ac218eec2907e7423ea6f
+    group_id: 573ba591e4b00c8c02d41c5c
