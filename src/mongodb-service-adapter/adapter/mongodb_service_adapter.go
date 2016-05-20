@@ -198,10 +198,41 @@ func (a Adapter) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs
 		"username": username,
 		"password": password,
 		"database": username,
+		"servers":  servers,
 	}, nil
 }
 
 func (a Adapter) DeleteBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest) error {
+
+	// create an admin level user
+	username := fmt.Sprintf("pcf_%v", encodeID(bindingID))
+
+	properties := manifest.Properties["mongo_ops"].(map[interface{}]interface{})
+	adminPassword := properties["admin_password"].(string)
+
+	servers := make([]string, len(deploymentTopology["mongod_node"]))
+	for i, node := range deploymentTopology["mongod_node"] {
+		servers[i] = fmt.Sprintf("%s:28000", node)
+	}
+
+	dialInfo := &mgo.DialInfo{
+		Addrs:     servers,
+		Username:  "admin",
+		Password:  adminPassword,
+		Mechanism: "SCRAM-SHA-1",
+		Database:  "admin",
+		FailFast:  true,
+	}
+
+	session, err := mgo.DialWithInfo(dialInfo)
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+
+	adminDB := session.DB("admin")
+	adminDB.RemoveUser(username)
+
 	return nil
 }
 
