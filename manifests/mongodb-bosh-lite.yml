@@ -1,6 +1,6 @@
 ---
 name: mongodb
-director_uuid: b7e651e2-3afe-471f-9bca-93048fa591f4
+director_uuid: 510ac165-ee99-4c45-8274-1b989e5d5697
 
 releases:
   - name: mongodb
@@ -20,7 +20,7 @@ update:
 
 instance_groups:
   - name: mongod_node
-    instances: 3
+    instances: 1
     jobs:
       - name: mongod_node
         release: mongodb
@@ -38,5 +38,5 @@ instance_groups:
 properties:
   mongo_ops:
     url: http://ec2-54-175-81-192.compute-1.amazonaws.com:8080
-    api_key: cb73851e617ac218eec2907e7423ea6f
-    group_id: 573ba591e4b00c8c02d41c5c
+    api_key: 758e351b7a7612d049f6b415b90d4603
+    group_id: 573f6377e4b00c8c02d5ecde

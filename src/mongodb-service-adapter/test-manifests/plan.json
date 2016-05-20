@@ -10,7 +10,7 @@
     }
   ],
   "properties": {
-    "id": "single_replica_set",
+    "id": "standalone",
     "mongo_ops": {
       "url": "http://ec2-54-175-81-192.compute-1.amazonaws.com:8080",
       "username": "dhigham@pivotal.io",

@@ -1,6 +1,6 @@
 ---
 name: mongodb
-director_uuid: b7e651e2-3afe-471f-9bca-93048fa591f4
+director_uuid: 510ac165-ee99-4c45-8274-1b989e5d5697
 
 releases:
   - name: mongodb
@@ -118,7 +118,7 @@ properties:
         - pivotal
       plans:
 
-        - name: single_node
+        - name: standalone
           plan_id: f40cf0fa-4eb9-446c-a429-0b1ea2ae6ae7
           description: Standalone Instance
           metadata:
@@ -133,7 +133,7 @@ properties:
               networks:
                 - default
           properties:
-            id: single_node
+            id: standalone
             mongo_ops:
               url: http://ec2-54-175-81-192.compute-1.amazonaws.com:8080
               username: dhigham@pivotal.io

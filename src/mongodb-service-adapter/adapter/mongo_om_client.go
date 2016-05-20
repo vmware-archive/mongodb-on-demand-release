@@ -30,7 +30,7 @@ type Group struct {
 
 func (oc OMClient) LoadDoc(key string, ctx map[string]string) (string, error) {
 	docs := map[string]string{
-		"single_node":        "om_cluster_docs/3_2_cluster.json",
+		"standalone":        "om_cluster_docs/standalone.json",
 		"single_replica_set": "om_cluster_docs/replica_set.json",
 		"sharded_cluster":    "om_cluster_docs/3_2_cluster.json",
 	}

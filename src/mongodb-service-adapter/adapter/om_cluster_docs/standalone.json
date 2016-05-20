@@ -1,0 +1,135 @@
+{
+    "options": {
+        "downloadBase": "/var/lib/mongodb-mms-automation",
+        "downloadBaseWindows": "C:\\mongodb-mms-automation"
+    },
+    "mongoDbVersions": [{
+        "name": "3.0.12"
+    }, {
+        "name": "3.0.2"
+    }],
+    "backupVersions": [{
+        "hostname": "mongod-node-0",
+        "logPath": "/var/log/mongodb-mms-automation/backup-agent.log",
+        "logRotate": {
+            "sizeThresholdMB": 1000,
+            "timeThresholdHrs": 24
+        }
+    }],
+
+    "monitoringVersions": [{
+        "hostname": "mongod-node-0",
+        "logPath": "/var/log/mongodb-mms-automation/monitoring-agent.log",
+        "logRotate": {
+            "sizeThresholdMB": 1000,
+            "timeThresholdHrs": 24
+        }
+    }],
+    "processes": [{
+        "args2_6": {
+            "net": {
+                "port": 28000
+            },
+            "storage": {
+                "dbPath": "/var/vcap/store/mongodb-data"
+            },
+            "systemLog": {
+                "destination": "file",
+                "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
+            }
+        },
+        "hostname": "mongod-node-0",
+        "logRotate": {
+            "sizeThresholdMB": 1000,
+            "timeThresholdHrs": 24
+        },
+        "name": "mongod-node-0",
+        "processType": "mongod",
+        "version": "3.0.12",
+        "authSchemaVersion": 5
+    }],
+    "replicaSets": [],
+    "roles": [],
+    "sharding": [],
+
+    "auth": {
+        "autoUser": "mms-automation",
+        "autoPwd": "{{ password }}",
+        "deploymentAuthMechanisms": [
+            "SCRAM-SHA-1",
+            "MONGODB-CR"
+        ],
+        "key": "{{ key }}",
+        "keyfile": "/var/vcap/jobs/mongod_node/config/mongo_om.key",
+        "disabled": false,
+        "usersDeleted": [],
+        "usersWanted": [
+            {
+                "db": "admin",
+                "roles": [
+                    {
+                        "db": "admin",
+                        "role": "clusterMonitor"
+                    }
+                ],
+                "user": "mms-monitoring-agent",
+                "initPwd": "{{ password }}"
+            },
+            {
+                "db": "admin",
+                "roles": [
+                    {
+                        "db": "admin",
+                        "role": "clusterAdmin"
+                    },
+                    {
+                        "db": "admin",
+                        "role": "readAnyDatabase"
+                    },
+                    {
+                        "db": "admin",
+                        "role": "userAdminAnyDatabase"
+                    },
+                    {
+                        "db": "local",
+                        "role": "readWrite"
+                    },
+                    {
+                        "db": "admin",
+                        "role": "readWrite"
+                    }
+                ],
+                "user": "mms-backup-agent",
+                "initPwd": "{{ password }}"
+            },
+            {
+               "db": "admin" ,
+               "user": "admin" ,
+               "roles": [
+                 {
+                     "db": "admin",
+                     "role": "clusterAdmin"
+                 },
+                 {
+                     "db": "admin",
+                     "role": "readAnyDatabase"
+                 },
+                 {
+                     "db": "admin",
+                     "role": "userAdminAnyDatabase"
+                 },
+                 {
+                     "db": "local",
+                     "role": "readWrite"
+                 },
+                 {
+                     "db": "admin",
+                     "role": "readWrite"
+                 }
+               ],
+               "initPwd": "{{ admin_password }}"
+            }
+        ],
+        "autoAuthMechanism": "SCRAM-SHA-1"
+    }
+}
