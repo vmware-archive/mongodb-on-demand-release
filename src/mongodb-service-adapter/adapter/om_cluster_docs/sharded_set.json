@@ -8,17 +8,10 @@
     }, {
         "name": "3.0.2"
     }],
-    "backupVersions": [{
-        "hostname": "mongod-node-0",
-        "logPath": "/var/log/mongodb-mms-automation/backup-agent.log",
-        "logRotate": {
-            "sizeThresholdMB": 1000,
-            "timeThresholdHrs": 24
-        }
-    }],
-
+    "backupVersions": [],
+    "indexConfigs": [],
     "monitoringVersions": [{
-        "hostname": "mongod-node-0",
+        "hostname": "mongod-node-3",
         "logPath": "/var/log/mongodb-mms-automation/monitoring-agent.log",
         "logRotate": {
             "sizeThresholdMB": 1000,
@@ -28,114 +21,620 @@
     "processes": [{
         "args2_6": {
             "net": {
-                "port": 28000
+                "port": 27000
             },
-            "sharding": {
-                    "clusterRole": "configsvr"
+            "replication": {
+                "replSetName": "miyer_0"
+            },
+            "storage": {
+                "dbPath": "/var/vcap/data/miyer-sharded-cluster-1_miyer_0_3"
+            },
+            "systemLog": {
+                "destination": "file",
+                "path": "/var/vcap/data/miyer-sharded-cluster-1_miyer_0_3/mongodb.log"
+            }
+        },
+        "hostname": "mongod-node-3",
+        "logRotate": {
+            "sizeThresholdMB": 1000,
+            "timeThresholdHrs": 24
+        },
+        "name": "miyer-sharded-cluster-1_miyer_0_3",
+        "processType": "mongod",
+		"version": "3.2.7"
+        "authSchemaVersion": 5
+    }, {
+        "args2_6": {
+            "net": {
+                "port": 27000
+            },
+            "replication": {
+                "replSetName": "miyer_0"
+            },
+            "storage": {
+                "dbPath": "/var/vcap/data/miyer-sharded-cluster-1_miyer_0_4"
+            },
+            "systemLog": {
+                "destination": "file",
+                "path": "/var/vcap/data/miyer-sharded-cluster-1_miyer_0_4/mongodb.log"
+            }
+        },
+		"hostname": "mongod-node-4",
+        "logRotate": {
+            "sizeThresholdMB": 1000,
+            "timeThresholdHrs": 24
+        },
+        "name": "miyer-sharded-cluster-1_miyer_0_4",
+        "processType": "mongod",
+		"version": "3.2.7"
+        "authSchemaVersion": 5
+    }, {
+        "args2_6": {
+            "net": {
+                "port": 27000
+            },
+            "replication": {
+                "replSetName": "miyer_0"
+            },
+            "storage": {
+                "dbPath": "/var/vcap/data/miyer-sharded-cluster-1_miyer_0_5"
+            },
+            "systemLog": {
+                "destination": "file",
+                "path": "/var/vcap/data/miyer-sharded-cluster-1_miyer_0_5/mongodb.log"
+            }
+        },
+        "hostname": "mongod-node-5",
+        "logRotate": {
+            "sizeThresholdMB": 1000,
+            "timeThresholdHrs": 24
+        },
+        "name": "miyer-sharded-cluster-1_miyer_0_5",
+        "processType": "mongod",
+        "version": "3.2.7",
+        "authSchemaVersion": 5
+    }
+    
+			{
+                "args2_6": {
+                    "net": {
+                        "port": 27000
+                    },              
+                    "replication": {
+                        "replSetName": "miyer_1"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/data/miyer-sharded-cluster-1_miyer_1_6"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/data/miyer-sharded-cluster-1_miyer_1_6/mongodb.log"
+                    }
                 },
-            "replication": {
-                "replSetName": "pcf_repl"
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-6",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "miyer-sharded-cluster-1_miyer_1_6",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },  
+    
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27000
+                    },
+                    "replication": {
+                        "replSetName": "miyer_1"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/data/miyer-sharded-cluster-1_miyer_1_7"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/data/miyer-sharded-cluster-1_miyer_1_7/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-7",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "miyer-sharded-cluster-1_miyer_1_7",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },    
+    
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27000
+                    },
+                    "replication": {
+                        "replSetName": "miyer_1"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/data/miyer-sharded-cluster-1_miyer_1_8"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/data/miyer-sharded-cluster-1_miyer_1_8/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-8",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "miyer-sharded-cluster-1_miyer_1_8",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },    
+    
+
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27001
+                    },
+                    "replication": {
+                        "replSetName": "miyer_2"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/data/miyer-sharded-cluster-1_miyer_2_9"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/data/miyer-sharded-cluster-1_miyer_2_9/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-3",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "miyer-sharded-cluster-1_miyer_2_9",
+                "processType": "mongod",
+                "version": "3.2.7"
             },
-            "storage": {
-                "dbPath": "/var/vcap/store/mongodb-data"
+
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27001
+                    },
+                    "replication": {
+                        "replSetName": "miyer_2"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/data/miyer-sharded-cluster-1_miyer_2_10"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/data/miyer-sharded-cluster-1_miyer_2_10/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-4",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "miyer-sharded-cluster-1_miyer_2_10",
+                "processType": "mongod",
+                "version": "3.2.7"
             },
-            "systemLog": {
-                "destination": "file",
-                "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
-            }
-        },
-        "hostname": "mongod-node-0",
-        "logRotate": {
-            "sizeThresholdMB": 1000,
-            "timeThresholdHrs": 24
-        },
-        "name": "mongod-node-0",
-        "processType": "mongod",
-        "version": "3.0.12",
-        "authSchemaVersion": 5
-    }, {
-        "args2_6": {
-            "net": {
-                "port": 28000
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27001
+                    },
+                    "replication": {
+                        "replSetName": "miyer_2"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/data/miyer-sharded-cluster-1_miyer_2_11"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/data/miyer-sharded-cluster-1_miyer_2_11/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-5",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "miyer-sharded-cluster-1_miyer_2_11",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },            
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27019
+                    },
+                    "replication": {
+                        "replSetName": "miyer-sharded-cluster-1_csrs"
+                    },
+                    "sharding": {
+                        "clusterRole": "configsvr"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/data/miyer-sharded-cluster-1_csrs_0"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/data/miyer-sharded-cluster-1_csrs_0/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-0",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "miyer-sharded-cluster-1_csrs_0",
+                "processType": "mongod",
+                "version": "3.2.7"
             },
-            "replication": {
-                "replSetName": "pcf_repl"
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27019
+                    },
+                    "replication": {
+                        "replSetName": "miyer-sharded-cluster-1_csrs"
+                    },
+                    "sharding": {
+                        "clusterRole": "configsvr"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/data/miyer-sharded-cluster-1_csrs_1"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/data/miyer-sharded-cluster-1_csrs_1/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-1",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "miyer-sharded-cluster-1_csrs_1",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },     
+            
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27019
+                    },
+                    "replication": {
+                        "replSetName": "miyer-sharded-cluster-1_csrs"
+                    },
+                    "sharding": {
+                        "clusterRole": "configsvr"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/data/miyer-sharded-cluster-1_csrs_2"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/data/miyer-sharded-cluster-1_csrs_2/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-2",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "miyer-sharded-cluster-1_csrs_2",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },       
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27017
+                    },
+                    "operationProfiling": {},
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/data/miyer-sharded-cluster-1_mongos_12/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "cluster": "miyer-sharded-cluster-1",
+                "hostname": "mongod-node-6",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "miyer-sharded-cluster-1_mongos_12",
+                "processType": "mongos",
+                "version": "3.2.7"
             },
-            "storage": {
-                "dbPath": "/var/vcap/store/mongodb-data"
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27017
+                    },
+                    "operationProfiling": {},
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/data/miyer-sharded-cluster-1_mongos_13/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "cluster": "miyer-sharded-cluster-1",
+                "hostname": "mongod-node-7",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "miyer-sharded-cluster-1_mongos_13",
+                "processType": "mongos",
+                "version": "3.2.7"
+            },    
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27017
+                    },
+                    "operationProfiling": {},
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/data/miyer-sharded-cluster-1_mongos_14/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "cluster": "miyer-sharded-cluster-1",
+                "hostname": "mongod-node-8",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "miyer-sharded-cluster-1_mongos_14",
+                "processType": "mongos",
+                "version": "3.2.7"
             },
-            "systemLog": {
-                "destination": "file",
-                "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
-            }
-        },
-        "hostname": "mongod-node-1",
-        "logRotate": {
-            "sizeThresholdMB": 1000,
-            "timeThresholdHrs": 24
-        },
-        "name": "mongod-node-1",
-        "processType": "mongod",
-        "version": "3.0.12",
-        "authSchemaVersion": 5
-    }, {
-        "args2_6": {
-            "net": {
-                "port": 28000
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27017
+                    },
+                    "operationProfiling": {},
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/data/miyer-sharded-cluster-1_mongos_15/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "cluster": "miyer-sharded-cluster-1",
+                "hostname": "mongod-node-3",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "miyer-sharded-cluster-1_mongos_15",
+                "processType": "mongos",
+                "version": "3.2.7"
+            }, 
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27017
+                    },
+                    "operationProfiling": {},
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/data/miyer-sharded-cluster-1_mongos_16/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "cluster": "miyer-sharded-cluster-1",
+                "hostname": "mongod-node-4",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "miyer-sharded-cluster-1_mongos_16",
+                "processType": "mongos",
+                "version": "3.2.7"
             },
-            "replication": {
-                "replSetName": "pcf_repl"
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27017
+                    },
+                    "operationProfiling": {},
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/data/miyer-sharded-cluster-1_mongos_17/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "cluster": "miyer-sharded-cluster-1",
+                "hostname": "mongod-node-5",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "miyer-sharded-cluster-1_mongos_17",
+                "processType": "mongos",
+                "version": "3.2.7"
+            }                                           
+    
+    ],
+    "replicaSets": [
+            {
+                "_id": "miyer_0",
+                "members": [
+                    {
+                        "_id": 0,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "miyer-sharded-cluster-1_miyer_0_3",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    },
+                    {
+                        "_id": 1,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "miyer-sharded-cluster-1_miyer_0_4",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    },
+                    {
+                        "_id": 2,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "miyer-sharded-cluster-1_miyer_0_5",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    }
+                ]
             },
-            "storage": {
-                "dbPath": "/var/vcap/store/mongodb-data"
-            },
-            "systemLog": {
-                "destination": "file",
-                "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
-            }
-        },
-        "cluster":"pcfShCluster"
-        "hostname": "mongod-node-2",
-        "logRotate": {
-            "sizeThresholdMB": 1000,
-            "timeThresholdHrs": 24
-        },
-        "name": "mongod-node-2",
-        "processType": "mongod",
-        "version": "3.0.12",
-        "authSchemaVersion": 5
-    }],
-    "replicaSets": [{
-        "_id": "pcf_repl",
-        "members": [{
-            "_id": 0,
-            "host": "mongod-node-0"
-        }, {
-            "_id": 1,
-            "host": "mongod-node-1"
-        }, {
-            "_id": 2,
-            "arbiterOnly": true,
-            "host": "mongod-node-2",
-            "priority": 0
-        }]
-    }],
+            {
+                "_id": "miyer_1",
+                "members": [
+                    {
+                        "_id": 0,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "miyer-sharded-cluster-1_miyer_1_6",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    },
+                    {
+                        "_id": 1,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "miyer-sharded-cluster-1_miyer_1_7",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    },
+                    {
+                        "_id": 2,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "miyer-sharded-cluster-1_miyer_1_8",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    }
+                ]
+            }, 
+            {
+                "_id": "miyer_2",
+                "members": [
+                    {
+                        "_id": 0,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "miyer-sharded-cluster-1_miyer_2_9",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    },
+                    {
+                        "_id": 1,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "miyer-sharded-cluster-1_miyer_2_10",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    },
+                    {
+                        "_id": 2,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "miyer-sharded-cluster-1_miyer_2_11",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    }
+                ]
+            }        
+            {
+                "_id": "miyer-sharded-cluster-1_csrs",
+                "members": [
+                    {
+                        "_id": 0,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "miyer-sharded-cluster-1_csrs_0",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    },
+                    {
+                        "_id": 1,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "miyer-sharded-cluster-1_csrs_1",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    },
+                    {
+                        "_id": 2,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "miyer-sharded-cluster-1_csrs_2",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    }
+                ]
+            }                           
+
+    ],
     "roles": [],
     "sharding": [
             {
-            "configServer": [
-                "mongodb-data"
-            ],
-            "name": "pcfShCluster",
-            "shards": [
-                {
-                    "_id": "pcf_sh",
-                    "rs": "pcf_sh"
-                }
-            ]
-        }
+                "shards": [
+                    {
+                        "tags": [],
+                        "_id": "miyer_0",
+                        "rs": "miyer_0"
+                    },
+                    {
+                        "tags": [],
+                        "_id": "miyer_1",
+                        "rs": "miyer_1"
+                    },
+                    {
+                        "tags": [],
+                        "_id": "miyer_2",
+                        "rs": "miyer_2"
+                    }
+                ],
+                "name": "miyer-sharded-cluster-1",
+                "configServer": [],
+                "configServerReplica": "miyer-sharded-cluster-1_csrs",
+                "collections": []
+            }          
     ],
-
     "auth": {
         "autoUser": "mms-automation",
         "autoPwd": "{{ password }}",

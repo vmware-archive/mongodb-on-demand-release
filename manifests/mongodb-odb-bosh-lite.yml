@@ -135,9 +135,9 @@ properties:
           properties:
             id: standalone
             mongo_ops:
-              url: http://ec2-54-175-81-192.compute-1.amazonaws.com:8080
-              username: dhigham@pivotal.io
-              api_key: 420c1966-0be7-44ba-ae3c-a61dd636e7a7
+              url: http://ec2-54-210-202-233.compute-1.amazonaws.com:8080
+              username: sam.weaver@mongodb.com
+              api_key: e6bcfee1-2f42-459d-a354-23cdbf5e3557
 
 
         - name: single_replica_set
@@ -157,9 +157,9 @@ properties:
           properties:
             id: single_replica_set
             mongo_ops:
-              url: http://ec2-54-175-81-192.compute-1.amazonaws.com:8080
-              username: dhigham@pivotal.io
-              api_key: 420c1966-0be7-44ba-ae3c-a61dd636e7a7
+              url: http://ec2-54-210-202-233.compute-1.amazonaws.com:8080
+              username: sam.weaver@mongodb.com
+              api_key: e6bcfee1-2f42-459d-a354-23cdbf5e3557
 
 
         - name: sharded_cluster
@@ -179,9 +179,9 @@ properties:
           properties:
             id: sharded_cluster
             mongo_ops:
-              url: http://ec2-54-175-81-192.compute-1.amazonaws.com:8080
-              username: dhigham@pivotal.io
-              api_key: 420c1966-0be7-44ba-ae3c-a61dd636e7a7
+              url: http://ec2-54-210-202-233.compute-1.amazonaws.com:8080
+              username: sam.weaver@mongodb.com
+              api_key: e6bcfee1-2f42-459d-a354-23cdbf5e3557
 
   cf:
     api_url: https://api.local.pcfdev.io

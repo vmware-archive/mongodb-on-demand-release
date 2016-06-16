@@ -20,7 +20,7 @@ update:
 
 instance_groups:
   - name: mongod_node
-    instances: 1
+    instances: 9
     jobs:
       - name: mongod_node
         release: mongodb
@@ -37,6 +37,6 @@ instance_groups:
 
 properties:
   mongo_ops:
-    url: http://ec2-54-175-81-192.compute-1.amazonaws.com:8080
-    api_key: 758e351b7a7612d049f6b415b90d4603
-    group_id: 573f6377e4b00c8c02d5ecde
+    url: http://ec2-54-173-228-238.compute-1.amazonaws.com:8080
+    api_key: 26e818ae1007b618da01137cf847a464
+    group_id: 576315fce4b03c89b2c04e08
