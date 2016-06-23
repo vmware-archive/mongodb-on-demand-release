@@ -10,6 +10,8 @@ import (
 
 func main() {
 	logger := log.New(os.Stderr, "[mongodb-service-adapter] ", log.LstdFlags)
-	sa := adapter.Adapter{}
-	serviceadapter.HandleCommandLineInvocation(os.Args, sa, logger)
+	//sa := adapter.Adapter{}
+	manifestGenerator := adapter.ManifestGenerator{}
+	binder := adapter.Binder{}
+	serviceadapter.HandleCommandLineInvocation(os.Args, manifestGenerator, binder, nil, logger)
 }

@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"gopkg.in/mgo.v2"
+	// "gopkg.in/mgo.v2"
 
 	// "gopkg.in/mgo.v2/bson"
 	"github.com/pivotal-cf/on-demand-service-broker-sdk/bosh"
@@ -25,15 +25,17 @@ var (
 	MongodJobs = []string{MongodJobName}
 )
 
-type Adapter struct{}
+type ManifestGenerator struct {
+}
 
-func (a Adapter) GenerateManifest(
-	boshInfo serviceadapter.BoshInfo,
-	serviceReleases serviceadapter.ServiceReleases,
+func (m ManifestGenerator) GenerateManifest(
+	serviceDeployment serviceadapter.ServiceDeployment,
 	plan serviceadapter.Plan,
-	arbitraryParams map[string]interface{},
+	requestParams serviceadapter.RequestParameters,	
 	previousManifest *bosh.BoshManifest,
-) (bosh.BoshManifest, error) {
+	previousPlan *serviceadapter.Plan) (bosh.BoshManifest, error) {
+
+	arbitraryParams := requestParams.ArbitraryParams()
 
 	logger := log.New(os.Stderr, "[mongodb-service-adapter] ", log.LstdFlags)
 
@@ -76,7 +78,7 @@ func (a Adapter) GenerateManifest(
 	}
 
 	releases := []bosh.Release{}
-	for _, release := range serviceReleases {
+	for _, release := range serviceDeployment.Releases {
 		releases = append(releases, bosh.Release{
 			Name:    release.Name,
 			Version: release.Version,
@@ -88,7 +90,7 @@ func (a Adapter) GenerateManifest(
 		return bosh.BoshManifest{}, fmt.Errorf("no definition found for instance group '%s'", MongodInstanceGroupName)
 	}
 
-	mongodJobs, err := gatherJobs(serviceReleases, MongodJobs)
+	mongodJobs, err := gatherJobs(serviceDeployment.Releases, MongodJobs)
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
@@ -101,24 +103,24 @@ func (a Adapter) GenerateManifest(
 		return bosh.BoshManifest{}, fmt.Errorf("no networks definition found for instance group '%s'", MongodInstanceGroupName)
 	}
 
-	mongodProperties, err := mongodProperties(boshInfo.Name, plan.Properties, arbitraryParams, previousManifest)
+	mongodProperties, err := mongodProperties(serviceDeployment.DeploymentName, plan.Properties, arbitraryParams, previousManifest)
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
 
-	manifestProperties, err := manifestProperties(boshInfo.Name, group, plan.Properties, ctx["admin_password"])
+	manifestProperties, err := manifestProperties(serviceDeployment.DeploymentName, group, plan.Properties, ctx["admin_password"])
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
 
 	return bosh.BoshManifest{
-		Name:     boshInfo.Name,
+		Name:     serviceDeployment.DeploymentName,
 		Releases: releases,
 		Stemcells: []bosh.Stemcell{
 			{
 				Alias:   StemcellAlias,
-				OS:      boshInfo.StemcellOS,
-				Version: boshInfo.StemcellVersion,
+				OS:      serviceDeployment.Stemcell.OS,
+				Version: serviceDeployment.Stemcell.Version,
 			},
 		},
 		InstanceGroups: []bosh.InstanceGroup{
@@ -144,97 +146,7 @@ func (a Adapter) GenerateManifest(
 	}, nil
 }
 
-func (a Adapter) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest) (map[string]interface{}, error) {
 
-	// create an admin level user
-	username := fmt.Sprintf("pcf_%v", encodeID(bindingID))
-	password := OMClient{}.RandomString(32)
-
-	properties := manifest.Properties["mongo_ops"].(map[interface{}]interface{})
-	adminPassword := properties["admin_password"].(string)
-
-	servers := make([]string, len(deploymentTopology["mongod_node"]))
-	for i, node := range deploymentTopology["mongod_node"] {
-		servers[i] = fmt.Sprintf("%s:28000", node)
-	}
-
-	dialInfo := &mgo.DialInfo{
-		Addrs:     servers,
-		Username:  "admin",
-		Password:  adminPassword,
-		Mechanism: "SCRAM-SHA-1",
-		Database:  "admin",
-		FailFast:  true,
-	}
-
-	session, err := mgo.DialWithInfo(dialInfo)
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-
-	adminDB := session.DB("admin")
-
-	// add user to admin database with admin priveleges
-	user := &mgo.User{
-		Username: username,
-		Password: password,
-		Roles: []mgo.Role{
-			mgo.RoleUserAdmin,
-			mgo.RoleDBAdmin,
-			mgo.RoleReadWrite,
-		},
-		OtherDBRoles: map[string][]mgo.Role{
-			username: []mgo.Role{
-				mgo.RoleUserAdmin,
-				mgo.RoleDBAdmin,
-				mgo.RoleReadWrite,
-			},
-		},
-	}
-	adminDB.UpsertUser(user)
-
-	return map[string]interface{}{
-		"username": username,
-		"password": password,
-		"database": username,
-		"servers":  servers,
-	}, nil
-}
-
-func (a Adapter) DeleteBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest) error {
-
-	// create an admin level user
-	username := fmt.Sprintf("pcf_%v", encodeID(bindingID))
-
-	properties := manifest.Properties["mongo_ops"].(map[interface{}]interface{})
-	adminPassword := properties["admin_password"].(string)
-
-	servers := make([]string, len(deploymentTopology["mongod_node"]))
-	for i, node := range deploymentTopology["mongod_node"] {
-		servers[i] = fmt.Sprintf("%s:28000", node)
-	}
-
-	dialInfo := &mgo.DialInfo{
-		Addrs:     servers,
-		Username:  "admin",
-		Password:  adminPassword,
-		Mechanism: "SCRAM-SHA-1",
-		Database:  "admin",
-		FailFast:  true,
-	}
-
-	session, err := mgo.DialWithInfo(dialInfo)
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-
-	adminDB := session.DB("admin")
-	adminDB.RemoveUser(username)
-
-	return nil
-}
 
 func findInstanceGroup(plan serviceadapter.Plan, jobName string) *serviceadapter.InstanceGroup {
 	for _, instanceGroup := range plan.InstanceGroups {
@@ -261,7 +173,7 @@ func gatherJobs(releases serviceadapter.ServiceReleases, requiredJobs []string) 
 			Provides: map[string]bosh.ProvidesLink{
 				"mongod_node": bosh.ProvidesLink{As: "mongod_node"},
 			},
-			Consumes: map[string]bosh.ConsumesLink{
+			Consumes: map[string]interface{}{
 				"mongod_node": bosh.ConsumesLink{From: "mongod_node"},
 			},
 		}

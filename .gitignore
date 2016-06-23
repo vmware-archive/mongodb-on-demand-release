@@ -1,3 +1,4 @@
+manifests/bosh-warden*
 tile/*.pivotal
 tile/*.md5
 tile/*.yml
