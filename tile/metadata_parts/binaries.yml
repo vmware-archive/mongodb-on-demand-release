@@ -1,0 +1,22 @@
+
+---
+name: mongodb-on-demand
+product_version: 0.0.1
+metadata_version: '1.8'
+stemcell_criteria:
+  os: ubuntu-trusty
+  version: '3232.4'
+releases:
+- name: on-demand-service-broker
+  file: on-demand-service-broker-0.5.0+dev.1.tgz
+  version: 0.5.0+dev.1
+  md5: 049bec861349255b4474816cd06c98c9
+
+- name: mongodb
+  file: mongodb-0+dev.5.tgz
+  version: 0+dev.5
+  md5: 795e03e09d8763b79388a5873752577e
+
+provides_product_versions:
+- name: mongodb-on-demand
+  version: 0.0.1
