@@ -6,15 +6,16 @@
       "vm_type": "default",
       "networks": [
         "default"
-      ]
+      ],
+      "azs": ["az1"]
     }
   ],
   "properties": {
     "id": "standalone",
     "mongo_ops": {
-      "url": "http://ec2-54-175-81-192.compute-1.amazonaws.com:8080",
-      "username": "dhigham@pivotal.io",
-      "api_key": "420c1966-0be7-44ba-ae3c-a61dd636e7a7"
+      "url": "http://ec2-54-210-202-233.compute-1.amazonaws.com:8080",
+      "username": "sam.weaver@mongodb.com",
+      "api_key": "e6bcfee1-2f42-459d-a354-23cdbf5e3557"
     }
   }
 }

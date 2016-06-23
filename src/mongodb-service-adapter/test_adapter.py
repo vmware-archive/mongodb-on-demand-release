@@ -14,5 +14,4 @@ with open("test-manifests/plan.json", "r") as myfile:
 with open("test-manifests/service-releases.json", "r") as myfile:
     service_releases = myfile.read().replace('\n', ' ').replace('\r', '')
 
-call(['go', 'run', 'cmd/mongodb-service-adapter/main.go', argv[1], bosh_info,
-            service_releases, plan, params, '---'])
+call(['go', 'run', 'cmd/mongodb-service-adapter/main.go', argv[1], bosh_info, plan, params, '---', '{}'])
