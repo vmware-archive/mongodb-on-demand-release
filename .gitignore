@@ -1,3 +1,5 @@
+tile/releases
+tile/*.pivotal
 config/dev.yml
 config/private.yml
 releases/*.tgz
