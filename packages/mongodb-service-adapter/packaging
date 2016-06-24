@@ -9,11 +9,11 @@ export PATH=${GOROOT}/bin:${PATH}
 
 # Build mongodb service adapter
 mkdir -p ${BOSH_COMPILE_TARGET}/go/src
-mv ${BOSH_COMPILE_TARGET}/mongodb-service-adapter ${BOSH_COMPILE_TARGET}/go/src
-cd ${BOSH_COMPILE_TARGET}/go/src/mongodb-service-adapter
+mv ${BOSH_COMPILE_TARGET}/mongodb-service-adapter ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng
+cd ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-service-adapter
 export GOPATH=${BOSH_COMPILE_TARGET}/go
 go build -o out/mongodb-service-adapter cmd/mongodb-service-adapter/main.go
 
 # Copy mongodb service adapter
 mkdir -p ${BOSH_INSTALL_TARGET}/bin
-cp -a ${BOSH_COMPILE_TARGET}/go/src/mongodb-service-adapter/out/mongodb-service-adapter ${BOSH_INSTALL_TARGET}/bin/
+cp -a ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-service-adapter/out/mongodb-service-adapter ${BOSH_INSTALL_TARGET}/bin/
