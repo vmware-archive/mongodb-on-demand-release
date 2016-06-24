@@ -5,15 +5,15 @@ set -u # report the usage of uninitialized variables
 
 # Set Golang dependency
 export GOROOT=$(cd "/var/vcap/packages/golang" && pwd -P)
+export GOPATH=${BOSH_COMPILE_TARGET}/go
 export PATH=${GOROOT}/bin:${PATH}
 
 # Build mongodb service adapter
-mkdir -p ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng
-mv ${BOSH_COMPILE_TARGET}/mongodb-service-adapter ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng
-cd ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-service-adapter
-export GOPATH=${BOSH_COMPILE_TARGET}/go
+mkdir -p ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-on-demand-release/src
+mv ${BOSH_COMPILE_TARGET}/mongodb-service-adapter ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-on-demand-release/src
+cd ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-on-demand-release/src/mongodb-service-adapter
 go build -o out/mongodb-service-adapter cmd/mongodb-service-adapter/main.go
 
 # Copy mongodb service adapter
 mkdir -p ${BOSH_INSTALL_TARGET}/bin
-cp -a ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-service-adapter/out/mongodb-service-adapter ${BOSH_INSTALL_TARGET}/bin/
+cp -a ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-on-demand-release/src/mongodb-service-adapter/out/mongodb-service-adapter ${BOSH_INSTALL_TARGET}/bin/
