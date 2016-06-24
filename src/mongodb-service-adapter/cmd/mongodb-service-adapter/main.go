@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/pivotal-cf/on-demand-service-broker-sdk/serviceadapter"
-	"mongodb-service-adapter/adapter"
+	"github.com/cf-platform-eng/mongodb-on-demand-release/src/mongodb-service-adapter/adapter"
 )
 
 func main() {
