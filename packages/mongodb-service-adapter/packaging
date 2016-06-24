@@ -8,7 +8,7 @@ export GOROOT=$(cd "/var/vcap/packages/golang" && pwd -P)
 export PATH=${GOROOT}/bin:${PATH}
 
 # Build mongodb service adapter
-mkdir -p ${BOSH_COMPILE_TARGET}/go/src
+mkdir -p ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng
 mv ${BOSH_COMPILE_TARGET}/mongodb-service-adapter ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng
 cd ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-service-adapter
 export GOPATH=${BOSH_COMPILE_TARGET}/go
