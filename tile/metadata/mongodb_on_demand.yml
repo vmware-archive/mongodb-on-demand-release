@@ -7,13 +7,13 @@ stemcell_criteria:
   version: '3232.4'
 releases:
 - name: on-demand-service-broker
-  file: on-demand-service-broker-0.5.0+dev.1.tgz
-  version: 0.5.0+dev.1
-  md5: 049bec861349255b4474816cd06c98c9
+  file: on-demand-service-broker-0.4.0+dev.1.tgz
+  version: 0.4.0+dev.1
+  md5: 28a21b445e3b20cc7e641e084dcdcb24
 - name: mongodb
-  file: mongodb-0+dev.5.tgz
-  version: 0+dev.5
-  md5: 795e03e09d8763b79388a5873752577e
+  file: mongodb-0+dev.17.tgz
+  version: 0+dev.17
+  md5: 2ed33effd87ccea6bf900af1e46304ab
 provides_product_versions:
 - name: mongodb-on-demand
   version: 0.0.1
