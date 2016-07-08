@@ -13,9 +13,9 @@ releases:
   md5: 28a21b445e3b20cc7e641e084dcdcb24
 
 - name: mongodb
-  file: mongodb-0+dev.26.tgz
-  version: 0+dev.26
-  md5: 5560542a8cb82ed1b4e66c10a80b4626
+  file: mongodb-0+dev.1.tgz
+  version: 0+dev.1
+  md5: a990e01098e64d156e2d0010e830be71
 
 provides_product_versions:
 - name: mongodb-on-demand
