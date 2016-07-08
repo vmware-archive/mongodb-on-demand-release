@@ -2,6 +2,7 @@ package adapter
 
 import (
 	"fmt"
+	"strings"
 	"gopkg.in/mgo.v2"
 	"github.com/pivotal-cf/on-demand-service-broker-sdk/bosh"
 	"github.com/pivotal-cf/on-demand-service-broker-sdk/serviceadapter"
@@ -67,6 +68,7 @@ func (Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, m
 				"password": password,
 				"database": username,
 				"servers":  servers,
+				"uri": fmt.Sprintf("mongodb://%s:%s@%s/%s",username,password,strings.Join(servers, ","),username),		
 		}, 
 	},nil
 }

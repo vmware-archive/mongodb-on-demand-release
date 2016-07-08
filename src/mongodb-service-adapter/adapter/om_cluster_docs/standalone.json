@@ -4,9 +4,7 @@
         "downloadBaseWindows": "C:\\mongodb-mms-automation"
     },
     "mongoDbVersions": [{
-        "name": "3.0.12"
-    }, {
-        "name": "3.0.2"
+        "name": "3.2.7"
     }],
     "backupVersions": [{
         "hostname": "mongod-node-0",
@@ -45,7 +43,7 @@
         },
         "name": "mongod-node-0",
         "processType": "mongod",
-        "version": "3.0.12",
+        "version": "3.2.7",
         "authSchemaVersion": 5
     }],
     "replicaSets": [],
