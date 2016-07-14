@@ -4,6 +4,23 @@
         "downloadBaseWindows": "C:\\mongodb-mms-automation"
     },
     "mongoDbVersions": [{
+        "builds": [
+                {
+                    "bits": 64,
+                    "flavor": "",
+                    "gitVersion": "4249c1d2b5999ebbf1fdf3bc0e0e3b3ff5c0aaf2",
+                    "maxOsVersion": "",
+                    "minOsVersion": "",
+                    "modules": [],
+                    "platform": "osx",
+                    "url": "https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-amazon-3.2.7.tgz",
+                    "win2008plus": false,
+                    "winVCRedistDll": "",
+                    "winVCRedistOptions": [],
+                    "winVCRedistUrl": "",
+                    "winVCRedistVersion": ""
+                }
+            ],
         "name": "3.2.7"
     }],
     "backupVersions": [{
@@ -121,8 +138,7 @@
         "autoUser": "mms-automation",
         "autoPwd": "{{ password }}",
         "deploymentAuthMechanisms": [
-            "SCRAM-SHA-1",
-            "MONGODB-CR"
+            "SCRAM-SHA-1"
         ],
         "key": "{{ key }}",
         "keyfile": "/var/vcap/jobs/mongod_node/config/mongo_om.key",
