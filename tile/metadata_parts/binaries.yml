@@ -1,7 +1,7 @@
 
 ---
 name: mongodb-on-demand
-product_version: 0.2.0
+product_version: 0.4.3
 metadata_version: '1.8'
 stemcell_criteria:
   os: ubuntu-trusty
@@ -13,10 +13,10 @@ releases:
   md5: 291d1a63fe29d983a0c39b2e49abf621
 
 - name: mongodb
-  file: mongodb-0+dev.2.tgz
-  version: 0+dev.2
-  md5: 5a4e86055e7a41f0267c56e0189a6b58
+  file: mongodb-0+dev.7.tgz
+  version: 0+dev.7
+  md5: e5a9224f0bd78c26cb57a3532f2f3d9c
 
 provides_product_versions:
 - name: mongodb-on-demand
-  version: 0.2.0
+  version: 0.4.3

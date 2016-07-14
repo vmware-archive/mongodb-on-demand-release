@@ -32,10 +32,16 @@ form_types:
   - reference: .broker.api_key
     label: MongoDB Operations Manager API key
     description: This will be the API Key for your MongoDB Ops Manager.
-    type: secret 
-  - reference: .broker.mongodb_az_multi_select
+    type: secret
+  - reference: .broker.vm_type
+    label: MongoDB VM Type
+    description: Select the VM Type
+  - reference: .broker.disk_type
+    label: MongoDB disk type
+    description: Select the Disk Type
+  - reference: .broker.az_multi_select
     label: MongoDB availability zone(s)
-    description: Select one or more availability zones    
+    description: Select one or more availability zones
 
 job_types:
 - name: broker
@@ -78,11 +84,11 @@ job_types:
           description: Standalone Instance
           instance_groups:
           - name: mongod_node
-            vm_type: m3.medium
+            vm_type: (( .broker.vm_type.value ))
             instances: 1
-            persistent_disk: 5120
-            networks: [(( $self.service_network ))]   
-            azs: (( .broker.mongodb_az_multi_select.value ))          
+            persistent_disk: (( .broker.disk_type.value ))
+            networks: [(( $self.service_network ))]
+            azs: (( .broker.az_multi_select.value ))
           properties:
             id: standalone
             mongo_ops:
@@ -94,11 +100,11 @@ job_types:
           description: Replica Set
           instance_groups:
           - name: mongod_node
-            vm_type: m3.medium
+            vm_type: (( .broker.vm_type.value ))
             instances: 3
-            persistent_disk: 5120
-            networks: [(( $self.service_network ))]   
-            azs: (( .broker.mongodb_az_multi_select.value ))          
+            persistent_disk: (( .broker.disk_type.value ))
+            networks: [(( $self.service_network ))]
+            azs: (( .broker.az_multi_select.value ))
           properties:
             id: single_replica_set
             mongo_ops:
@@ -110,11 +116,11 @@ job_types:
           description: Sharded Cluster
           instance_groups:
           - name: mongod_node
-            vm_type: m3.medium
+            vm_type: (( .broker.vm_type.value ))
             instances: 9
-            persistent_disk: 5120
-            networks: [(( $self.service_network ))]   
-            azs: (( .broker.mongodb_az_multi_select.value ))          
+            persistent_disk: (( .broker.disk_type.value ))
+            networks: [(( $self.service_network ))]
+            azs: (( .broker.az_multi_select.value ))
           properties:
             id: sharded_cluster
             mongo_ops:
@@ -134,13 +140,20 @@ job_types:
     type: string
     configurable: true
   - name: api_key
-    type: string
+    type: secret
     configurable: true
-  - name: mongodb_az_multi_select
+  - name: az_multi_select
     type: service_network_az_multi_select
     configurable: true
     optional: false
-
+  - name: vm_type
+    type: vm_type_dropdown
+    optional: true
+    configurable: true
+  - name: disk_type
+    type: disk_type_dropdown
+    configurable: true
+    optional: true
   static_ip: 0
   dynamic_ip: 1
   max_in_flight: 1
@@ -151,7 +164,7 @@ job_types:
     configurable: true
     default: 1
     constraints:
-      max: 1    
+      max: 1
 
 
   resource_definitions:
@@ -172,7 +185,7 @@ job_types:
   - name: cpu
     type: integer
     configurable: true
-    default: 1      
+    default: 1
 
 - name: register_on_demand_service_broker
   resource_label: On Demand Service Broker Registrar
@@ -319,4 +332,3 @@ job_types:
     type: salted_credentials
     default:
       identity: vcap
-
