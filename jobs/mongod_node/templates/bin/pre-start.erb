@@ -22,5 +22,5 @@ set -e
   hosts = link("mongod_node").instances.collect{ |x| "#{x.address} #{x.name.gsub('_', '-')}-#{x.index}" }.join("\\n")
 %>
 
-hostname $(ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print (}'))
+hostname $(/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
 sed -i '1i<%= hosts %>' /etc/hosts
