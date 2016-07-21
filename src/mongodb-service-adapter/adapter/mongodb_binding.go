@@ -3,14 +3,14 @@ package adapter
 import (
 	"fmt"
 	"strings"
-	"gopkg.in/mgo.v2"
+
 	"github.com/pivotal-cf/on-demand-service-broker-sdk/bosh"
 	"github.com/pivotal-cf/on-demand-service-broker-sdk/serviceadapter"
+	"gopkg.in/mgo.v2"
 )
 
 type Binder struct {
 }
-
 
 func (Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest, requestParams serviceadapter.RequestParameters) (serviceadapter.Binding, error) {
 
@@ -64,13 +64,13 @@ func (Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, m
 
 	return serviceadapter.Binding{
 		Credentials: map[string]interface{}{
-				"username": username,
-				"password": password,
-				"database": username,
-				"servers":  servers,
-				"uri": fmt.Sprintf("mongodb://%s:%s@%s/%s",username,password,strings.Join(servers, ","),username),		
-		}, 
-	},nil
+			"username": username,
+			"password": password,
+			"database": username,
+			"servers":  servers,
+			"uri":      fmt.Sprintf("mongodb://%s:%s@%s/%s?authSource=admin", username, password, strings.Join(servers, ","), username),
+		},
+	}, nil
 }
 
 func (Binder) DeleteBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest, requestParams serviceadapter.RequestParameters) error {
