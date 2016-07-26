@@ -8,9 +8,6 @@ import (
 	"os"
 	"strings"
 
-	// "gopkg.in/mgo.v2"
-
-	// "gopkg.in/mgo.v2/bson"
 	"github.com/pivotal-cf/on-demand-service-broker-sdk/bosh"
 	"github.com/pivotal-cf/on-demand-service-broker-sdk/serviceadapter"
 )
@@ -90,6 +87,13 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, err
 	}
 
+	configAgentRelease, err := findReleaseForJob(serviceDeployment.Releases, "mongod_config_agent")
+
+	configAgentProperties, err := configAgentProperties(serviceDeployment.DeploymentName, group, plan.Properties)
+	if err != nil {
+		return bosh.BoshManifest{}, err
+	}
+
 	return bosh.BoshManifest{
 		Name:     serviceDeployment.DeploymentName,
 		Releases: releases,
@@ -111,6 +115,24 @@ func (m ManifestGenerator) GenerateManifest(
 				AZs:                mongodInstanceGroup.AZs,
 				Networks:           mongodNetworks,
 				Properties:         mongodProperties,
+			},
+			{
+				Name:      "mongod-config-agent",
+				Instances: 1,
+				Jobs: []bosh.Job{
+					bosh.Job{
+						Name:    "mongod_config_agent",
+						Release: configAgentRelease.Name,
+						Consumes: map[string]interface{}{
+							"mongod_node": bosh.ConsumesLink{From: "mongod_node"},
+						},
+					},
+				},
+				VMType:     mongodInstanceGroup.VMType,
+				Stemcell:   StemcellAlias,
+				AZs:        mongodInstanceGroup.AZs,
+				Networks:   mongodNetworks,
+				Properties: configAgentProperties,
 			},
 		},
 		Update: bosh.Update{
@@ -205,6 +227,34 @@ func manifestProperties(deploymentName string, group Group, planProperties servi
 			"url":      url,
 			"api_key":  group.AgentAPIKey,
 			"group_id": group.ID,
+		},
+	}, nil
+}
+
+func configAgentProperties(deploymentName string, group Group, planProperties serviceadapter.Properties) (map[string]interface{}, error) {
+	// mongo_ops.url:
+	// 	description: "Mongo Ops Manager URL"
+	// mongo_ops.api_key:
+	//  description: "API Key for Ops Manager"
+	// mongo_ops.username:
+	//  description: "Username for Ops Manager"
+	// mongo_ops.group_id:
+	//  description: "Group Id"
+	// mongo_ops.plan_id:
+	//  description: "Plan identifier"
+
+	mongoOps := planProperties["mongo_ops"].(map[string]interface{})
+	url := mongoOps["url"].(string)
+	username := mongoOps["username"].(string)
+	apiKey := mongoOps["api_key"].(string)
+
+	return map[string]interface{}{
+		"mongo_ops": map[string]string{
+			"url":      url,
+			"api_key":  apiKey,
+			"username": username,
+			"group_id": group.ID,
+			"plan_id":  planProperties["id"].(string),
 		},
 	}, nil
 }

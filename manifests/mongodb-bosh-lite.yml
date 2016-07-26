@@ -20,7 +20,7 @@ update:
 
 instance_groups:
   - name: mongod_node
-    instances: 9
+    instances: 3
     jobs:
       - name: mongod_node
         release: mongodb
@@ -28,6 +28,11 @@ instance_groups:
           mongod_node: {from: mongod_node}
         provides:
           mongod_node: {as: mongod_node}
+    properties:
+      mongo_ops:
+        url: http://ec2-54-88-23-164.compute-1.amazonaws.com:8080
+        api_key: 072373bcf5d31ee7b58cce7ce7949c1c
+        group_id: 5797e27ee4b0afc6be62357b
 
     vm_type: default
     stemcell: default
@@ -35,8 +40,24 @@ instance_groups:
     networks:
       - name: default
 
-properties:
-  mongo_ops:
-    url: http://ec2-54-173-228-238.compute-1.amazonaws.com:8080
-    api_key: 26e818ae1007b618da01137cf847a464
-    group_id: 576315fce4b03c89b2c04e08
+  - name: mongodb_config_agent
+    instances: 1
+    jobs:
+      - name: mongodb_config_agent
+        release: mongodb
+        consumes:
+          mongod_node: {from: mongod_node}
+
+    properties:
+      mongo_ops:
+        url: http://ec2-54-88-23-164.compute-1.amazonaws.com:8080
+        api_key: ebd5e5aa-cdb4-4431-91a2-ebbb5530cfc7
+        group_id: 5797e27ee4b0afc6be62357b
+        username: imallika@gmail.com
+        plan_id: single_replica_set
+
+    vm_type: default
+    stemcell: default
+    persistent_disk_type: default
+    networks:
+      - name: default
