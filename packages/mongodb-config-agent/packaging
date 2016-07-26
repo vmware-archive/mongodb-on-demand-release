@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e # exit immediately if a simple command exits with a non-zero status
+set -u # report the usage of uninitialized variables
+
+# Set Golang dependency
+export GOROOT=$(cd "/var/vcap/packages/golang" && pwd -P)
+export GOPATH=${BOSH_COMPILE_TARGET}/go
+export PATH=${GOROOT}/bin:${PATH}
+
+# Build mongodb config agent
+mkdir -p ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-on-demand-release/src
+mv ${BOSH_COMPILE_TARGET}/mongodb-config-agent ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-on-demand-release/src
+cd ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-on-demand-release/src/mongodb-config-agent
+go build -o out/mongodb-config-agent cmd/mongodb-config-agent/main.go
+
+# Copy mongodb config agent
+mkdir -p ${BOSH_INSTALL_TARGET}/bin
+cp -a ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-on-demand-release/src/mongodb-config-agent/out/mongodb-config-agent ${BOSH_INSTALL_TARGET}/bin/

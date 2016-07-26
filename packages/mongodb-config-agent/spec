@@ -1,0 +1,9 @@
+---
+name: mongodb-config-agent
+
+dependencies:
+  - golang
+
+files:
+  - mongodb-config-agent/**/*
+  - common/utils.sh

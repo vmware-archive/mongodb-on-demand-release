@@ -1,0 +1,23 @@
+---
+name: mongodb_config_agent
+
+packages:
+  - mongodb-config-agent
+
+templates:
+  bin/mongod_config_agent_ctl.erb: bin/mongod_config_agent_ctl
+
+consumes:
+  - {name: mongod_node, type: node}
+
+properties:
+  mongo_ops.url:
+    description: "Mongo Ops Manager URL"
+  mongo_ops.api_key:
+   description: "API Key for Ops Manager"
+  mongo_ops.username:
+   description: "Username for Ops Manager"
+  mongo_ops.group_id:
+   description: "Group Id"
+  mongo_ops.plan_id:
+   description: "Plan identifier"
