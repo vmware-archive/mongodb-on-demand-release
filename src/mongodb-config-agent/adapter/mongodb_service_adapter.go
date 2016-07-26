@@ -31,7 +31,7 @@ type ManifestGenerator struct {
 func (m ManifestGenerator) GenerateManifest(
 	serviceDeployment serviceadapter.ServiceDeployment,
 	plan serviceadapter.Plan,
-	requestParams serviceadapter.RequestParameters,
+	requestParams serviceadapter.RequestParameters,	
 	previousManifest *bosh.BoshManifest,
 	previousPlan *serviceadapter.Plan) (bosh.BoshManifest, error) {
 
@@ -53,6 +53,29 @@ func (m ManifestGenerator) GenerateManifest(
 	}
 
 	logger.Printf("created group %s (%s)", group.Name, group.ID)
+
+	// generate context
+	ctx := map[string]string{
+		"auto_user":      "mms-automation",
+		"auto_password":  "Sy4oBX9ei0amvupBAN8lVQhj",
+		"key":            "GrSLAAsHGXmJOrvElJ2AHTGauvH4O0EFT1r8byvb0G9sTU0viVX21PwUMqBjyXB9WrZP9QvEmCQIF1wOqJofyWmx7wWZqpO69dnc9GUWcpGQLr7eVyKTs99WAPXR3kXpF4MVrHdBMEDfRfhytgomgAso96urN6eC8RaUpjX4Bf9HcAEJwfddZshin97XKJDmqCaqAfORNnf1e8hkfTIwYg1tvIpwemmEF4TkmOgK09N5dINyejyWMU8iWG8FqW5MfQ8A2DrtIdyGSKLH05s7H1dXyADjDECaC77QqLXTx7gWyHca3I0K92PuVFoOs5385vzqTYN3kVgFotSdXgoM8Zt5QIoj2lX4PYqm2TWsVp0s15JELikH8bNVIIMGiSSWJEWGU1PVEXD7V7cYepDb88korMjr3wbh6kZ76Q7F2RtfJqkd4hKw7B5OCX04b5eppkjL598iCpSUUx3X9C6fFavWj2DrHsv9DY86iCWBlcG08DRPKs9EPizCW4jNZtJcm3T7WlcI0MZMKOtsKOCWBZA0C9YnttNrp4eTsQ1U43StiIRPqp2K8rrQAu6etURH0RHedazHeeukTWI7iTG1dZpYk9EyittZ72qKXLNLhi5vJ9TlYw8O91vihB1nJwwA3B1WbiYhkqqRzoL0cQpXJMUsUlsoSP6Q70IMU92vEHbUmna5krESPLeJfQBKGQPNVVE63XYBh2TnvFTdi6koitu209wMFUnHZrzWj3UWGqsyTqqHbPl4RhRLFe24seRwV2SbUuLygBIdptKHnA3kutAbHzsWTT8UxOaiQzFV4auxounrgXj7MoMWEVKKS8AHkELPILGqFVFC8BZsfPC0WacSN5Rg5SaCvfs74hcsCQ3ghq9PyxEb2fbHUiaCjnsBcXqzQw9AjZJG4yX0ubEwicP0bKB6y3w4PUQqdouxH5y16OgkUjrZgodJfRLgP9vqGbHNDpj4yBuswluvCFBh38gBoSIQu11qtQmk43n4G8Dskn0DrJ32l2Gz35q5LaKT",
+		"admin_password": "password",
+	}
+
+	doc, err := oc.LoadDoc(plan.Properties["id"].(string), ctx)
+	if err != nil {
+		return bosh.BoshManifest{}, err
+	}
+
+	logger.Println(doc)
+
+	err = oc.ConfigureGroup(doc, group.ID)
+
+	logger.Printf("configured group %s (%s)", group.Name, group.ID)
+
+	if err != nil {
+		return bosh.BoshManifest{}, fmt.Errorf("could not configure group '%s' (%s)", group.Name, err.Error())
+	}
 
 	releases := []bosh.Release{}
 	for _, release := range serviceDeployment.Releases {
@@ -85,7 +108,7 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, err
 	}
 
-	manifestProperties, err := manifestProperties(serviceDeployment.DeploymentName, group, plan.Properties)
+	manifestProperties, err := manifestProperties(serviceDeployment.DeploymentName, group, plan.Properties, ctx["admin_password"])
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
@@ -122,6 +145,8 @@ func (m ManifestGenerator) GenerateManifest(
 		Properties: manifestProperties,
 	}, nil
 }
+
+
 
 func findInstanceGroup(plan serviceadapter.Plan, jobName string) *serviceadapter.InstanceGroup {
 	for _, instanceGroup := range plan.InstanceGroups {
@@ -196,15 +221,16 @@ func mongodProperties(deploymentName string, planProperties serviceadapter.Prope
 	}, nil
 }
 
-func manifestProperties(deploymentName string, group Group, planProperties serviceadapter.Properties) (map[string]interface{}, error) {
+func manifestProperties(deploymentName string, group Group, planProperties serviceadapter.Properties, adminPassword string) (map[string]interface{}, error) {
 	mongoOps := planProperties["mongo_ops"].(map[string]interface{})
 	url := mongoOps["url"].(string)
 
 	return map[string]interface{}{
 		"mongo_ops": map[string]string{
-			"url":      url,
-			"api_key":  group.AgentAPIKey,
-			"group_id": group.ID,
+			"url":            url,
+			"api_key":        group.AgentAPIKey,
+			"group_id":       group.ID,
+			"admin_password": adminPassword,
 		},
 	}, nil
 }

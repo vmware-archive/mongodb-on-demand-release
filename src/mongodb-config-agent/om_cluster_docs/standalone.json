@@ -40,14 +40,10 @@
             "timeThresholdHrs": 24
         }
     }],
-    "processes": [{{#each nodes}}
-      {
+    "processes": [{
         "args2_6": {
             "net": {
                 "port": 28000
-            },
-            "replication": {
-                "replSetName": "pcf_repl"
             },
             "storage": {
                 "dbPath": "/var/vcap/store/mongodb-data"
@@ -57,29 +53,17 @@
                 "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
             }
         },
-        "hostname": "{{this}}",
+        "hostname": "mongod-node-0",
         "logRotate": {
             "sizeThresholdMB": 1000,
             "timeThresholdHrs": 24
         },
-        "name": "{{this}}",
+        "name": "mongod-node-0",
         "processType": "mongod",
         "version": "3.2.7",
         "authSchemaVersion": 5
-    }{{#if @last}}{{else}},{{/if}}
-    {{/each}}
-  ],
-    "replicaSets": [{
-        "_id": "pcf_repl",
-        "members": [
-          {{#each nodes}}
-          {
-            "_id": {{@index}},
-            "host": "{{this}}"
-          {{#if @last}},"arbiterOnly": true,"priority": 0}
-          {{else}}},{{/if}}{{/each}}
-        ]
     }],
+    "replicaSets": [],
     "roles": [],
     "sharding": [],
 

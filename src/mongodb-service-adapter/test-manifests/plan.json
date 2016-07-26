@@ -13,9 +13,9 @@
   "properties": {
     "id": "standalone",
     "mongo_ops": {
-      "url": "http://ec2-54-210-202-233.compute-1.amazonaws.com:8080",
-      "username": "sam.weaver@mongodb.com",
-      "api_key": "e6bcfee1-2f42-459d-a354-23cdbf5e3557"
+      "url": "http://ec2-54-88-23-164.compute-1.amazonaws.com:8080",
+      "username": "imallika@gmail.com",
+      "api_key": "ebd5e5aa-cdb4-4431-91a2-ebbb5530cfc7"
     }
   }
 }

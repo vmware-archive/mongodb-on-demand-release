@@ -1,0 +1,649 @@
+{
+   "options": {
+        "downloadBase": "/var/lib/mongodb-mms-automation",
+        "downloadBaseWindows": "C:\\mongodb-mms-automation"
+    },
+    "mongoDbVersions": [{
+        "builds": [
+                {
+                    "bits": 64,
+                    "flavor": "",
+                    "gitVersion": "4249c1d2b5999ebbf1fdf3bc0e0e3b3ff5c0aaf2",
+                    "maxOsVersion": "",
+                    "minOsVersion": "",
+                    "modules": [],
+                    "platform": "osx",
+                    "url": "https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-amazon-3.2.7.tgz",
+                    "win2008plus": false,
+                    "winVCRedistDll": "",
+                    "winVCRedistOptions": [],
+                    "winVCRedistUrl": "",
+                    "winVCRedistVersion": ""
+                }
+            ],
+        "name": "3.2.7"
+    }],
+    "backupVersions": [
+    ],
+
+    "monitoringVersions": [
+    {
+        "hostname": "sharded-cluster_shard_1_10",
+        "logPath": "/var/log/mongodb-mms-automation/monitoring-agent.log",
+        "logRotate": {
+            "sizeThresholdMB": 1000,
+            "timeThresholdHrs": 24
+        }
+    }
+    ],
+    "processes": [
+                    {
+                "args2_6": {
+                    "net": {
+                        "port": 27000
+                    },
+                    "operationProfiling": {},
+                    "replication": {
+                        "replSetName": "shard_0"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/store/sharded-cluster_shard_0_6"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/sys/log/sharded-cluster_shard_0_6/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-14",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "sharded-cluster_shard_0_6",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27000
+                    },
+                    "operationProfiling": {},
+                    "replication": {
+                        "replSetName": "shard_0"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/store/sharded-cluster_shard_0_7"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/sys/log/sharded-cluster_shard_0_7/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-2",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "sharded-cluster_shard_0_7",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27000
+                    },
+                    "operationProfiling": {},
+                    "replication": {
+                        "replSetName": "shard_0"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/store/sharded-cluster_shard_0_8"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/sys/log/sharded-cluster_shard_0_8/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-3",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "sharded-cluster_shard_0_8",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27000
+                    },
+                    "operationProfiling": {},
+                    "replication": {
+                        "replSetName": "shard_1"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/store/sharded-cluster_shard_1_9"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/sys/log/sharded-cluster_shard_1_9/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-4",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "sharded-cluster_shard_1_9",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27000
+                    },
+                    "operationProfiling": {},
+                    "replication": {
+                        "replSetName": "shard_1"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/store/sharded-cluster_shard_1_10"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/sys/log/sharded-cluster_shard_1_10/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-5",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "sharded-cluster_shard_1_10",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27000
+                    },
+                    "operationProfiling": {},
+                    "replication": {
+                        "replSetName": "shard_1"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/store/sharded-cluster_shard_1_11"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/sys/log/sharded-cluster_shard_1_11/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-6",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "sharded-cluster_shard_1_11",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27000
+                    },
+                    "operationProfiling": {},
+                    "replication": {
+                        "replSetName": "shard_2"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/store/sharded-cluster_shard_2_12"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/sys/log/sharded-cluster_shard_2_12/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-7",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "sharded-cluster_shard_2_12",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27000
+                    },
+                    "operationProfiling": {},
+                    "replication": {
+                        "replSetName": "shard_2"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/store/sharded-cluster_shard_2_13"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/sys/log/sharded-cluster_shard_2_13/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-8",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "sharded-cluster_shard_2_13",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27000
+                    },
+                    "operationProfiling": {},
+                    "replication": {
+                        "replSetName": "shard_2"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/store/sharded-cluster_shard_2_14"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/sys/log/sharded-cluster_shard_2_14/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-9",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "sharded-cluster_shard_2_14",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27019
+                    },
+                    "operationProfiling": {},
+                    "replication": {
+                        "replSetName": "configRs"
+                    },
+                    "sharding": {
+                        "clusterRole": "configsvr"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/store/configRs_0"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/sys/log/configRs_0/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-0",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "configRs_0",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27019
+                    },
+                    "operationProfiling": {},
+                    "replication": {
+                        "replSetName": "configRs"
+                    },
+                    "sharding": {
+                        "clusterRole": "configsvr"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/store/configRs_1"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/sys/log/configRs_1/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-1",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "configRs_1",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27019
+                    },
+                    "operationProfiling": {},
+                    "replication": {
+                        "replSetName": "configRs"
+                    },
+                    "sharding": {
+                        "clusterRole": "configsvr"
+                    },
+                    "storage": {
+                        "dbPath": "/var/vcap/store/configRs_2"
+                    },
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/sys/log/configRs_2/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "hostname": "mongod-node-10",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "configRs_2",
+                "processType": "mongod",
+                "version": "3.2.7"
+            },
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27017
+                    },
+                    "operationProfiling": {},
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/store/sharded-cluster_mongos_3/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "cluster": "sharded-cluster",
+                "hostname": "mongod-node-11",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "sharded-cluster_mongos_3",
+                "processType": "mongos",
+                "version": "3.2.7"
+            },
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27017
+                    },
+                    "operationProfiling": {},
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/sys/log/sharded-cluster_mongos_4/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "cluster": "sharded-cluster",
+                "hostname": "mongod-node-12",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "sharded-cluster_mongos_4",
+                "processType": "mongos",
+                "version": "3.2.7"
+            },
+            {
+                "args2_6": {
+                    "net": {
+                        "port": 27017
+                    },
+                    "operationProfiling": {},
+                    "systemLog": {
+                        "destination": "file",
+                        "path": "/var/vcap/sys/log/sharded-cluster_mongos_5/mongodb.log"
+                    }
+                },
+                "authSchemaVersion": 5,
+                "cluster": "sharded-cluster",
+                "hostname": "mongod-node-13",
+                "logRotate": {
+                    "sizeThresholdMB": 1000,
+                    "timeThresholdHrs": 24
+                },
+                "name": "sharded-cluster_mongos_5",
+                "processType": "mongos",
+                "version": "3.2.7"
+            }
+
+    ],
+    "replicaSets": [
+{
+                "_id": "shard_0",
+                "members": [
+                    {
+                        "_id": 0,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "sharded-cluster_shard_0_6",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    },
+                    {
+                        "_id": 1,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "sharded-cluster_shard_0_7",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    },
+                    {
+                        "_id": 2,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "sharded-cluster_shard_0_8",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    }
+                ]
+            },
+            {
+                "_id": "shard_1",
+                "members": [
+                    {
+                        "_id": 0,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "sharded-cluster_shard_1_9",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    },
+                    {
+                        "_id": 1,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "sharded-cluster_shard_1_10",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    },
+                    {
+                        "_id": 2,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "sharded-cluster_shard_1_11",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    }
+                ]
+            },
+            {
+                "_id": "shard_2",
+                "members": [
+                    {
+                        "_id": 0,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "sharded-cluster_shard_2_12",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    },
+                    {
+                        "_id": 1,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "sharded-cluster_shard_2_13",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    },
+                    {
+                        "_id": 2,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "sharded-cluster_shard_2_14",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    }
+                ]
+            },
+            {
+                "_id": "configRs",
+                "members": [
+                    {
+                        "_id": 0,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "configRs_0",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    },
+                    {
+                        "_id": 1,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "configRs_1",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    },
+                    {
+                        "_id": 2,
+                        "arbiterOnly": false,
+                        "hidden": false,
+                        "host": "configRs_2",
+                        "priority": 1,
+                        "slaveDelay": 0,
+                        "votes": 1
+                    }
+                ]
+            }
+    ],
+    "sharding": [
+        {
+                "shards": [
+                    {
+                        "tags": [],
+                        "_id": "shard_0",
+                        "rs": "shard_0"
+                    },
+                    {
+                        "tags": [],
+                        "_id": "shard_1",
+                        "rs": "shard_1"
+                    },
+                    {
+                        "tags": [],
+                        "_id": "shard_2",
+                        "rs": "shard_2"
+                    }
+                ],
+                "name": "sharded-cluster",
+                "configServer": [],
+                "configServerReplica": "configRs",
+                "collections": []
+            }
+    ],
+
+    "auth":{
+       "disabled":false,
+       "autoPwd": "{{ password }}",
+       "autoUser":"mms-automation",
+       "deploymentAuthMechanisms": [
+           "SCRAM-SHA-1"
+       ],
+       "key":"{{ key }}",
+       "keyfile":"/var/vcap/jobs/mongod_node/config/mongo_om.key",
+       "usersWanted":[
+          {
+             "db":"admin",
+             "initPwd":"{{ password }}",
+             "roles":[
+                {
+                   "db":"admin",
+                   "role":"clusterMonitor"
+                }
+             ],
+             "user":"mms-monitoring-agent"
+          },
+          {
+             "db":"admin",
+             "initPwd":"{{ password }}",
+             "roles":[
+                {
+                   "db":"admin",
+                   "role":"clusterAdmin"
+                },
+                {
+                   "db":"admin",
+                   "role":"readAnyDatabase"
+                },
+                {
+                   "db":"admin",
+                   "role":"userAdminAnyDatabase"
+                },
+                {
+                   "db":"local",
+                   "role":"readWrite"
+                },
+                {
+                   "db":"admin",
+                   "role":"readWrite"
+                }
+             ],
+             "user":"mms-backup-agent"
+          }
+       ],
+       "usersDeleted":[],
+       "autoAuthMechanism": "SCRAM-SHA-1"
+    }
+}

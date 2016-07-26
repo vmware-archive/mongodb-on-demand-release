@@ -40,8 +40,7 @@
             "timeThresholdHrs": 24
         }
     }],
-    "processes": [{{#each nodes}}
-      {
+    "processes": [{
         "args2_6": {
             "net": {
                 "port": 28000
@@ -57,28 +56,80 @@
                 "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
             }
         },
-        "hostname": "{{this}}",
+        "hostname": "mongod-node-0",
         "logRotate": {
             "sizeThresholdMB": 1000,
             "timeThresholdHrs": 24
         },
-        "name": "{{this}}",
+        "name": "mongod-node-0",
         "processType": "mongod",
         "version": "3.2.7",
         "authSchemaVersion": 5
-    }{{#if @last}}{{else}},{{/if}}
-    {{/each}}
-  ],
+    }, {
+        "args2_6": {
+            "net": {
+                "port": 28000
+            },
+            "replication": {
+                "replSetName": "pcf_repl"
+            },
+            "storage": {
+                "dbPath": "/var/vcap/store/mongodb-data"
+            },
+            "systemLog": {
+                "destination": "file",
+                "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
+            }
+        },
+        "hostname": "mongod-node-1",
+        "logRotate": {
+            "sizeThresholdMB": 1000,
+            "timeThresholdHrs": 24
+        },
+        "name": "mongod-node-1",
+        "processType": "mongod",
+        "version": "3.2.7",
+        "authSchemaVersion": 5
+    }, {
+        "args2_6": {
+            "net": {
+                "port": 28000
+            },
+            "replication": {
+                "replSetName": "pcf_repl"
+            },
+            "storage": {
+                "dbPath": "/var/vcap/store/mongodb-data"
+            },
+            "systemLog": {
+                "destination": "file",
+                "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
+            }
+        },
+        "hostname": "mongod-node-2",
+        "logRotate": {
+            "sizeThresholdMB": 1000,
+            "timeThresholdHrs": 24
+        },
+        "name": "mongod-node-2",
+        "processType": "mongod",
+        "version": "3.2.7",
+        "authSchemaVersion": 5
+    }],
     "replicaSets": [{
         "_id": "pcf_repl",
-        "members": [
-          {{#each nodes}}
-          {
-            "_id": {{@index}},
-            "host": "{{this}}"
-          {{#if @last}},"arbiterOnly": true,"priority": 0}
-          {{else}}},{{/if}}{{/each}}
-        ]
+        "members": [{
+            "_id": 0,
+            "host": "mongod-node-0"
+        }, {
+            "_id": 1,
+            "host": "mongod-node-1"
+        }, {
+            "_id": 2,
+            "arbiterOnly": true,
+            "host": "mongod-node-2",
+            "priority": 0
+        }]
     }],
     "roles": [],
     "sharding": [],

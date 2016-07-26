@@ -23,14 +23,19 @@ type OMClient struct {
 }
 
 type Group struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	AgentAPIKey string `json:"agentApiKey"`
+	ID          string         `json:"id"`
+	Name        string         `json:"name"`
+	AgentAPIKey string         `json:"agentApiKey"`
+	HostCounts  map[string]int `json:"hostCounts"`
 }
 
-func (oc OMClient) LoadDoc(key string, ctx map[string]string) (string, error) {
+type GroupHosts struct {
+	TotalCount int `json:"totalCount"`
+}
+
+func (oc OMClient) LoadDoc(key string, ctx map[string]interface{}) (string, error) {
 	docs := map[string]string{
-		"standalone":        "om_cluster_docs/standalone.json",
+		"standalone":         "om_cluster_docs/standalone.json",
 		"single_replica_set": "om_cluster_docs/replica_set.json",
 		"sharded_cluster":    "om_cluster_docs/sharded_set.json",
 	}
@@ -71,6 +76,56 @@ func (oc OMClient) CreateGroup() (Group, error) {
 	err = json.Unmarshal(b, &group)
 
 	return group, nil
+}
+
+func (oc OMClient) GetGroup(GroupID string) (Group, error) {
+	var group Group
+
+	resp, err := oc.doRequest("GET", fmt.Sprintf("/api/public/v1.0/groups/%s", GroupID), nil)
+
+	if err != nil {
+		return group, err
+	}
+
+	var b []byte
+	b, err = ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return group, err
+	}
+
+	err = json.Unmarshal(b, &group)
+
+	if err != nil {
+		return group, err
+	}
+
+	return group, nil
+}
+
+func (oc OMClient) GetGroupHosts(GroupID string) (GroupHosts, error) {
+	var groupHosts GroupHosts
+
+	resp, err := oc.doRequest("GET", fmt.Sprintf("/api/public/v1.0/groups/%s/hosts", GroupID), nil)
+
+	if err != nil {
+		return groupHosts, err
+	}
+
+	var b []byte
+	b, err = ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return groupHosts, err
+	}
+
+	err = json.Unmarshal(b, &groupHosts)
+
+	if err != nil {
+		return groupHosts, err
+	}
+
+	return groupHosts, nil
 }
 
 func (oc OMClient) ConfigureGroup(configurationDoc string, groupId string) error {
