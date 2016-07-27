@@ -87,7 +87,7 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, err
 	}
 
-	configAgentRelease, err := findReleaseForJob(serviceDeployment.Releases, "mongod_config_agent")
+	configAgentRelease, err := findReleaseForJob(serviceDeployment.Releases, "mongodb_config_agent")
 
 	configAgentProperties, err := configAgentProperties(serviceDeployment.DeploymentName, group, plan.Properties)
 	if err != nil {
