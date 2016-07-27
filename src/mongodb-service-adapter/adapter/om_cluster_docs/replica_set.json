@@ -24,7 +24,7 @@
         "name": "3.2.7"
     }],
     "backupVersions": [{
-        "hostname": "mongod-node-0",
+        "hostname": "{{nodes.[0]}}",
         "logPath": "/var/log/mongodb-mms-automation/backup-agent.log",
         "logRotate": {
             "sizeThresholdMB": 1000,
@@ -33,7 +33,7 @@
     }],
 
     "monitoringVersions": [{
-        "hostname": "mongod-node-0",
+        "hostname": "{{nodes.[0]}}",
         "logPath": "/var/log/mongodb-mms-automation/monitoring-agent.log",
         "logRotate": {
             "sizeThresholdMB": 1000,

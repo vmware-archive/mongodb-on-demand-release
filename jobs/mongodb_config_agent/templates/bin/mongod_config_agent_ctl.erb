@@ -2,33 +2,33 @@
 
 set -e # exit immediately if a simple command exits with a non-zero status
 
-source /var/vcap/packages/mongod-config-agent/utils.sh
+source /var/vcap/packages/mongodb-config-agent/utils.sh
 
-RUN_DIR=/var/vcap/sys/run/mongod-config-agent
-LOG_DIR=/var/vcap/sys/log/mongod-config-agent
-TMP_DIR=/var/vcap/sys/tmp/mongod-config-agent
-STORE_DIR=/var/vcap/store/mongod-config-agent
+RUN_DIR=/var/vcap/sys/run/mongodb_config_agent
+LOG_DIR=/var/vcap/sys/log/mongodb_config_agent
+TMP_DIR=/var/vcap/sys/tmp/mongodb_config_agent
+STORE_DIR=/var/vcap/store/mongodb_config_agent
 mkdir -p ${RUN_DIR} ${LOG_DIR} ${TMP_DIR} ${STORE_DIR}
 
-PIDFILE=${RUN_DIR}/mongo_config_agent.pid
+PIDFILE=${RUN_DIR}/mongodb_config_agent.pid
 
 case $1 in
 
   start)
-    pid_guard ${PIDFILE} "mongo_config_agent"
+    pid_guard ${PIDFILE} "mongodb_config_agent"
     echo $$ > ${PIDFILE}
 
     <% hosts = link("mongod_node").instances.collect{ |x| "#{x.address}" }.join(",") %>
 
-    exec /var/vcap/packages/mongod-config-agent/bin/mongodb-config-agent \
+    exec /var/vcap/packages/mongodb-config-agent/bin/mongodb-config-agent \
       -url <%= p('mongo_ops.url') %> \
       -username <%= p('mongo_ops.username') %> \
       -api-key <%= p('mongo_ops.api_key') %> \
       -group <%= p('mongo_ops.group_id') %> \
       -plan <%= p('mongo_ops.plan_id') %> \
       -nodes "<%= hosts %>" \
-      >>  ${LOG_DIR}/mongod-config-agent.stdout.log \
-      2>> ${LOG_DIR}/mongod-config-agent.stderr.log
+      >>  ${LOG_DIR}/mongodb_config_agent.stdout.log \
+      2>> ${LOG_DIR}/mongodb_config_agent.stderr.log
     ;;
 
   stop)
