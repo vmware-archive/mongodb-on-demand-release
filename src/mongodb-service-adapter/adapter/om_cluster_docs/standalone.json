@@ -24,7 +24,7 @@
         "name": "3.2.7"
     }],
     "backupVersions": [{
-        "hostname": "mongod-node-0",
+        "hostname": "{{nodes.[0]}}",
         "logPath": "/var/log/mongodb-mms-automation/backup-agent.log",
         "logRotate": {
             "sizeThresholdMB": 1000,
@@ -33,7 +33,7 @@
     }],
 
     "monitoringVersions": [{
-        "hostname": "mongod-node-0",
+        "hostname": "{{nodes.[0]}}",
         "logPath": "/var/log/mongodb-mms-automation/monitoring-agent.log",
         "logRotate": {
             "sizeThresholdMB": 1000,
@@ -53,12 +53,12 @@
                 "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
             }
         },
-        "hostname": "mongod-node-0",
+        "hostname": "{{nodes.[0]}}",
         "logRotate": {
             "sizeThresholdMB": 1000,
             "timeThresholdHrs": 24
         },
-        "name": "mongod-node-0",
+        "name": "{{nodes.[0]}}",
         "processType": "mongod",
         "version": "3.2.7",
         "authSchemaVersion": 5

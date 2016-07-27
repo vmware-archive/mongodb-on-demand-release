@@ -31,8 +31,8 @@ instance_groups:
     properties:
       mongo_ops:
         url: http://ec2-54-88-23-164.compute-1.amazonaws.com:8080
-        api_key: e2a7a789947fc4f569a9bdc5c82435ca
-        group_id: 57984b12e4b0afc6be627474
+        api_key: 332b4da90e5b5bb9d949b90b08a2cefe
+        group_id: 5798dfafe4b0afc6be62c821
 
     vm_type: default
     stemcell: default
@@ -52,7 +52,7 @@ instance_groups:
       mongo_ops:
         url: http://ec2-54-88-23-164.compute-1.amazonaws.com:8080
         api_key: ebd5e5aa-cdb4-4431-91a2-ebbb5530cfc7
-        group_id: 57984b12e4b0afc6be627474
+        group_id: 5798dfafe4b0afc6be62c821
         username: imallika@gmail.com
         plan_id: single_replica_set
 
