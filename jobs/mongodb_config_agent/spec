@@ -6,7 +6,8 @@ packages:
 
 templates:
   bin/mongod_config_agent_ctl.erb: bin/mongod_config_agent_ctl
-
+  bin/drain.erb: bin/drain
+  
 consumes:
   - {name: mongod_node, type: node}
 
