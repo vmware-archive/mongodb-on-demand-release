@@ -117,11 +117,11 @@ func (m ManifestGenerator) GenerateManifest(
 				Properties:         mongodProperties,
 			},
 			{
-				Name:      "mongod-config-agent",
+				Name:      "mongodb-config-agent",
 				Instances: 1,
 				Jobs: []bosh.Job{
 					bosh.Job{
-						Name:    "mongod_config_agent",
+						Name:    "mongodb_config_agent",
 						Release: configAgentRelease.Name,
 						Consumes: map[string]interface{}{
 							"mongod_node": bosh.ConsumesLink{From: "mongod_node"},

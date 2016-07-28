@@ -43,7 +43,7 @@
                 "port": 28000
             },
             "replication": {
-                "replSetName": "shard_{{math @index "/" 3 }}"
+                "replSetName": "shard_{{div @index 3 }}"
             },
             "storage": {
                 "dbPath": "/var/vcap/store/mongodb-data"

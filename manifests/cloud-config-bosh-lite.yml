@@ -21,9 +21,11 @@ networks:
         reserved:
           - 10.244.0.1
         cloud_properties: {}
+        az: z1
 
 compilation:
   workers: 5
   vm_type: default
   network: default
   reuse_compilation_vms: true
+  az: z1

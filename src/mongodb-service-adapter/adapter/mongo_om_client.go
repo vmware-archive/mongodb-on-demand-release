@@ -44,6 +44,10 @@ func (oc OMClient) LoadDoc(key string, ctx map[string]interface{}) (string, erro
 		return oc.RandomString(32)
 	})
 
+	raymond.RegisterHelper("div", func(val int, div int) int {
+		return val / div
+	})
+
 	path := docs[key]
 	asset, _ := Asset(path)
 
