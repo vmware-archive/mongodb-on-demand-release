@@ -106,7 +106,7 @@ properties:
     releases:
       - name: mongodb
         version: latest
-        jobs: [mongod_node]
+        jobs: [mongod_node, mongodb_config_agent]
     stemcell:
       os: ubuntu-trusty
       version: latest
