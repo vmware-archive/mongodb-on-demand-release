@@ -22,5 +22,5 @@ properties:
    description: "Group Id"
   mongo_ops.plan_id:
    description: "Plan identifier"
-  mongo_ops.admin_password
+  mongo_ops.admin_password:
    description: "Admin password for mongo"
