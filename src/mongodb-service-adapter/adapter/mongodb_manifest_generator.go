@@ -44,6 +44,8 @@ func (m ManifestGenerator) GenerateManifest(
 
 	oc := &OMClient{Url: url, Username: username, ApiKey: apiKey}
 
+	adminPassword := oc.RandomString(20)
+
 	group, err := oc.CreateGroup()
 	if err != nil {
 		return bosh.BoshManifest{}, fmt.Errorf("could not create new group (%s)", err.Error())
@@ -82,7 +84,7 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, err
 	}
 
-	manifestProperties, err := manifestProperties(serviceDeployment.DeploymentName, group, plan.Properties)
+	manifestProperties, err := manifestProperties(serviceDeployment.DeploymentName, group, plan.Properties, adminPassword)
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
@@ -93,7 +95,9 @@ func (m ManifestGenerator) GenerateManifest(
 
 	logger.Printf("conf agent releases %+v", configAgentRelease)
 
-	configAgentProperties, err := configAgentProperties(serviceDeployment.DeploymentName, group, plan.Properties)
+	configAgentProperties, err := configAgentProperties(serviceDeployment.DeploymentName,
+		group, plan.Properties, adminPassword)
+
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
@@ -222,20 +226,21 @@ func mongodProperties(deploymentName string, planProperties serviceadapter.Prope
 	}, nil
 }
 
-func manifestProperties(deploymentName string, group Group, planProperties serviceadapter.Properties) (map[string]interface{}, error) {
+func manifestProperties(deploymentName string, group Group, planProperties serviceadapter.Properties, adminPassword string) (map[string]interface{}, error) {
 	mongoOps := planProperties["mongo_ops"].(map[string]interface{})
 	url := mongoOps["url"].(string)
 
 	return map[string]interface{}{
 		"mongo_ops": map[string]string{
-			"url":      url,
-			"api_key":  group.AgentAPIKey,
-			"group_id": group.ID,
+			"url":            url,
+			"api_key":        group.AgentAPIKey,
+			"group_id":       group.ID,
+			"admin_password": adminPassword,
 		},
 	}, nil
 }
 
-func configAgentProperties(deploymentName string, group Group, planProperties serviceadapter.Properties) (map[string]interface{}, error) {
+func configAgentProperties(deploymentName string, group Group, planProperties serviceadapter.Properties, adminPassword string) (map[string]interface{}, error) {
 	// mongo_ops.url:
 	// 	description: "Mongo Ops Manager URL"
 	// mongo_ops.api_key:
@@ -254,11 +259,12 @@ func configAgentProperties(deploymentName string, group Group, planProperties se
 
 	return map[string]interface{}{
 		"mongo_ops": map[string]string{
-			"url":      url,
-			"api_key":  apiKey,
-			"username": username,
-			"group_id": group.ID,
-			"plan_id":  planProperties["id"].(string),
+			"url":            url,
+			"api_key":        apiKey,
+			"username":       username,
+			"group_id":       group.ID,
+			"plan_id":        planProperties["id"].(string),
+			"admin_password": adminPassword,
 		},
 	}, nil
 }

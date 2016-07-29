@@ -7,7 +7,7 @@ packages:
 templates:
   bin/mongod_config_agent_ctl.erb: bin/mongod_config_agent_ctl
   bin/drain.erb: bin/drain
-  
+
 consumes:
   - {name: mongod_node, type: node}
 
@@ -22,3 +22,5 @@ properties:
    description: "Group Id"
   mongo_ops.plan_id:
    description: "Plan identifier"
+  mongo_ops.admin_password
+   description: "Admin password for mongo"

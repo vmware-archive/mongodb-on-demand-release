@@ -12,7 +12,7 @@ import (
 type ConfigAgent struct{}
 
 func (c ConfigAgent) PollAndConfigureGroup(url string, username string, apiKey string,
-	groupID string, planID string, nodeAddresses string) {
+	groupID string, planID string, nodeAddresses string, adminPassword string) {
 
 	logger := log.New(os.Stderr, "[mongodb-config-agent]", log.LstdFlags)
 

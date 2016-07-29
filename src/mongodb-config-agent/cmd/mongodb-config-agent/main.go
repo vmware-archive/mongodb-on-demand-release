@@ -15,6 +15,7 @@ func main() {
 	groupID := flag.String("group", "", "MOM Group ID")
 	planID := flag.String("plan", "", "The name of the service plan")
 	nodeAddresses := flag.String("nodes", "", "Comma separated list of addresses")
+	adminPassword := flag.String("admin-password", "", "Admin password for the mongo instance")
 
 	flag.Parse()
 
@@ -25,5 +26,6 @@ func main() {
 		*groupID,
 		*planID,
 		*nodeAddresses,
+		*adminPassword,
 	)
 }
