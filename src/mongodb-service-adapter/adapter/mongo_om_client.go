@@ -65,6 +65,10 @@ func (oc OMClient) LoadDoc(key string, ctx map[string]interface{}) (string, erro
 		}
 	})
 
+	raymond.RegisterHelper("hasShardedCluster", func(index int) bool {
+		return index > 11 && index < 15
+	})
+
 	raymond.RegisterHelper("div", func(val int, div int) int {
 		return val / div
 	})

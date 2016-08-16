@@ -69,12 +69,16 @@
         },
         "name": "{{this}}",
         "processType": "{{processType @index}}",
+        {{#if (hasShardedCluster @index)}}
+        "cluster": "sharded-cluster",
+        {{/if}}
         "version": "3.2.7",
         "authSchemaVersion": 5
     }{{#if @last}}{{else}},{{/if}}
     {{/each}}
     ],
     "replicaSets": [{{#each partitionedNodes}}
+
             {
                 "_id": "shard_{{@index}}",
                 "members": [{{#each this}}
@@ -137,7 +141,7 @@
                 ],
                 "name": "sharded-cluster",
                 "configServer": [],
-                "configServerReplica": "configRs",
+                "configServerReplica": "shard_3",
                 "collections": []
             }
     ],
