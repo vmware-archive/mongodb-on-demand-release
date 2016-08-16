@@ -34,6 +34,7 @@ type GroupHosts struct {
 }
 
 func (oc OMClient) LoadDoc(key string, ctx map[string]interface{}) (string, error) {
+
 	docs := map[string]string{
 		"standalone":         "om_cluster_docs/standalone.json",
 		"single_replica_set": "om_cluster_docs/replica_set.json",
@@ -42,6 +43,26 @@ func (oc OMClient) LoadDoc(key string, ctx map[string]interface{}) (string, erro
 
 	raymond.RegisterHelper("password", func() string {
 		return oc.RandomString(32)
+	})
+
+	raymond.RegisterHelper("isConfig", func(index int) bool {
+		return index > 9 && index < 12
+	})
+
+	raymond.RegisterHelper("isInShard", func(index int) bool {
+		return index < 12
+	})
+
+	raymond.RegisterHelper("hasStorage", func(index int) bool {
+		return index < 12
+	})
+
+	raymond.RegisterHelper("processType", func(index int) string {
+		if index > 11 && index < 15 {
+			return "mongos"
+		} else {
+			return "mongod"
+		}
 	})
 
 	raymond.RegisterHelper("div", func(val int, div int) int {
@@ -55,7 +76,7 @@ func (oc OMClient) LoadDoc(key string, ctx map[string]interface{}) (string, erro
 	result, err := raymond.Render(tpl, ctx)
 
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	return result, nil

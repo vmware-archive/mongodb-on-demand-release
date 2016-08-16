@@ -11,7 +11,7 @@
     }
   ],
   "properties": {
-    "id": "standalone",
+    "id": "sharded_cluster",
     "mongo_ops": {
       "url": "http://ec2-54-88-23-164.compute-1.amazonaws.com:8080",
       "username": "imallika@gmail.com",

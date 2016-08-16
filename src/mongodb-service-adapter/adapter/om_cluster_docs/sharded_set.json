@@ -42,12 +42,21 @@
             "net": {
                 "port": 28000
             },
+            {{#if (isInShard @index)}}
             "replication": {
                 "replSetName": "shard_{{div @index 3 }}"
             },
+            {{/if}}
+            {{#if (isConfig @index)}}
+            "sharding": {
+                "clusterRole": "configsvr"
+            },
+            {{/if}}
+            {{#if (hasStorage @index)}}
             "storage": {
                 "dbPath": "/var/vcap/store/mongodb-data"
             },
+            {{/if}}
             "systemLog": {
                 "destination": "file",
                 "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
@@ -59,53 +68,37 @@
             "timeThresholdHrs": 24
         },
         "name": "{{this}}",
-        "processType": "mongod",
+        "processType": "{{processType @index}}",
         "version": "3.2.7",
         "authSchemaVersion": 5
     }{{#if @last}}{{else}},{{/if}}
     {{/each}}
     ],
-    "replicaSets": [
-{
-                "_id": "shard_0",
-                "members": [
+    "replicaSets": [{{#each partitionedNodes}}
+            {
+                "_id": "shard_{{@index}}",
+                "members": [{{#each this}}
                     {
-                        "_id": 0,
+                        "_id": {{@index}},
                         "arbiterOnly": false,
                         "hidden": false,
-                        "host": "sharded-cluster_shard_0_6",
+                        "host": "{{this}}",
                         "priority": 1,
                         "slaveDelay": 0,
                         "votes": 1
-                    },
-                    {
-                        "_id": 1,
-                        "arbiterOnly": false,
-                        "hidden": false,
-                        "host": "sharded-cluster_shard_0_7",
-                        "priority": 1,
-                        "slaveDelay": 0,
-                        "votes": 1
-                    },
-                    {
-                        "_id": 2,
-                        "arbiterOnly": false,
-                        "hidden": false,
-                        "host": "sharded-cluster_shard_0_8",
-                        "priority": 1,
-                        "slaveDelay": 0,
-                        "votes": 1
-                    }
+                    }{{#if @last}}{{else}},{{/if}}
+                    {{/each}}
                 ]
             },
+            {{/each}}
             {
-                "_id": "shard_1",
+                "_id": "shard_3",
                 "members": [
                     {
                         "_id": 0,
                         "arbiterOnly": false,
                         "hidden": false,
-                        "host": "sharded-cluster_shard_1_9",
+                        "host": "{{nodes.[9]}}",
                         "priority": 1,
                         "slaveDelay": 0,
                         "votes": 1
@@ -114,7 +107,7 @@
                         "_id": 1,
                         "arbiterOnly": false,
                         "hidden": false,
-                        "host": "sharded-cluster_shard_1_10",
+                        "host": "{{nodes.[10]}}",
                         "priority": 1,
                         "slaveDelay": 0,
                         "votes": 1
@@ -123,71 +116,7 @@
                         "_id": 2,
                         "arbiterOnly": false,
                         "hidden": false,
-                        "host": "sharded-cluster_shard_1_11",
-                        "priority": 1,
-                        "slaveDelay": 0,
-                        "votes": 1
-                    }
-                ]
-            },
-            {
-                "_id": "shard_2",
-                "members": [
-                    {
-                        "_id": 0,
-                        "arbiterOnly": false,
-                        "hidden": false,
-                        "host": "sharded-cluster_shard_2_12",
-                        "priority": 1,
-                        "slaveDelay": 0,
-                        "votes": 1
-                    },
-                    {
-                        "_id": 1,
-                        "arbiterOnly": false,
-                        "hidden": false,
-                        "host": "sharded-cluster_shard_2_13",
-                        "priority": 1,
-                        "slaveDelay": 0,
-                        "votes": 1
-                    },
-                    {
-                        "_id": 2,
-                        "arbiterOnly": false,
-                        "hidden": false,
-                        "host": "sharded-cluster_shard_2_14",
-                        "priority": 1,
-                        "slaveDelay": 0,
-                        "votes": 1
-                    }
-                ]
-            },
-            {
-                "_id": "configRs",
-                "members": [
-                    {
-                        "_id": 0,
-                        "arbiterOnly": false,
-                        "hidden": false,
-                        "host": "configRs_0",
-                        "priority": 1,
-                        "slaveDelay": 0,
-                        "votes": 1
-                    },
-                    {
-                        "_id": 1,
-                        "arbiterOnly": false,
-                        "hidden": false,
-                        "host": "configRs_1",
-                        "priority": 1,
-                        "slaveDelay": 0,
-                        "votes": 1
-                    },
-                    {
-                        "_id": 2,
-                        "arbiterOnly": false,
-                        "hidden": false,
-                        "host": "configRs_2",
+                        "host": "{{nodes.[11]}}",
                         "priority": 1,
                         "slaveDelay": 0,
                         "votes": 1
@@ -198,21 +127,13 @@
     "sharding": [
         {
                 "shards": [
+                  {{#each partitionedNodes}}
                     {
                         "tags": [],
-                        "_id": "shard_0",
-                        "rs": "shard_0"
-                    },
-                    {
-                        "tags": [],
-                        "_id": "shard_1",
-                        "rs": "shard_1"
-                    },
-                    {
-                        "tags": [],
-                        "_id": "shard_2",
-                        "rs": "shard_2"
-                    }
+                        "_id": "shard_{{@index}}",
+                        "rs": "shard_{{@index}}"
+                    }{{#if @last}}{{else}},{{/if}}
+                    {{/each}}
                 ],
                 "name": "sharded-cluster",
                 "configServer": [],
