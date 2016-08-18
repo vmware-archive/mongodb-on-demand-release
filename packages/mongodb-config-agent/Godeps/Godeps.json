@@ -1,0 +1,9 @@
+{
+	"ImportPath": "github.com/cf-platform-eng/mongodb-on-demand-release/packages/mongodb-config-agent",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v74",
+	"Packages": [
+		"./..."
+	],
+	"Deps": []
+}

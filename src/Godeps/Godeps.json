@@ -1,0 +1,77 @@
+{
+	"ImportPath": "github.com/cf-platform-eng/mongodb-on-demand-release/src",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v74",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/AsGz/httpAuthClient",
+			"Rev": "f04e6143e1ca3fdc3b56fa036e6fda4560ebb7b2"
+		},
+		{
+			"ImportPath": "github.com/aymerick/raymond",
+			"Comment": "v2.0.1",
+			"Rev": "a2232af10b53ef1ae5a767f5178db3a6c1dab655"
+		},
+		{
+			"ImportPath": "github.com/aymerick/raymond/ast",
+			"Comment": "v2.0.1",
+			"Rev": "a2232af10b53ef1ae5a767f5178db3a6c1dab655"
+		},
+		{
+			"ImportPath": "github.com/aymerick/raymond/lexer",
+			"Comment": "v2.0.1",
+			"Rev": "a2232af10b53ef1ae5a767f5178db3a6c1dab655"
+		},
+		{
+			"ImportPath": "github.com/aymerick/raymond/parser",
+			"Comment": "v2.0.1",
+			"Rev": "a2232af10b53ef1ae5a767f5178db3a6c1dab655"
+		},
+		{
+			"ImportPath": "github.com/nu7hatch/gouuid",
+			"Rev": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
+		},
+		{
+			"ImportPath": "github.com/pivotal-cf/on-demand-service-broker-sdk/bosh",
+			"Comment": "v0.5.0-1-g7e26710",
+			"Rev": "7e26710d3814380c57c55ddd583d9943c079a30d"
+		},
+		{
+			"ImportPath": "github.com/pivotal-cf/on-demand-service-broker-sdk/serviceadapter",
+			"Comment": "v0.5.0-1-g7e26710",
+			"Rev": "7e26710d3814380c57c55ddd583d9943c079a30d"
+		},
+		{
+			"ImportPath": "gopkg.in/go-playground/validator.v8",
+			"Comment": "v8.17.2",
+			"Rev": "25f1823069d853eccffbde025dca1812fa09c14b"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2",
+			"Comment": "r2016.02.04-3-g29cc868",
+			"Rev": "29cc868a5ca65f401ff318143f9408d02f4799cc"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/bson",
+			"Comment": "r2016.02.04-3-g29cc868",
+			"Rev": "29cc868a5ca65f401ff318143f9408d02f4799cc"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/internal/sasl",
+			"Comment": "r2016.02.04-3-g29cc868",
+			"Rev": "29cc868a5ca65f401ff318143f9408d02f4799cc"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/internal/scram",
+			"Comment": "r2016.02.04-3-g29cc868",
+			"Rev": "29cc868a5ca65f401ff318143f9408d02f4799cc"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "a83829b6f1293c91addabc89d0571c246397bbf4"
+		}
+	]
+}
