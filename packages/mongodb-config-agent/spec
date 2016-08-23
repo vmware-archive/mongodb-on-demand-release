@@ -6,4 +6,5 @@ dependencies:
 
 files:
   - mongodb-config-agent/**/*
+  - mongodb-service-adapter/**/*
   - common/utils.sh

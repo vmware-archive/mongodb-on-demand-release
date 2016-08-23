@@ -2,7 +2,7 @@
   "instance_groups": [
     {
       "name": "mongod_node",
-      "instances": 3,
+      "instances": 1,
       "vm_type": "default",
       "networks": [
         "default"
@@ -11,7 +11,7 @@
     }
   ],
   "properties": {
-    "id": "sharded_cluster",
+    "id": "standalone",
     "mongo_ops": {
       "url": "http://ec2-54-88-23-164.compute-1.amazonaws.com:8080",
       "username": "imallika@gmail.com",

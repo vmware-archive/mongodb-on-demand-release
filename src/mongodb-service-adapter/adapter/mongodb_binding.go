@@ -35,6 +35,10 @@ func (Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, m
 		FailFast:  true,
 	}
 
+	fmt.Printf("%s",dialInfo)
+
+	fmt.Printf("%s",servers)
+
 	session, err := mgo.DialWithInfo(dialInfo)
 	if err != nil {
 		panic(err)
@@ -94,6 +98,10 @@ func (Binder) DeleteBinding(bindingID string, deploymentTopology bosh.BoshVMs, m
 		Database:  "admin",
 		FailFast:  true,
 	}
+
+	fmt.Printf("%s",dialInfo)
+
+	fmt.Printf("%s",servers)
 
 	session, err := mgo.DialWithInfo(dialInfo)
 	if err != nil {

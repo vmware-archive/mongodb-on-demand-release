@@ -9,6 +9,7 @@ export GOPATH=${BOSH_COMPILE_TARGET}/go
 export PATH=${GOROOT}/bin:${PATH}
 
 # Build mongodb service adapter
+
 mkdir -p ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-on-demand-release/src
 mv ${BOSH_COMPILE_TARGET}/mongodb-service-adapter ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-on-demand-release/src
 cd ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-on-demand-release/src/mongodb-service-adapter

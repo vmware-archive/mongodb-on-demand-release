@@ -13,6 +13,7 @@ export PATH=${GOROOT}/bin:${PATH}
 # Build mongodb config agent
 mkdir -p ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-on-demand-release/src
 mv ${BOSH_COMPILE_TARGET}/mongodb-config-agent ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-on-demand-release/src
+mv ${BOSH_COMPILE_TARGET}/mongodb-service-adapter ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-on-demand-release/src
 cd ${BOSH_COMPILE_TARGET}/go/src/github.com/cf-platform-eng/mongodb-on-demand-release/src/mongodb-config-agent
 go build -o out/mongodb-config-agent cmd/mongodb-config-agent/main.go
 

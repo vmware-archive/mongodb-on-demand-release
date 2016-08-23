@@ -105,7 +105,7 @@ func om_cluster_docsSharded_setJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "om_cluster_docs/sharded_set.json", size: 6206, mode: os.FileMode(420), modTime: time.Unix(1471376593, 0)}
+	info := bindataFileInfo{name: "om_cluster_docs/sharded_set.json", size: 6206, mode: os.FileMode(420), modTime: time.Unix(1471974022, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
