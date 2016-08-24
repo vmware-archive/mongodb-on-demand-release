@@ -34,7 +34,7 @@ func (c ConfigAgent) PollAndConfigureGroup(url string, username string, apiKey s
 	partitionedNodes := [][]string{}
 	ctx := map[string]interface{}{}
 
-	//if planID == "sharded_cluster" {
+	if planID == "sharded_cluster" {
 			partitionedNodes = partitionNodes(nodes, 3)
 			logger.Printf("%#v", partitionedNodes)
 			ctx = map[string]interface{}{
@@ -44,7 +44,7 @@ func (c ConfigAgent) PollAndConfigureGroup(url string, username string, apiKey s
 				"admin_password":   adminPassword,
 				"nodes":            nodes,
 				"partitionedNodes": partitionedNodes,
-		/*	}
+			}
   } else {
 			ctx = map[string]interface{}{
 				"auto_user":        "mms-automation",
@@ -53,9 +53,9 @@ func (c ConfigAgent) PollAndConfigureGroup(url string, username string, apiKey s
 				"admin_password":   adminPassword,
 				"nodes":            nodes,
 			}
-	}*/
+	}
 
-	logger.Printf("%+v", nodes)
+	logger.Printf("%+v   $$$$$ these are the NODES $$$$$", nodes)
 	doc, err := omClient.LoadDoc(planID, ctx)
 	if err != nil {
 		logger.Fatal(err)
@@ -72,7 +72,7 @@ func (c ConfigAgent) PollAndConfigureGroup(url string, username string, apiKey s
 			logger.Fatal(err)
 		}
 
-		logger.Printf("total number of hosts %s", groupHosts.TotalCount)
+	//	logger.Printf("total number of hosts *** %v", groupHosts.TotalCount)
 		if groupHosts.TotalCount == 0 {
 
 			logger.Printf("Host count for %s is 0, configuring...", groupID)

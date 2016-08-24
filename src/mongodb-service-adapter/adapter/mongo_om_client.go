@@ -45,7 +45,7 @@ func (oc OMClient) LoadDoc(key string, ctx map[string]interface{}) (string, erro
 		return oc.RandomString(32)
 	})
 
-	raymond.RegisterHelper("isConfig", func(index int) bool {
+	raymond.RegisterHelper("isConfig", func(index int) bool {		
 		return index > 9 && index < 12
 	})
 

@@ -117,7 +117,7 @@ job_types:
           instance_groups:
           - name: mongod_node
             vm_type: (( .broker.vm_type.value ))
-            instances: 9
+            instances: 15
             persistent_disk: (( .broker.disk_type.value ))
             networks: [(( $self.service_network ))]
             azs: (( .broker.az_multi_select.value ))

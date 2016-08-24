@@ -35,10 +35,13 @@ func (Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, m
 		FailFast:  true,
 	}
 
+  fmt.Printf(" **** Dial info *****")
 	fmt.Printf("%s",dialInfo)
+	fmt.Printf(" **** Dial info End *****")
 
+	fmt.Printf(" **** Servers *****")
 	fmt.Printf("%s",servers)
-
+	fmt.Printf(" **** Servers End *****")
 	session, err := mgo.DialWithInfo(dialInfo)
 	if err != nil {
 		panic(err)
@@ -65,6 +68,9 @@ func (Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, m
 		},
 	}
 	adminDB.UpsertUser(user)
+
+
+	fmt.Printf("This is the connection string :     mongodb://%s:%s@%s/%s?authSource=admin", username, password, strings.Join(servers, ","), username)
 
 	return serviceadapter.Binding{
 		Credentials: map[string]interface{}{
