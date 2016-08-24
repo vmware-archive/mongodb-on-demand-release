@@ -55,7 +55,7 @@ func (c ConfigAgent) PollAndConfigureGroup(url string, username string, apiKey s
 			}
 	}
 
-	logger.Printf("%+v   $$$$$ these are the NODES $$$$$", nodes)
+	logger.Printf("%+v", nodes)
 	doc, err := omClient.LoadDoc(planID, ctx)
 	if err != nil {
 		logger.Fatal(err)
