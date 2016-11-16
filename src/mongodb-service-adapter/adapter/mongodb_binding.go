@@ -3,7 +3,8 @@ package adapter
 import (
 	"fmt"
 	"strings"
-
+	"log"
+	"os"
 	"github.com/pivotal-cf/on-demand-service-broker-sdk/bosh"
 	"github.com/pivotal-cf/on-demand-service-broker-sdk/serviceadapter"
 	"gopkg.in/mgo.v2"
@@ -16,10 +17,18 @@ func (Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, m
 
 	// create an admin level user
 	username := fmt.Sprintf("pcf_%v", encodeID(bindingID))
+	logger := log.New(os.Stderr, "[mongodb-service-adapter]", log.LstdFlags)
+	logger.Println(username)
 	password := OMClient{}.RandomString(32)
+
 
 	properties := manifest.Properties["mongo_ops"].(map[interface{}]interface{})
 	adminPassword := properties["admin_password"].(string)
+
+	logger.Println(adminPassword)
+
+	logger.Println(properties)
+
 
 	servers := make([]string, len(deploymentTopology["mongod_node"]))
 	for i, node := range deploymentTopology["mongod_node"] {
@@ -34,6 +43,8 @@ func (Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, m
 		Database:  "admin",
 		FailFast:  true,
 	}
+	logger.Println(dialInfo)
+
 
 	session, err := mgo.DialWithInfo(dialInfo)
 	if err != nil {
@@ -61,6 +72,15 @@ func (Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, m
 		},
 	}
 	adminDB.UpsertUser(user)
+
+
+
+	logger.Println("mongodb://%s:%s@%s/%s?authSource=admin", username, password, strings.Join(servers, ","), username)
+
+	logger.Println(username)
+	logger.Println(password)
+
+
 
 	return serviceadapter.Binding{
 		Credentials: map[string]interface{}{

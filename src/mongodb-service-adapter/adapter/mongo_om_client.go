@@ -35,10 +35,14 @@ type GroupHosts struct {
 
 func (oc OMClient) LoadDoc(key string, ctx map[string]interface{}) (string, error) {
 
-	docs := map[string]string{
+	/*docs := map[string]string{
 		"standalone":         "om_cluster_docs/standalone.json",
 		"single_replica_set": "om_cluster_docs/replica_set.json",
 		"sharded_cluster":    "om_cluster_docs/sharded_set.json",
+	}*/
+	docs := map[string]string{
+		"standalone":         "om_cluster_docs/standalone.json",
+		"single_replica_set": "om_cluster_docs/replica_set.json",
 	}
 
 	raymond.RegisterHelper("password", func() string {
