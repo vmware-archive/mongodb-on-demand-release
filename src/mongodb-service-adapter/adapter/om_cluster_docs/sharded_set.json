@@ -151,7 +151,7 @@
        "autoPwd": "{{ password }}",
        "autoUser":"mms-automation",
        "deploymentAuthMechanisms": [
-           "SCRAM-SHA-1"
+           "MONGODB-CR"
        ],
        "key":"{{ key }}",
        "keyfile":"/var/vcap/jobs/mongod_node/config/mongo_om.key",
@@ -196,6 +196,6 @@
           }
        ],
        "usersDeleted":[],
-       "autoAuthMechanism": "SCRAM-SHA-1"
+       "autoAuthMechanism": "MONGODB-CR"
     }
 }
