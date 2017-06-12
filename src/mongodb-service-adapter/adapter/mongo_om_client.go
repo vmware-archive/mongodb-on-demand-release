@@ -1,3 +1,4 @@
+//go:generate go-bindata -pkg adapter -prefix om_cluster_docs -o bindata.go om_cluster_docs
 package adapter
 
 import (
@@ -34,17 +35,6 @@ type GroupHosts struct {
 }
 
 func (oc OMClient) LoadDoc(key string, ctx map[string]interface{}) (string, error) {
-
-	/*docs := map[string]string{
-		"standalone":         "om_cluster_docs/standalone.json",
-		"single_replica_set": "om_cluster_docs/replica_set.json",
-		"sharded_cluster":    "om_cluster_docs/sharded_set.json",
-	}*/
-	docs := map[string]string{
-		"standalone":         "om_cluster_docs/standalone.json",
-		"single_replica_set": "om_cluster_docs/replica_set.json",
-	}
-
 	raymond.RegisterHelper("password", func() string {
 		return oc.RandomString(32)
 	})
@@ -77,8 +67,10 @@ func (oc OMClient) LoadDoc(key string, ctx map[string]interface{}) (string, erro
 		return val / div
 	})
 
-	path := docs[key]
-	asset, _ := Asset(path)
+	asset, err := Asset(key+".json")
+	if err != nil {
+		return "", err
+	}
 
 	tpl := string(asset)
 	result, err := raymond.Render(tpl, ctx)
