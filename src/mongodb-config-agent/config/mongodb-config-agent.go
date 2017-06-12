@@ -26,7 +26,7 @@ func partitionNodes(values []string, parts int) [][]string {
 func (c ConfigAgent) PollAndConfigureGroup(url string, username string, apiKey string,
 	groupID string, planID string, nodeAddresses string, adminPassword string) {
 
-	logger := log.New(os.Stderr, "[mongodb-config-agent]", log.LstdFlags)
+	logger := log.New(os.Stderr, "[mongodb-config-agent] ", log.LstdFlags)
 
 	omClient := adapter.OMClient{Url: url, Username: username, ApiKey: apiKey}
 

@@ -11,5 +11,5 @@ with open("test-manifests/params.json", "r") as myfile:
 with open("test-manifests/deployment.yml", "r") as myfile:
     deployment = myfile.read()
 
-call(['go', 'run', 'cmd/mongodb-service-adapter/main.go', argv[1], 'some-binding-id', vms,
+call(['go', 'run', 'main.go', argv[1], 'some-binding-id', vms,
             deployment, params])

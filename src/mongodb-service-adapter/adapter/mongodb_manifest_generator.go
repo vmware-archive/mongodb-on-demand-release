@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/pivotal-cf/on-demand-service-broker-sdk/bosh"
-	"github.com/pivotal-cf/on-demand-service-broker-sdk/serviceadapter"
+	"github.com/pivotal-cf/on-demand-services-sdk/bosh"
+	"github.com/pivotal-cf/on-demand-services-sdk/serviceadapter"
 )
 
 const (
@@ -119,7 +119,7 @@ func (m ManifestGenerator) GenerateManifest(
 				Jobs:               mongodJobs,
 				VMType:             mongodInstanceGroup.VMType,
 				Stemcell:           StemcellAlias,
-				PersistentDiskType: mongodInstanceGroup.PersistentDisk,
+				PersistentDiskType: mongodInstanceGroup.PersistentDiskType,
 				AZs:                mongodInstanceGroup.AZs,
 				Networks:           mongodNetworks,
 				Properties:         mongodProperties,
