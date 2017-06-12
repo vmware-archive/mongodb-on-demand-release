@@ -1,7 +1,7 @@
 {
 	"ImportPath": "github.com/cf-platform-eng/mongodb-on-demand-release/src/mongodb-service-adapter",
-	"GoVersion": "go1.6",
-	"GodepVersion": "v74",
+	"GoVersion": "go1.8",
+	"GodepVersion": "v79",
 	"Packages": [
 		"./..."
 	],
