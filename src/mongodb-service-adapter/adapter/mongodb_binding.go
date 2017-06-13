@@ -59,7 +59,7 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 
 	session, err := mgo.DialWithInfo(dialInfo)
 	if err != nil {
-		panic(err)
+		return serviceadapter.Binding{}, err
 	}
 	defer session.Close()
 
@@ -129,7 +129,7 @@ func (Binder) DeleteBinding(bindingID string, deploymentTopology bosh.BoshVMs, m
 
 	session, err := mgo.DialWithInfo(dialInfo)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer session.Close()
 

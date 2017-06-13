@@ -218,6 +218,7 @@ func findReleaseForJob(releases serviceadapter.ServiceReleases, requiredJob stri
 	return releasesThatProvideRequiredJob[0], nil
 }
 
+// TODO: figure out what's going on here
 func mongodProperties(deploymentName string, planProperties serviceadapter.Properties, arbitraryParams map[string]interface{}, previousManifest *bosh.BoshManifest) (map[string]interface{}, error) {
 	return map[string]interface{}{
 	// "mongo_ops": mongoOps,

@@ -67,14 +67,13 @@ func (oc OMClient) LoadDoc(key string, ctx map[string]interface{}) (string, erro
 		return val / div
 	})
 
-	asset, err := Asset(key+".json")
+	asset, err := Asset(key + ".json")
 	if err != nil {
 		return "", err
 	}
 
 	tpl := string(asset)
 	result, err := raymond.Render(tpl, ctx)
-
 	if err != nil {
 		return "", err
 	}
@@ -83,23 +82,29 @@ func (oc OMClient) LoadDoc(key string, ctx map[string]interface{}) (string, erro
 }
 
 func (oc OMClient) CreateGroup() (Group, error) {
-
-	u, err := uuid.NewV4()
-	groupName := fmt.Sprintf("pcf_%s", u)
-	body := strings.NewReader(fmt.Sprintf("{\"name\": \"%s\"}", groupName))
-
 	var group Group
 
-	resp, err := oc.doRequest("POST", "/api/public/v1.0/groups", body)
-
+	u, err := uuid.NewV4()
 	if err != nil {
 		return group, err
 	}
 
-	var b []byte
-	b, err = ioutil.ReadAll(resp.Body)
-	err = json.Unmarshal(b, &group)
+	groupName := fmt.Sprintf("pcf_%s", u)
+	body := strings.NewReader(fmt.Sprintf("{\"name\": \"%s\"}", groupName))
 
+	resp, err := oc.doRequest("POST", "/api/public/v1.0/groups", body)
+	if err != nil {
+		return group, err
+	}
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return group, err
+	}
+
+	if err = json.Unmarshal(b, &group); err != nil {
+		return group, err
+	}
 	return group, nil
 }
 
@@ -107,24 +112,18 @@ func (oc OMClient) GetGroup(GroupID string) (Group, error) {
 	var group Group
 
 	resp, err := oc.doRequest("GET", fmt.Sprintf("/api/public/v1.0/groups/%s", GroupID), nil)
-
 	if err != nil {
 		return group, err
 	}
 
-	var b []byte
-	b, err = ioutil.ReadAll(resp.Body)
-
+	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return group, err
 	}
 
-	err = json.Unmarshal(b, &group)
-
-	if err != nil {
+	if err = json.Unmarshal(b, &group); err != nil {
 		return group, err
 	}
-
 	return group, nil
 }
 
@@ -132,20 +131,16 @@ func (oc OMClient) GetGroupHosts(GroupID string) (GroupHosts, error) {
 	var groupHosts GroupHosts
 
 	resp, err := oc.doRequest("GET", fmt.Sprintf("/api/public/v1.0/groups/%s/hosts", GroupID), nil)
-
 	if err != nil {
 		return groupHosts, err
 	}
 
-	var b []byte
-	b, err = ioutil.ReadAll(resp.Body)
-
+	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return groupHosts, err
 	}
 
 	err = json.Unmarshal(b, &groupHosts)
-
 	if err != nil {
 		return groupHosts, err
 	}
@@ -154,36 +149,38 @@ func (oc OMClient) GetGroupHosts(GroupID string) (GroupHosts, error) {
 }
 
 func (oc OMClient) ConfigureGroup(configurationDoc string, groupId string) error {
-
 	url := fmt.Sprintf("/api/public/v1.0/groups/%s/automationConfig", groupId)
 	body := strings.NewReader(configurationDoc)
 
 	resp, err := oc.doRequest("PUT", url, body)
-	var b []byte
-	b, err = ioutil.ReadAll(resp.Body)
-
-	log.Println(string(b))
-
 	if err != nil {
 		return err
 	}
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	log.Println(string(b))
 
 	return nil
 }
 
 func (oc OMClient) doRequest(method string, path string, body io.Reader) (*http.Response, error) {
 	req, err := http.NewRequest(method, fmt.Sprintf("%s%s", strings.TrimRight(oc.Url, "/"), path), body)
+	if err != nil {
+		return nil, err
+	}
+
 	req.Header.Set("Content-Type", "application/json")
-
 	err = httpAuthClient.ApplyHttpDigestAuth(oc.Username, oc.ApiKey, fmt.Sprintf("%s%s", oc.Url, path), req)
-
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
 	}
 
 	resp, err := http.DefaultClient.Do(req)
-
 	if err != nil {
 		log.Fatalf("could not post: %v", err)
 		return nil, err
