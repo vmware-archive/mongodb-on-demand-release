@@ -172,8 +172,7 @@ func (oc OMClient) ConfigureGroup(configurationDoc string, groupId string) error
 }
 
 func (oc OMClient) doRequest(method string, path string, body io.Reader) (*http.Response, error) {
-
-	req, err := http.NewRequest(method, fmt.Sprintf("%s%s", oc.Url, path), body)
+	req, err := http.NewRequest(method, fmt.Sprintf("%s%s", strings.TrimRight(oc.Url, "/"), path), body)
 	req.Header.Set("Content-Type", "application/json")
 
 	err = httpAuthClient.ApplyHttpDigestAuth(oc.Username, oc.ApiKey, fmt.Sprintf("%s%s", oc.Url, path), req)
