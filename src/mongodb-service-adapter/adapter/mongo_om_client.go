@@ -168,25 +168,26 @@ func (oc OMClient) ConfigureGroup(configurationDoc string, groupId string) error
 }
 
 func (oc OMClient) doRequest(method string, path string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest(method, fmt.Sprintf("%s%s", strings.TrimRight(oc.Url, "/"), path), body)
+	uri := fmt.Sprintf("%s%s", strings.TrimRight(oc.Url, "/"), path)
+	req, err := http.NewRequest(method, uri, body)
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	err = httpAuthClient.ApplyHttpDigestAuth(oc.Username, oc.ApiKey, fmt.Sprintf("%s%s", oc.Url, path), req)
+	err = httpAuthClient.ApplyHttpDigestAuth(oc.Username, oc.ApiKey, uri, req)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Fatalf("could not post: %v", err)
+		log.Fatalf("%s %s error: %v", method, uri, err)
 		return nil, err
 	}
 
-	return resp, nil
+	return res, nil
 }
 
 func (oc OMClient) RandomString(strlen int) string {
