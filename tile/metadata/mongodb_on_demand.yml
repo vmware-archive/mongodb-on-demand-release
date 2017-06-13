@@ -140,7 +140,7 @@ job_types:
               networks: [(( $self.service_network ))]
               azs: (( .broker.az_multi_select.value ))
           properties:
-            id: sharded_cluster
+            id: sharded_set
             mongo_ops:
               url: (( .broker.url.value ))
               username: (( .broker.username.value ))
