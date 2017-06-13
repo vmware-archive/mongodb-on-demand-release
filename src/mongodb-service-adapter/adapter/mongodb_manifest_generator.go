@@ -1,11 +1,8 @@
 package adapter
 
 import (
-	"crypto/md5"
-	"encoding/base64"
 	"fmt"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/pivotal-cf/on-demand-services-sdk/bosh"
@@ -23,6 +20,13 @@ var (
 )
 
 type ManifestGenerator struct {
+	Logger *log.Logger
+}
+
+func (m *ManifestGenerator) logf(msg string, v ...interface{}) {
+	if m.Logger != nil {
+		m.Logger.Printf(msg, v...)
+	}
 }
 
 func (m ManifestGenerator) GenerateManifest(
@@ -33,8 +37,6 @@ func (m ManifestGenerator) GenerateManifest(
 	previousPlan *serviceadapter.Plan) (bosh.BoshManifest, error) {
 
 	arbitraryParams := requestParams.ArbitraryParams()
-
-	logger := log.New(os.Stderr, "[mongodb-service-adapter] ", log.LstdFlags)
 
 	mongoOps := plan.Properties["mongo_ops"].(map[string]interface{})
 
@@ -51,7 +53,7 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, fmt.Errorf("could not create new group (%s)", err.Error())
 	}
 
-	logger.Printf("created group %s (%s)", group.Name, group.ID)
+	m.logf("created group %s (%s)", group.Name, group.ID)
 
 	releases := []bosh.Release{}
 	for _, release := range serviceDeployment.Releases {
@@ -89,11 +91,11 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, err
 	}
 
-	logger.Printf("service releases %+v", serviceDeployment.Releases)
+	m.logf("service releases %+v", serviceDeployment.Releases)
 
 	configAgentRelease, err := findReleaseForJob(serviceDeployment.Releases, "mongodb_config_agent")
 
-	logger.Printf("conf agent releases %+v", configAgentRelease)
+	m.logf("conf agent releases %+v", configAgentRelease)
 
 	configAgentProperties, err := configAgentProperties(serviceDeployment.DeploymentName,
 		group, plan.Properties, adminPassword)
@@ -267,10 +269,4 @@ func configAgentProperties(deploymentName string, group Group, planProperties se
 			"admin_password": adminPassword,
 		},
 	}, nil
-}
-
-func encodeID(id string) string {
-	b64 := base64.StdEncoding.EncodeToString([]byte(id))
-	md5 := md5.Sum([]byte(b64))
-	return fmt.Sprintf("%x", md5)
 }

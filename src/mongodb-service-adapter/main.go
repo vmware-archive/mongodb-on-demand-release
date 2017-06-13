@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/cf-platform-eng/mongodb-on-demand-release/src/mongodb-service-adapter/adapter"
@@ -34,10 +35,12 @@ func main() {
 		usage("<generate-manifest|create-binding|delete-binding|dashboard-url>")
 	}
 
+	logger := log.New(os.Stderr, "[mongodb-config-agent] ", log.LstdFlags)
+
 	serviceadapter.HandleCommandLineInvocation(
 		os.Args,
-		&adapter.ManifestGenerator{},
-		&adapter.Binder{},
+		&adapter.ManifestGenerator{logger},
+		&adapter.Binder{logger},
 		&adapter.DashboardURLGenerator{},
 	)
 }
