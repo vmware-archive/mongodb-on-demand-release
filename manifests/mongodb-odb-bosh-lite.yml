@@ -175,7 +175,7 @@ properties:
             api_key: ebd5e5aa-cdb4-4431-91a2-ebbb5530cfc7
 
 
-      - name: sharded_cluster
+      - name: sharded_set
         plan_id: 477a196a-9e28-4103-87d3-593767448c9f
         description: Sharded Cluster
         metadata:
@@ -195,7 +195,7 @@ properties:
               - default
             azs: [z1]
         properties:
-          id: sharded_cluster
+          id: sharded_set
           mongo_ops:
             url: http://ec2-54-88-23-164.compute-1.amazonaws.com:8080
             username: imallika@gmail.com

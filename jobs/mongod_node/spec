@@ -19,6 +19,6 @@ properties:
   mongo_ops.url:
     description: "Mongo Ops Manager URL"
   mongo_ops.api_key:
-   description: "API Key for Ops Manager"
+    description: "API Key for Ops Manager"
   mongo_ops.group_id:
-   description: "Group Id"
+    description: "Group Id"

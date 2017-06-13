@@ -124,7 +124,7 @@ job_types:
               url: (( .broker.url.value ))
               username: (( .broker.username.value ))
               api_key: (( .broker.api_key.value ))
-        - name: sharded_cluster
+        - name: sharded_set
           plan_id: 477a196a-9e28-4103-87d3-593767448c9f
           description: Sharded Cluster
           metadata:

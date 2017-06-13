@@ -34,7 +34,7 @@ func (c ConfigAgent) PollAndConfigureGroup(url string, username string, apiKey s
 	partitionedNodes := [][]string{}
 	ctx := map[string]interface{}{}
 
-	if planID == "sharded_cluster" {
+	if planID == "sharded_set" {
 			partitionedNodes = partitionNodes(nodes, 3)
 			logger.Printf("%#v", partitionedNodes)
 			ctx = map[string]interface{}{
