@@ -36,6 +36,8 @@ func (m ManifestGenerator) GenerateManifest(
 	previousManifest *bosh.BoshManifest,
 	previousPlan *serviceadapter.Plan) (bosh.BoshManifest, error) {
 
+	m.logf("request params: %#v", requestParams)
+
 	arbitraryParams := requestParams.ArbitraryParams()
 
 	mongoOps := plan.Properties["mongo_ops"].(map[string]interface{})
