@@ -130,7 +130,7 @@ func (m ManifestGenerator) GenerateManifest(
 				Name:      "mongodb-config-agent",
 				Instances: 1,
 				Jobs: []bosh.Job{
-					bosh.Job{
+					{
 						Name:    "mongodb_config_agent",
 						Release: configAgentRelease.Name,
 						Consumes: map[string]interface{}{
