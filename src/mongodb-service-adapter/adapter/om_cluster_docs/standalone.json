@@ -21,7 +21,7 @@
                     "winVCRedistVersion": ""
                 }
             ],
-        "name": "3.2.7"
+        "name": "{{version}}"
     }],
     "backupVersions": [{
         "hostname": "{{nodes.[0]}}",
@@ -60,7 +60,7 @@
         },
         "name": "{{nodes.[0]}}",
         "processType": "mongod",
-        "version": "3.2.7",
+        "version": "{{version}}",
         "authSchemaVersion": 5
     }],
     "replicaSets": [],

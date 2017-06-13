@@ -16,6 +16,7 @@ func main() {
 	planID := flag.String("plan", "", "The name of the service plan")
 	nodeAddresses := flag.String("nodes", "", "Comma separated list of addresses")
 	adminPassword := flag.String("admin-password", "", "Admin password for the mongo instance")
+	engineVersion := flag.String("engine-version", "", "Engine version")
 
 	flag.Parse()
 
@@ -27,5 +28,6 @@ func main() {
 		*planID,
 		*nodeAddresses,
 		*adminPassword,
+		*engineVersion,
 	)
 }

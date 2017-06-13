@@ -21,7 +21,7 @@
                     "winVCRedistVersion": ""
                 }
             ],
-        "name": "3.2.7"
+        "name": "{{version}}"
     }],
     "backupVersions": [{
         "hostname": "{{nodes.[0]}}",
@@ -64,7 +64,7 @@
         },
         "name": "{{this}}",
         "processType": "mongod",
-        "version": "3.2.7",
+        "version": "{{version}}",
         "authSchemaVersion": 5
     }{{#if @last}}{{else}},{{/if}}
     {{/each}}

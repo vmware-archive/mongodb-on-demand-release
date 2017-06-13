@@ -52,7 +52,6 @@ func (m ManifestGenerator) GenerateManifest(
 	if err != nil {
 		return bosh.BoshManifest{}, fmt.Errorf("could not create new group (%s)", err.Error())
 	}
-
 	m.logf("created group %s (%s)", group.Name, group.ID)
 
 	releases := []bosh.Release{}
@@ -91,20 +90,29 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, err
 	}
 
-	m.logf("service releases %+v", serviceDeployment.Releases)
-
 	configAgentRelease, err := findReleaseForJob(serviceDeployment.Releases, "mongodb_config_agent")
+	if err != nil {
+		return bosh.BoshManifest{}, err
+	}
 
-	m.logf("conf agent releases %+v", configAgentRelease)
+	engineVersion, ok := arbitraryParams["version"].(string)
+	if engineVersion == "" || !ok {
+		engineVersion = "3.2.7" // TODO: make it configurable in deployment manifest
+	}
 
 	configAgentProperties, err := configAgentProperties(serviceDeployment.DeploymentName,
-		group, plan.Properties, adminPassword)
+		group, plan.Properties, adminPassword, engineVersion)
 
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
 
-	return bosh.BoshManifest{
+	instances, ok := arbitraryParams["instances"].(int)
+	if instances == 0 || !ok {
+		instances = mongodInstanceGroup.Instances
+	}
+
+	manifest := bosh.BoshManifest{
 		Name:     serviceDeployment.DeploymentName,
 		Releases: releases,
 		Stemcells: []bosh.Stemcell{
@@ -117,7 +125,7 @@ func (m ManifestGenerator) GenerateManifest(
 		InstanceGroups: []bosh.InstanceGroup{
 			{
 				Name:               MongodInstanceGroupName,
-				Instances:          mongodInstanceGroup.Instances,
+				Instances:          instances,
 				Jobs:               mongodJobs,
 				VMType:             mongodInstanceGroup.VMType,
 				Stemcell:           StemcellAlias,
@@ -152,7 +160,10 @@ func (m ManifestGenerator) GenerateManifest(
 			MaxInFlight:     4,
 		},
 		Properties: manifestProperties,
-	}, nil
+	}
+
+	m.logf("generated manifest: %#v", manifest)
+	return manifest, nil
 }
 
 func findInstanceGroup(plan serviceadapter.Plan, jobName string) *serviceadapter.InstanceGroup {
@@ -165,9 +176,7 @@ func findInstanceGroup(plan serviceadapter.Plan, jobName string) *serviceadapter
 }
 
 func gatherJobs(releases serviceadapter.ServiceReleases, requiredJobs []string) ([]bosh.Job, error) {
-
 	jobs := []bosh.Job{}
-
 	for _, requiredJob := range requiredJobs {
 		release, err := findReleaseForJob(releases, requiredJob)
 		if err != nil {
@@ -243,7 +252,7 @@ func manifestProperties(deploymentName string, group Group, planProperties servi
 	}, nil
 }
 
-func configAgentProperties(deploymentName string, group Group, planProperties serviceadapter.Properties, adminPassword string) (map[string]interface{}, error) {
+func configAgentProperties(deploymentName string, group Group, planProperties serviceadapter.Properties, adminPassword, engineVersion string) (map[string]interface{}, error) {
 	// mongo_ops.url:
 	// 	description: "Mongo Ops Manager URL"
 	// mongo_ops.api_key:
@@ -254,6 +263,8 @@ func configAgentProperties(deploymentName string, group Group, planProperties se
 	//  description: "Group Id"
 	// mongo_ops.plan_id:
 	//  description: "Plan identifier"
+	// mongo_ops.engine_version:
+	//  description: "Engine version"
 
 	mongoOps := planProperties["mongo_ops"].(map[string]interface{})
 	url := mongoOps["url"].(string)
@@ -268,6 +279,7 @@ func configAgentProperties(deploymentName string, group Group, planProperties se
 			"group_id":       group.ID,
 			"plan_id":        planProperties["id"].(string),
 			"admin_password": adminPassword,
+			"engine_version": engineVersion,
 		},
 	}, nil
 }

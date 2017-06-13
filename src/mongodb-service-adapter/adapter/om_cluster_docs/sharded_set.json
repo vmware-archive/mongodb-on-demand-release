@@ -21,7 +21,7 @@
                     "winVCRedistVersion": ""
                 }
             ],
-        "name": "3.2.7"
+        "name": "{{version}}"
     }],
     "backupVersions": [
     ],
@@ -72,7 +72,7 @@
         {{#if (hasShardedCluster @index)}}
         "cluster": "sharded-cluster",
         {{/if}}
-        "version": "3.2.7",
+        "version": "{{version}}",
         "authSchemaVersion": 5
     }{{#if @last}}{{else}},{{/if}}
     {{/each}}

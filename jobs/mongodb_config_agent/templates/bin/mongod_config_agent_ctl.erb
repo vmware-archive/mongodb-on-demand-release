@@ -28,6 +28,7 @@ case $1 in
       -plan <%= p('mongo_ops.plan_id') %> \
       -nodes "<%= hosts %>" \
       -admin-password <%= p('mongo_ops.admin_password') %> \
+      -engine-version <%= p('mongo_ops.engine_version') %> \
       >>  ${LOG_DIR}/mongodb_config_agent.stdout.log \
       2>> ${LOG_DIR}/mongodb_config_agent.stderr.log
     ;;
