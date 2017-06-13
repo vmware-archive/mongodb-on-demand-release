@@ -6,7 +6,7 @@ set -e
   TMP_DIR=/var/vcap/sys/tmp/mongod_agent
   mkdir -p ${TMP_DIR}
 
-  DOWNLOAD="<%= url %>/download/agent/automation/mongodb-mms-automation-agent-latest.linux_x86_64.tar.gz"
+  DOWNLOAD="<%= url.chomp("/") %>/download/agent/automation/mongodb-mms-automation-agent-latest.linux_x86_64.tar.gz"
 
   echo "*** Downloading MongoDB agent from <%= url %>"
   wget --quiet --no-check-certificate -O ${TMP_DIR}/mongodb.agent.tgz "${DOWNLOAD}"
