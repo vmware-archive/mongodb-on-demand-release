@@ -1,7 +1,7 @@
 ---
 blobstore:
-  provider: local
-#  provider: s3
-#  options:
-#    bucket_name: mongodb-on-demand-release
+  #  provider: local
+  provider: s3
+  options:
+    bucket_name: mongodb-on-demand-release
 final_name: mongodb-on-demand-release
