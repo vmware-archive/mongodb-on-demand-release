@@ -25,7 +25,7 @@
     }],
     "backupVersions": [{
         "hostname": "{{nodes.[0]}}",
-        "logPath": "/var/log/mongodb-mms-automation/backup-agent.log",
+        "logPath": "/var/vcap/sys/log/mongod_node/backup-agent.log",
         "logRotate": {
             "sizeThresholdMB": 1000,
             "timeThresholdHrs": 24
@@ -34,7 +34,7 @@
 
     "monitoringVersions": [{
         "hostname": "{{nodes.[0]}}",
-        "logPath": "/var/log/mongodb-mms-automation/monitoring-agent.log",
+        "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
         "logRotate": {
             "sizeThresholdMB": 1000,
             "timeThresholdHrs": 24
