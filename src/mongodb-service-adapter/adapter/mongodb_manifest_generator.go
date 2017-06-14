@@ -109,13 +109,10 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, err
 	}
 
-	instances, ok := arbitraryParams["instances"].(int)
-	if instances == 0 || !ok {
-		instances = mongodInstanceGroup.Instances
+	instances := mongodInstanceGroup.Instances
+	if i, ok := arbitraryParams["instances"].(float64); ok && i != 0 {
+		instances = int(i)
 	}
-
-	// TODO: delete
-	m.logf("instances: params=%#v raw=%#v res=%#v\n", arbitraryParams, arbitraryParams["instances"], instances)
 
 	manifest := bosh.BoshManifest{
 		Name:     serviceDeployment.DeploymentName,
