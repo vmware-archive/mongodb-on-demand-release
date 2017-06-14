@@ -114,6 +114,9 @@ func (m ManifestGenerator) GenerateManifest(
 		instances = mongodInstanceGroup.Instances
 	}
 
+	// TODO: delete
+	m.logf("instances: params=%#v raw=%#v res=%#v\n", arbitraryParams, arbitraryParams["instances"], instances)
+
 	manifest := bosh.BoshManifest{
 		Name:     serviceDeployment.DeploymentName,
 		Releases: releases,
