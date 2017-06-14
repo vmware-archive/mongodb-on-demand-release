@@ -2,10 +2,12 @@
 
 exec 3>&1
 
+<% if_p('mongo_ops.url') do |url| %>
 curl --fail -u "<%= p("mongo_ops.username") %>:<%= p("mongo_ops.api_key") %>" \
 -X DELETE --digest \
--i "<%= p("mongo_ops.url") %>/api/public/v1.0/groups/<%= p("mongo_ops.group_id") %>" \
+-i "<%= url.chomp("/") %>/api/public/v1.0/groups/<%= p("mongo_ops.group_id") %>" \
 >/dev/null 2>&1
+<% end %>
 
 echo 0 >&3
 exit 0
