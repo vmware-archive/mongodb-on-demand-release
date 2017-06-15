@@ -1,4 +1,3 @@
-//go:generate go-bindata -pkg adapter -prefix om_cluster_docs -o bindata.go om_cluster_docs
 package adapter
 
 import (
@@ -67,12 +66,11 @@ func (oc OMClient) LoadDoc(key string, ctx map[string]interface{}) (string, erro
 		return val / div
 	})
 
-	asset, err := Asset(key + ".json")
-	if err != nil {
-		return "", err
+	tpl, ok := plans[key]
+	if !ok {
+		return "", fmt.Errorf("plan %q not found", key)
 	}
 
-	tpl := string(asset)
 	result, err := raymond.Render(tpl, ctx)
 	if err != nil {
 		return "", err
