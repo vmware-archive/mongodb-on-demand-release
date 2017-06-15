@@ -89,18 +89,24 @@ func (m ManifestGenerator) GenerateManifest(
 		engineVersion = "3.2.7" // TODO: make it configurable in deployment manifest
 	}
 
+	replicas := 0 // needed only by sharded_set
 	instances := mongodInstanceGroup.Instances
-	replicas := 3
-
 	planID := plan.Properties["id"].(string)
-	if planID == PlanShardedSet {
+	switch planID {
+	case PlanSingleReplicaSet:
+		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 1 {
+			// Instances number equals replicas number
+			instances = int(r)
+		}
+	case PlanShardedSet:
 		shards := 5
 		if s, ok := arbitraryParams["shards"].(float64); ok && s > 1 {
 			shards = int(s)
 		}
 
+		replicas := 3
 		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 1 {
-			replicas = 3
+			replicas = int(r)
 		}
 
 		// Number of instances for sharded cluster = shards * replicas

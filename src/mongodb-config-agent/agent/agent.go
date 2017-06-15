@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"errors"
 	"log"
 	"os"
 	"strings"
@@ -11,13 +12,24 @@ import (
 
 type ConfigAgent struct{}
 
-func partitionNodes(values []string, parts int) [][]string {
-	b := [][]string{}
-	for i := 0; i < parts; i++ {
-		b = append(b, []string{})
-		b[i] = values[i*parts : (i*parts)+parts]
+// Transforms a list of nodes into shards list depending on
+// replicas per shard number.
+// Number of nodes modulo number of replicas has to be zero.
+func partitionNodes(nodes []string, replicas int) ([][]string, error) {
+	if len(nodes) == 0 {
+		return nil, errors.New("len(nodes) == 0")
+	} else if replicas == 0 {
+		return nil, errors.New("replicas == 0")
+	} else if len(nodes)%replicas != 0 {
+		return nil, errors.New("len(nodes) % replicas != 0")
 	}
-	return b
+
+	b := [][]string{}
+	for i := 0; i < replicas; i++ {
+		b = append(b, []string{})
+		b[i] = nodes[i*replicas : (i*replicas)+replicas]
+	}
+	return b, nil
 }
 
 func (c ConfigAgent) PollAndConfigureGroup(url, username, apiKey, groupID, planID, nodeAddresses, adminPassword, engineVersion string, replicas int) {
@@ -35,7 +47,11 @@ func (c ConfigAgent) PollAndConfigureGroup(url, username, apiKey, groupID, planI
 	}
 
 	if planID == adapter.PlanShardedSet {
-		ctx["partitionedNodes"] = partitionNodes(nodes, replicas)
+		var err error
+		ctx["partitionedNodes"], err = partitionNodes(nodes, replicas)
+		if err != nil {
+			logger.Fatal(err)
+		}
 	}
 
 	logger.Printf("%+v", nodes)
