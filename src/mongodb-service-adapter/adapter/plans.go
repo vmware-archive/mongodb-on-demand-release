@@ -1,7 +1,13 @@
 package adapter
 
+const (
+	PlanStandalone       = "standalone"
+	PlanShardedSet       = "sharded_set"
+	PlanSingleReplicaSet = "single_replica_set"
+)
+
 var plans = map[string]string{
-	"standalone": `{
+	PlanStandalone: `{
     "options": {
         "downloadBase": "/var/lib/mongodb-mms-automation",
         "downloadBaseWindows": "C:\\mongodb-mms-automation"
@@ -151,7 +157,7 @@ var plans = map[string]string{
     }
 }`,
 
-	"sharded_set": `{
+	PlanShardedSet: `{
    "options": {
         "downloadBase": "/var/lib/mongodb-mms-automation",
         "downloadBaseWindows": "C:\\mongodb-mms-automation"
@@ -353,7 +359,7 @@ var plans = map[string]string{
     }
 }`,
 
-	"single_replica_set": `{
+	PlanSingleReplicaSet: `{
     "options": {
         "downloadBase": "/var/lib/mongodb-mms-automation",
         "downloadBaseWindows": "C:\\mongodb-mms-automation"

@@ -34,8 +34,7 @@ func (c ConfigAgent) PollAndConfigureGroup(url, username, apiKey, groupID, planI
 		"version":        engineVersion,
 	}
 
-	// TODO: get rid of hardcoded plan id
-	if planID == "sharded_set" {
+	if planID == adapter.PlanShardedSet {
 		ctx["partitionedNodes"] = partitionNodes(nodes, 3)
 	}
 
