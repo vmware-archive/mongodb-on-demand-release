@@ -4,10 +4,11 @@ import (
 	"flag"
 
 	"github.com/cf-platform-eng/mongodb-on-demand-release/src/mongodb-config-agent/config"
+	"github.com/cf-platform-eng/mongodb-on-demand-release/src/mongodb-config-agent/agent"
 )
 
 func main() {
-	configAgent := config.ConfigAgent{}
+	configAgent := agent.ConfigAgent{}
 
 	url := flag.String("url", "", "MOM URL")
 	username := flag.String("username", "", "MOM Username")
