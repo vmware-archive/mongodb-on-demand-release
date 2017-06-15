@@ -20,7 +20,7 @@ func partitionNodes(values []string, parts int) [][]string {
 	return b
 }
 
-func (c ConfigAgent) PollAndConfigureGroup(url, username, apiKey, groupID, planID, nodeAddresses, adminPassword, engineVersion string) {
+func (c ConfigAgent) PollAndConfigureGroup(url, username, apiKey, groupID, planID, nodeAddresses, adminPassword, engineVersion string, replicas int) {
 	logger := log.New(os.Stderr, "[mongodb-config-agent] ", log.LstdFlags)
 	omClient := adapter.OMClient{Url: url, Username: username, ApiKey: apiKey}
 
@@ -35,7 +35,7 @@ func (c ConfigAgent) PollAndConfigureGroup(url, username, apiKey, groupID, planI
 	}
 
 	if planID == adapter.PlanShardedSet {
-		ctx["partitionedNodes"] = partitionNodes(nodes, 3)
+		ctx["partitionedNodes"] = partitionNodes(nodes, replicas)
 	}
 
 	logger.Printf("%+v", nodes)

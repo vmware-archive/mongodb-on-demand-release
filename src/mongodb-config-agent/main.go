@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 
-	"github.com/cf-platform-eng/mongodb-on-demand-release/src/mongodb-config-agent/config"
 	"github.com/cf-platform-eng/mongodb-on-demand-release/src/mongodb-config-agent/agent"
 )
 
@@ -18,6 +17,7 @@ func main() {
 	nodeAddresses := flag.String("nodes", "", "Comma separated list of addresses")
 	adminPassword := flag.String("admin-password", "", "Admin password for the mongo instance")
 	engineVersion := flag.String("engine-version", "", "Engine version")
+	replicas := flag.Int("replicas", 0, "replicas per shard")
 
 	flag.Parse()
 
@@ -30,5 +30,6 @@ func main() {
 		*nodeAddresses,
 		*adminPassword,
 		*engineVersion,
+		*replicas,
 	)
 }

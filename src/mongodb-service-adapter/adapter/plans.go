@@ -237,7 +237,6 @@ var plans = map[string]string{
     {{/each}}
     ],
     "replicaSets": [{{#each partitionedNodes}}
-
             {
                 "_id": "shard_{{@index}}",
                 "members": [{{#each this}}
@@ -252,40 +251,8 @@ var plans = map[string]string{
                     }{{#if @last}}{{else}},{{/if}}
                     {{/each}}
                 ]
-            },
+            }{{#if @last}}{{else}},{{/if}}
             {{/each}}
-            {
-                "_id": "shard_3",
-                "members": [
-                    {
-                        "_id": 0,
-                        "arbiterOnly": false,
-                        "hidden": false,
-                        "host": "{{nodes.[9]}}",
-                        "priority": 1,
-                        "slaveDelay": 0,
-                        "votes": 1
-                    },
-                    {
-                        "_id": 1,
-                        "arbiterOnly": false,
-                        "hidden": false,
-                        "host": "{{nodes.[10]}}",
-                        "priority": 1,
-                        "slaveDelay": 0,
-                        "votes": 1
-                    },
-                    {
-                        "_id": 2,
-                        "arbiterOnly": false,
-                        "hidden": false,
-                        "host": "{{nodes.[11]}}",
-                        "priority": 1,
-                        "slaveDelay": 0,
-                        "votes": 1
-                    }
-                ]
-            }
     ],
     "sharding": [
         {
@@ -300,7 +267,7 @@ var plans = map[string]string{
                 ],
                 "name": "sharded-cluster",
                 "configServer": [],
-                "configServerReplica": "shard_3",
+                "configServerReplica": "shard_0",
                 "collections": []
             }
     ],

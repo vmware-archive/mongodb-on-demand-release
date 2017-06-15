@@ -29,6 +29,7 @@ case $1 in
       -nodes "<%= hosts %>" \
       -admin-password <%= p('mongo_ops.admin_password') %> \
       -engine-version <%= p('mongo_ops.engine_version') %> \
+      -replicas <%= p('mongo_ops.replicas') %> \
       >>  ${LOG_DIR}/mongodb_config_agent.stdout.log \
       2>> ${LOG_DIR}/mongodb_config_agent.stderr.log
     ;;

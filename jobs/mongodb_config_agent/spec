@@ -26,3 +26,5 @@ properties:
    description: "Admin password for mongo"
   mongo_ops.engine_version:
      description: "Engine version"
+  mongo_ops.replicas:
+       description: "Replicas number for each shard"

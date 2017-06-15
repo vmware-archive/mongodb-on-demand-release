@@ -7,16 +7,13 @@ import (
 
 	"github.com/pivotal-cf/on-demand-services-sdk/bosh"
 	"github.com/pivotal-cf/on-demand-services-sdk/serviceadapter"
+	"strconv"
 )
 
 const (
 	StemcellAlias           = "mongodb-stemcell"
 	MongodInstanceGroupName = "mongod_node"
 	MongodJobName           = "mongod_node"
-)
-
-var (
-	MongodJobs = []string{MongodJobName}
 )
 
 type ManifestGenerator struct {
@@ -69,7 +66,7 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, fmt.Errorf("no definition found for instance group '%s'", MongodInstanceGroupName)
 	}
 
-	mongodJobs, err := gatherJobs(serviceDeployment.Releases, MongodJobs)
+	mongodJobs, err := gatherJobs(serviceDeployment.Releases, []string{MongodJobName})
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
@@ -82,16 +79,6 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, fmt.Errorf("no networks definition found for instance group '%s'", MongodInstanceGroupName)
 	}
 
-	mongodProperties, err := mongodProperties(serviceDeployment.DeploymentName, plan.Properties, arbitraryParams, previousManifest)
-	if err != nil {
-		return bosh.BoshManifest{}, err
-	}
-
-	manifestProperties, err := manifestProperties(serviceDeployment.DeploymentName, group, plan.Properties, adminPassword)
-	if err != nil {
-		return bosh.BoshManifest{}, err
-	}
-
 	configAgentRelease, err := findReleaseForJob(serviceDeployment.Releases, "mongodb_config_agent")
 	if err != nil {
 		return bosh.BoshManifest{}, err
@@ -102,16 +89,22 @@ func (m ManifestGenerator) GenerateManifest(
 		engineVersion = "3.2.7" // TODO: make it configurable in deployment manifest
 	}
 
-	configAgentProperties, err := configAgentProperties(serviceDeployment.DeploymentName,
-		group, plan.Properties, adminPassword, engineVersion)
-
-	if err != nil {
-		return bosh.BoshManifest{}, err
-	}
-
 	instances := mongodInstanceGroup.Instances
-	if i, ok := arbitraryParams["instances"].(float64); ok && i != 0 {
-		instances = int(i)
+	replicas := 3
+
+	planID := plan.Properties["id"].(string)
+	if planID == PlanShardedSet {
+		shards := 5
+		if s, ok := arbitraryParams["shards"].(float64); ok && s > 1 {
+			shards = int(s)
+		}
+
+		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 1 {
+			replicas = 3
+		}
+
+		// Number of instances for sharded cluster = shards * replicas
+		instances = shards * replicas
 	}
 
 	manifest := bosh.BoshManifest{
@@ -134,7 +127,7 @@ func (m ManifestGenerator) GenerateManifest(
 				PersistentDiskType: mongodInstanceGroup.PersistentDiskType,
 				AZs:                mongodInstanceGroup.AZs,
 				Networks:           mongodNetworks,
-				Properties:         mongodProperties,
+				Properties:         map[string]interface{}{},
 			},
 			{
 				Name:      "mongodb-config-agent",
@@ -148,11 +141,24 @@ func (m ManifestGenerator) GenerateManifest(
 						},
 					},
 				},
-				VMType:     mongodInstanceGroup.VMType,
-				Stemcell:   StemcellAlias,
-				AZs:        mongodInstanceGroup.AZs,
-				Networks:   mongodNetworks,
-				Properties: configAgentProperties,
+				VMType:   mongodInstanceGroup.VMType,
+				Stemcell: StemcellAlias,
+				AZs:      mongodInstanceGroup.AZs,
+				Networks: mongodNetworks,
+
+				// See mongodb_config_agent job spec
+				Properties: map[string]interface{}{
+					"mongo_ops": map[string]string{
+						"url":            url,
+						"api_key":        apiKey,
+						"username":       username,
+						"group_id":       group.ID,
+						"plan_id":        planID,
+						"admin_password": adminPassword,
+						"engine_version": engineVersion,
+						"replicas":       strconv.Itoa(replicas),
+					},
+				},
 			},
 		},
 		Update: bosh.Update{
@@ -161,7 +167,14 @@ func (m ManifestGenerator) GenerateManifest(
 			UpdateWatchTime: "3000-180000",
 			MaxInFlight:     4,
 		},
-		Properties: manifestProperties,
+		Properties: map[string]interface{}{
+			"mongo_ops": map[string]string{
+				"url":            url,
+				"api_key":        group.AgentAPIKey,
+				"group_id":       group.ID,
+				"admin_password": adminPassword,
+			},
+		},
 	}
 
 	m.logf("generated manifest: %#v", manifest)
@@ -227,61 +240,4 @@ func findReleaseForJob(releases serviceadapter.ServiceReleases, requiredJob stri
 	}
 
 	return releasesThatProvideRequiredJob[0], nil
-}
-
-// TODO: figure out what's going on here
-func mongodProperties(deploymentName string, planProperties serviceadapter.Properties, arbitraryParams map[string]interface{}, previousManifest *bosh.BoshManifest) (map[string]interface{}, error) {
-	return map[string]interface{}{
-	// "mongo_ops": mongoOps,
-	// "spark_master": map[interface{}]interface{}{
-	// 	"port":       SparkMasterPort,
-	// 	"webui_port": SparkMasterWebUIPort,
-	// },
-	}, nil
-}
-
-func manifestProperties(deploymentName string, group Group, planProperties serviceadapter.Properties, adminPassword string) (map[string]interface{}, error) {
-	mongoOps := planProperties["mongo_ops"].(map[string]interface{})
-	url := mongoOps["url"].(string)
-
-	return map[string]interface{}{
-		"mongo_ops": map[string]string{
-			"url":            url,
-			"api_key":        group.AgentAPIKey,
-			"group_id":       group.ID,
-			"admin_password": adminPassword,
-		},
-	}, nil
-}
-
-func configAgentProperties(deploymentName string, group Group, planProperties serviceadapter.Properties, adminPassword, engineVersion string) (map[string]interface{}, error) {
-	// mongo_ops.url:
-	// 	description: "Mongo Ops Manager URL"
-	// mongo_ops.api_key:
-	//  description: "API Key for Ops Manager"
-	// mongo_ops.username:
-	//  description: "Username for Ops Manager"
-	// mongo_ops.group_id:
-	//  description: "Group Id"
-	// mongo_ops.plan_id:
-	//  description: "Plan identifier"
-	// mongo_ops.engine_version:
-	//  description: "Engine version"
-
-	mongoOps := planProperties["mongo_ops"].(map[string]interface{})
-	url := mongoOps["url"].(string)
-	username := mongoOps["username"].(string)
-	apiKey := mongoOps["api_key"].(string)
-
-	return map[string]interface{}{
-		"mongo_ops": map[string]string{
-			"url":            url,
-			"api_key":        apiKey,
-			"username":       username,
-			"group_id":       group.ID,
-			"plan_id":        planProperties["id"].(string),
-			"admin_password": adminPassword,
-			"engine_version": engineVersion,
-		},
-	}, nil
 }
