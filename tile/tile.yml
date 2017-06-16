@@ -60,7 +60,7 @@ requires_product_versions:
 packages:
 - name: on-demand-service-broker
   type: bosh-release
-  path: resources/on-demand-service-broker-0.5.0.tgz
+  path: resources/on-demand-service-broker-0.15.3.tgz
 - name: mongodb
   type: bosh-release
   path: resources/mongodb-0+dev.95.tgz
@@ -85,6 +85,7 @@ packages:
       port: 8080
       username: (( .properties.broker_basic_auth.identity ))
       password: (( .properties.broker_basic_auth.password ))
+      disable_ssl_cert_verification: (( ..cf.ha_proxy.skip_cert_verify.value ))
       bosh:
         url: https://(( $director.deployment_ip )):25555
         root_ca_cert: (( $director.ca_public_key ))
@@ -93,16 +94,26 @@ packages:
             url: https://(( $director.deployment_ip )):8443
             client_id: (( $self.uaa_client_name ))
             client_secret: (( $self.uaa_client_secret ))
+      cf:
+        url: (( $runtime.system_api_url ))
+        authentication:
+          url: "https://uaa.(( ..cf.cloud_controller.system_domain.value ))"
+          client_credentials:
+            client_id: (( ..cf.uaa.admin_client_credentials.identity ))
+            secret: (( ..cf.uaa.admin_client_credentials.password ))
+          user_credentials:
+            username: (( ..cf.uaa.admin_credentials.identity ))
+            password: (( ..cf.uaa.admin_credentials.password ))
       service_adapter:
         path: /var/vcap/packages/mongodb-service-adapter/bin/mongodb-service-adapter
       service_deployment:
         releases:
         - name: mongodb
-          version: latest
+          version: "0+dev.95"
           jobs: [mongod_node, mongodb_config_agent]
         stemcell:
           os: ubuntu-trusty
-          version: latest
+          version: "3232.4"
       service_catalog:
         id: D94A086D-203D-4966-A6F1-60A9E2300F72
         service_name: mongodb-odb
@@ -183,6 +194,7 @@ packages:
     instances: 1
     properties:
       broker_name: mongodb-odb
+      disable_ssl_cert_verification: (( ..cf.ha_proxy.skip_cert_verify.value ))
       cf:
         api_url: (( $runtime.system_api_url ))
         admin_username: (( ..cf.uaa.admin_credentials.identity ))
@@ -205,6 +217,7 @@ packages:
     instances: 1
     properties:
       broker_name: mongodb-odb
+      disable_ssl_cert_verification: (( ..cf.ha_proxy.skip_cert_verify.value ))
       cf:
         api_url: (( $runtime.system_api_url ))
         admin_username: (( ..cf.uaa.admin_credentials.identity ))
@@ -214,7 +227,7 @@ packages:
     lifecycle: errand
     pre_delete: true
     templates:
-    - name: delete-sub-deployments
+    - name: delete-all-service-instances
       release: on-demand-service-broker
     max_in_flight: 1
     memory: 1024
