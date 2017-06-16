@@ -17,22 +17,22 @@ properties:
 forms:
 - name: mongodb_ops_form
   label: MongoDB On-Demand
-  description: Configure MongoDB Operations Manager
+  description: Configure MongoDB Ops Manager
   properties:
   - name: url
     type: string
     configurable: true
-    label: MongoDB Operations Manager URL
+    label: MongoDB Ops Manager URL
     description: This will be the URL for your MongoDB Ops Manager. Please ensure that it is reachable.
   - name: username
     type: string
     configurable: true
-    label: MongoDB Operations Manager username
+    label: MongoDB Ops Manager username
     description: This will be the username for your MongoDB Ops Manager.
   - name: api_key
     type: secret
     configurable: true
-    label: MongoDB Operations Manager API key
+    label: MongoDB Ops Manager API key
     description: This will be the API Key for your MongoDB Ops Manager.
   - name: vm_type
     type: vm_type_dropdown
