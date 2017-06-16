@@ -98,9 +98,6 @@ packages:
         url: (( $runtime.system_api_url ))
         authentication:
           url: "https://uaa.(( ..cf.cloud_controller.system_domain.value ))"
-          client_credentials:
-            client_id: (( ..cf.uaa.admin_client_credentials.identity ))
-            secret: (( ..cf.uaa.admin_client_credentials.password ))
           user_credentials:
             username: (( ..cf.uaa.admin_credentials.identity ))
             password: (( ..cf.uaa.admin_credentials.password ))
