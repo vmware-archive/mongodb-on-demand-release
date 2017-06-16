@@ -196,6 +196,28 @@ packages:
         api_url: (( $runtime.system_api_url ))
         admin_username: (( ..cf.uaa.admin_credentials.identity ))
         admin_password: (( ..cf.uaa.admin_credentials.password ))
+  - name: delete_subdeployments_on_demand_service_broker
+    label: 'Delete all instances deployed by the On Demand Service Broker'
+    lifecycle: errand
+    pre_delete: true
+    templates:
+    - name: delete-all-service-instances
+      release: on-demand-service-broker
+    max_in_flight: 1
+    memory: 1024
+    ephemeral_disk: 2048
+    persistent_disk: 0
+    cpu: 1
+    static_ip: 0
+    dynamic_ip: 1
+    single_az_only: true
+    instances: 1
+    properties:
+      cf:
+        api_url: (( $runtime.system_api_url ))
+        admin_username: (( ..cf.uaa.admin_credentials.identity ))
+        admin_password: (( ..cf.uaa.admin_credentials.password ))
+
   - name: unregister_on_demand_service_broker
     label: 'On Demand Service Broker Deregistrar'
     lifecycle: errand
@@ -219,25 +241,3 @@ packages:
         api_url: (( $runtime.system_api_url ))
         admin_username: (( ..cf.uaa.admin_credentials.identity ))
         admin_password: (( ..cf.uaa.admin_credentials.password ))
-  - name: delete_subdeployments_on_demand_service_broker
-    label: 'Delete all instances deployed by the On Demand Service Broker'
-    lifecycle: errand
-    pre_delete: true
-    templates:
-    - name: delete-all-service-instances
-      release: on-demand-service-broker
-    max_in_flight: 1
-    memory: 1024
-    ephemeral_disk: 2048
-    persistent_disk: 0
-    cpu: 1
-    static_ip: 0
-    dynamic_ip: 1
-    single_az_only: true
-    instances: 1
-    properties:
-      cf:
-        api_url: (( $runtime.system_api_url ))
-        admin_username: (( ..cf.uaa.admin_credentials.identity ))
-        admin_password: (( ..cf.uaa.admin_credentials.password ))
-
