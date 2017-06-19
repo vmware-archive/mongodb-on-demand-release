@@ -1,6 +1,7 @@
 package adapter
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -8,8 +9,6 @@ import (
 	"log"
 	"net/http"
 	"strings"
-
-	"github.com/aymerick/raymond"
 )
 
 type OMClient struct {
@@ -29,57 +28,38 @@ type GroupHosts struct {
 	TotalCount int `json:"totalCount"`
 }
 
-func (oc OMClient) LoadDoc(key string, ctx map[string]interface{}) (string, error) {
-	raymond.RegisterHelper("password", func() string {
-		p, err := GenerateString(32)
-		if err != nil {
-			panic(err)
-		}
-		return p
-	})
+type DocContext struct {
+	ID            string
+	Key           string
+	AdminPassword string
+	Version       string
+	Nodes         []string
+	Shards        [][]string
+	Password      string
+}
 
-	raymond.RegisterHelper("isConfig", func(index int) bool {
-		return index >= 9 && index < 12
-	})
-
-	raymond.RegisterHelper("isInShard", func(index int) bool {
-		return index < 12
-	})
-
-	raymond.RegisterHelper("hasStorage", func(index int) bool {
-		return index < 12
-	})
-
-	raymond.RegisterHelper("processType", func(index int) string {
-		if index > 11 && index < 15 {
-			return "mongos"
-		} else {
-			return "mongod"
-		}
-	})
-
-	raymond.RegisterHelper("hasShardedCluster", func(index int) bool {
-		return index > 11 && index < 15
-	})
-
-	raymond.RegisterHelper("div", func(val int, div int) int {
-		return val / div
-	})
-
-	tpl, ok := plans[key]
+func (oc *OMClient) LoadDoc(key string, ctx *DocContext) (string, error) {
+	t, ok := plans[key]
 	if !ok {
 		return "", fmt.Errorf("plan %q not found", key)
 	}
 
-	result, err := raymond.Render(tpl, ctx)
-	if err != nil {
-		return "", err
+	if ctx.Password == "" {
+		var err error
+		ctx.Password, err = GenerateString(32)
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	return result, nil
+	b := bytes.Buffer{}
+	if err := t.Execute(&b, ctx); err != nil {
+		return "", err
+	}
+	return b.String(), nil
 }
 
-func (oc OMClient) CreateGroup(id string) (Group, error) {
+func (oc *OMClient) CreateGroup(id string) (Group, error) {
 	var group Group
 
 	name := fmt.Sprintf("pcf_%s", id)
@@ -102,7 +82,7 @@ func (oc OMClient) CreateGroup(id string) (Group, error) {
 	return group, nil
 }
 
-func (oc OMClient) GetGroup(GroupID string) (Group, error) {
+func (oc *OMClient) GetGroup(GroupID string) (Group, error) {
 	var group Group
 
 	resp, err := oc.doRequest("GET", fmt.Sprintf("/api/public/v1.0/groups/%s", GroupID), nil)
@@ -122,7 +102,7 @@ func (oc OMClient) GetGroup(GroupID string) (Group, error) {
 	return group, nil
 }
 
-func (oc OMClient) GetGroupHosts(GroupID string) (GroupHosts, error) {
+func (oc *OMClient) GetGroupHosts(GroupID string) (GroupHosts, error) {
 	var groupHosts GroupHosts
 
 	resp, err := oc.doRequest("GET", fmt.Sprintf("/api/public/v1.0/groups/%s/hosts", GroupID), nil)
@@ -144,7 +124,7 @@ func (oc OMClient) GetGroupHosts(GroupID string) (GroupHosts, error) {
 	return groupHosts, nil
 }
 
-func (oc OMClient) ConfigureGroup(configurationDoc string, groupId string) error {
+func (oc *OMClient) ConfigureGroup(configurationDoc string, groupId string) error {
 	url := fmt.Sprintf("/api/public/v1.0/groups/%s/automationConfig", groupId)
 	body := strings.NewReader(configurationDoc)
 
@@ -164,7 +144,7 @@ func (oc OMClient) ConfigureGroup(configurationDoc string, groupId string) error
 	return nil
 }
 
-func (oc OMClient) doRequest(method string, path string, body io.Reader) (*http.Response, error) {
+func (oc *OMClient) doRequest(method string, path string, body io.Reader) (*http.Response, error) {
 	uri := fmt.Sprintf("%s%s", strings.TrimRight(oc.Url, "/"), path)
 	req, err := http.NewRequest(method, uri, body)
 	if err != nil {

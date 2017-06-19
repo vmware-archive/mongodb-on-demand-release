@@ -1,12 +1,61 @@
 package adapter
 
+import (
+	"reflect"
+	"text/template"
+)
+
 const (
 	PlanStandalone       = "standalone"
 	PlanShardedSet       = "sharded_set"
 	PlanSingleReplicaSet = "single_replica_set"
 )
 
-var plans = map[string]string{
+var plans = map[string]*template.Template{}
+
+func init() {
+	funcs := template.FuncMap{
+		"last": func(a interface{}, x int) bool {
+			return reflect.ValueOf(a).Len()-1 == x
+		},
+		"isConfig": func(index int) bool {
+			return index >= 9 && index < 12
+		},
+		"isInShard": func(index int) bool {
+			return index < 12
+		},
+		"hasStorage": func(index int) bool {
+			return index < 12
+		},
+		"processType": func(index int) string {
+			if index > 11 && index < 15 {
+				return "mongos"
+			} else {
+				return "mongod"
+			}
+		},
+		"hasShardedCluster": func(index int) bool {
+			return index > 11 && index < 15
+		},
+		"shardNumber": func(index int) int {
+			return index % 3
+		},
+	}
+
+	for k, s := range plansRaw {
+		t := template.New(k).Funcs(funcs)
+		t, err := t.Parse(s)
+		if err != nil {
+			panic(err)
+		}
+
+		t = t.Funcs(funcs)
+
+		plans[k] = t
+	}
+}
+
+var plansRaw = map[string]string{
 	PlanStandalone: `{
     "options": {
         "downloadBase": "/var/lib/mongodb-mms-automation",
@@ -30,10 +79,10 @@ var plans = map[string]string{
                     "winVCRedistVersion": ""
                 }
             ],
-        "name": "{{version}}"
+        "name": "{{.Version}}"
     }],
     "backupVersions": [{
-        "hostname": "{{nodes.[0]}}",
+        "hostname": "{{index .Nodes 0}}",
         "logPath": "/var/vcap/sys/log/mongod_node/backup-agent.log",
         "logRotate": {
             "sizeThresholdMB": 1000,
@@ -42,7 +91,7 @@ var plans = map[string]string{
     }],
 
     "monitoringVersions": [{
-        "hostname": "{{nodes.[0]}}",
+        "hostname": "{{index .Nodes 0}}",
         "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
         "logRotate": {
             "sizeThresholdMB": 1000,
@@ -62,14 +111,14 @@ var plans = map[string]string{
                 "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
             }
         },
-        "hostname": "{{nodes.[0]}}",
+        "hostname": "{{index .Nodes 0}}",
         "logRotate": {
             "sizeThresholdMB": 1000,
             "timeThresholdHrs": 24
         },
-        "name": "{{nodes.[0]}}",
+        "name": "{{index .Nodes 0}}",
         "processType": "mongod",
-        "version": "{{version}}",
+        "version": "{{.Version}}",
         "authSchemaVersion": 5
     }],
     "replicaSets": [],
@@ -78,11 +127,11 @@ var plans = map[string]string{
 
     "auth": {
         "autoUser": "mms-automation",
-        "autoPwd": "{{ password }}",
+        "autoPwd": "{{.Password}}",
         "deploymentAuthMechanisms": [
             "SCRAM-SHA-1"
         ],
-        "key": "{{ key }}",
+        "key": "{{.key}}",
         "keyfile": "/var/vcap/jobs/mongod_node/config/mongo_om.key",
         "disabled": false,
         "usersDeleted": [],
@@ -96,7 +145,7 @@ var plans = map[string]string{
                     }
                 ],
                 "user": "mms-monitoring-agent",
-                "initPwd": "{{ password }}"
+                "initPwd": "{{.Password}}"
             },
             {
                 "db": "admin",
@@ -123,7 +172,7 @@ var plans = map[string]string{
                     }
                 ],
                 "user": "mms-backup-agent",
-                "initPwd": "{{ password }}"
+                "initPwd": "{{.Password}}"
             },
             {
                "db": "admin" ,
@@ -150,7 +199,7 @@ var plans = map[string]string{
                      "role": "readWrite"
                  }
                ],
-               "initPwd": "{{ admin_password }}"
+               "initPwd": "{{.admin_password}}"
             }
         ],
         "autoAuthMechanism": "SCRAM-SHA-1"
@@ -180,14 +229,14 @@ var plans = map[string]string{
                     "winVCRedistVersion": ""
                 }
             ],
-        "name": "{{version}}"
+        "name": "{{.Version}}"
     }],
     "backupVersions": [
     ],
 
     "monitoringVersions": [
     {
-        "hostname": "{{nodes.[0]}}",
+        "hostname": "{{index .Nodes 0}}",
         "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
         "logRotate": {
             "sizeThresholdMB": 1000,
@@ -195,96 +244,96 @@ var plans = map[string]string{
         }
     }
     ],
-    "processes": [{{#each nodes}}
-      {
+    "processes": [{{range $i, $node := .Nodes}}
+      {{if $i}},{{end}}{
         "args2_6": {
             "net": {
                 "port": 28000
             },
-            {{#if (isInShard @index)}}
+            {{if isInShard $i}}
             "replication": {
-                "replSetName": "shard_{{div @index 3 }}"
+                "replSetName": "shard_{{shardNumber $i}}"
             },
-            {{/if}}
-            {{#if (isConfig @index)}}
+            {{end}}
+            {{if isConfig $i}}
             "sharding": {
                 "clusterRole": "configsvr"
             },
-            {{/if}}
-            {{#if (hasStorage @index)}}
+            {{end}}
+            {{if hasStorage $i}}
             "storage": {
                 "dbPath": "/var/vcap/store/mongodb-data"
             },
-            {{/if}}
+            {{end}}
             "systemLog": {
                 "destination": "file",
                 "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
             }
         },
-        "hostname": "{{this}}",
+        "hostname": "{{$node}}",
         "logRotate": {
             "sizeThresholdMB": 1000,
             "timeThresholdHrs": 24
         },
-        "name": "{{this}}",
-        "processType": "{{processType @index}}",
-        {{#if (hasShardedCluster @index)}}
+        "name": "{{$node}}",
+        "processType": "{{processType $i}}",
+        {{if hasShardedCluster $i}}
         "cluster": "sharded-cluster",
-        {{/if}}
-        "version": "{{version}}",
+        {{end}}
+        "version": "{{$.Version}}",
         "authSchemaVersion": 5
-    }{{#if @last}}{{else}},{{/if}}
-    {{/each}}
+    }
+    {{end}}
     ],
-    "replicaSets": [{{#each partitionedNodes}}
-            {
-                "_id": "shard_{{id}}_{{@index}}",
-                "members": [{{#each this}}
-                    {
-                        "_id": {{@index}},
-                        "arbiterOnly": false,
-                        "hidden": false,
-                        "host": "{{this}}",
-                        "priority": 1,
-                        "slaveDelay": 0,
-                        "votes": 1
-                    }{{#if @last}}{{else}},{{/if}}
-                    {{/each}}
-                ]
-            }{{#if @last}}{{else}},{{/if}}
-            {{/each}}
+    "replicaSets": [{{range $i, $shard := .Shards}}
+        {{if $i}},{{end}}{
+           "_id": "shard_{{$.ID}}_{{$i}}",
+           "members": [{{range $i, $node := $shard}}
+               {{if $i}},{{end}}{
+                   "_id": {{$i}},
+                   "arbiterOnly": false,
+                   "hidden": false,
+                   "host": "{{$node}}",
+                   "priority": 1,
+                   "slaveDelay": 0,
+                   "votes": 1
+               }
+               {{end}}
+           ]
+       }
+       {{end}}
     ],
     "sharding": [
         {
                 "shards": [
-                  {{#each partitionedNodes}}
-                    {
+                  {{range $i, $shard := .Shards}}
+                    {{if $i}},{{end}}{
                         "tags": [],
-                        "_id": "shard_{{id}}_{{@index}}",
-                        "rs": "shard_{{id}}_{{@index}}"
-                    }{{#if @last}}{{else}},{{/if}}
-                    {{/each}}
+                        "_id": "shard_{{$.ID}}_{{$i}}",
+                        "rs": "shard_{{$.ID}}_{{$i}}"
+                    }
+                  {{end}}
                 ],
                 "name": "sharded-cluster",
                 "configServer": [],
-                "configServerReplica": "shard_{{id}}_0",
+                "configServerReplica": "shard_{{.ID}}_0",
                 "collections": []
             }
     ],
 
     "auth":{
        "disabled":false,
-       "autoPwd": "{{ password }}",
+       "autoPwd": "{{.Password}}",
        "autoUser":"mms-automation",
        "deploymentAuthMechanisms": [
            "MONGODB-CR"
        ],
-       "key":"{{ key }}",
+       "key":"{{.Key}}",
        "keyfile":"/var/vcap/jobs/mongod_node/config/mongo_om.key",
        "usersWanted":[
           {
              "db":"admin",
-             "initPwd":"{{ password }}",
+             "initPwd":"{{.Password}}",
              "roles":[
                 {
                    "db":"admin",
@@ -295,7 +344,7 @@ var plans = map[string]string{
           },
           {
              "db":"admin",
-             "initPwd":"{{ password }}",
+             "initPwd":"{{.Password}}",
              "roles":[
                 {
                    "db":"admin",
@@ -349,10 +398,10 @@ var plans = map[string]string{
                     "winVCRedistVersion": ""
                 }
             ],
-        "name": "{{version}}"
+        "name": "{{.Version}}"
     }],
     "backupVersions": [{
-        "hostname": "{{nodes.[0]}}",
+        "hostname": "{{index .Nodes 0}}",
         "logPath": "/var/vcap/sys/log/mongod_node/backup-agent.log",
         "logRotate": {
             "sizeThresholdMB": 1000,
@@ -361,15 +410,15 @@ var plans = map[string]string{
     }],
 
     "monitoringVersions": [{
-        "hostname": "{{nodes.[0]}}",
+        "hostname": "{{index .Nodes 0}}",
         "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
         "logRotate": {
             "sizeThresholdMB": 1000,
             "timeThresholdHrs": 24
         }
     }],
-    "processes": [{{#each nodes}}
-      {
+    "processes": [{{range $i, $node := .Nodes}}
+      {{if $i}},{{end}}{
         "args2_6": {
             "net": {
                 "port": 28000
@@ -385,27 +434,30 @@ var plans = map[string]string{
                 "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
             }
         },
-        "hostname": "{{this}}",
+        "hostname": "{{$node}}",
         "logRotate": {
             "sizeThresholdMB": 1000,
             "timeThresholdHrs": 24
         },
-        "name": "{{this}}",
+        "name": "{{$node}}",
         "processType": "mongod",
-        "version": "{{version}}",
+        "version": "{{$.Version}}",
         "authSchemaVersion": 5
-    }{{#if @last}}{{else}},{{/if}}
-    {{/each}}
+    }
+    {{end}}
   ],
     "replicaSets": [{
         "_id": "pcf_repl",
         "members": [
-          {{#each nodes}}
-          {
-            "_id": {{@index}},
-            "host": "{{this}}"
-          {{#if @last}},"arbiterOnly": true,"priority": 0}
-          {{else}}},{{/if}}{{/each}}
+          {{range $i, $node := .Nodes}}
+          {{if $i}},{{end}}{
+            "_id": {{$i}},
+            "host": "{{$node}}"{{if last $.Nodes $i}},
+            "arbiterOnly": true,
+            "priority": 0
+            {{end}}
+          }
+          {{end}}
         ]
     }],
     "roles": [],
@@ -413,11 +465,11 @@ var plans = map[string]string{
 
     "auth": {
         "autoUser": "mms-automation",
-        "autoPwd": "{{ password }}",
+        "autoPwd": "{{.Password}}",
         "deploymentAuthMechanisms": [
             "SCRAM-SHA-1"
         ],
-        "key": "{{ key }}",
+        "key": "{{.Key}}",
         "keyfile": "/var/vcap/jobs/mongod_node/config/mongo_om.key",
         "disabled": false,
         "usersDeleted": [],
@@ -431,7 +483,7 @@ var plans = map[string]string{
                     }
                 ],
                 "user": "mms-monitoring-agent",
-                "initPwd": "{{ password }}"
+                "initPwd": "{{.Password}}"
             },
             {
                 "db": "admin",
@@ -458,7 +510,7 @@ var plans = map[string]string{
                     }
                 ],
                 "user": "mms-backup-agent",
-                "initPwd": "{{ password }}"
+                "initPwd": "{{.Password}}"
             },
             {
                "db": "admin" ,
@@ -485,7 +537,7 @@ var plans = map[string]string{
                      "role": "readWrite"
                  }
                ],
-               "initPwd": "{{ admin_password }}"
+               "initPwd": "{{.AdminPassword}}"
             }
         ],
         "autoAuthMechanism": "SCRAM-SHA-1"

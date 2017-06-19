@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+// GenerateString generates a random string or panics
+// if something goes wrong.
 func GenerateString(l int) (string, error) {
 	b := make([]byte, l)
 	for i := l; i != 0; {
