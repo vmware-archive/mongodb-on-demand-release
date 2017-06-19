@@ -1,0 +1,110 @@
+---
+resources:
+- name: git
+  type: git
+  source:
+    branch: ((git-branch))
+    uri: ((git-uri))
+- name: version
+  type: semver
+  source:
+    driver: s3
+    bucket: ((aws-bucket))
+    key: version
+    access_key_id: ((aws-access-key))
+    secret_access_key: ((aws-secret-access-key))
+    initial_version: ((initial-version))
+- name: stemcell
+  type: s3
+  source:
+    bucket: ((aws-bucket))
+    regexp: ((stemcell-regexp))
+    access_key_id: ((aws-access-key))
+    secret_access_key: ((aws-secret-access-key))
+- name: odb
+  type: s3
+  source:
+    bucket: ((aws-bucket))
+    regexp: ((odb-regexp))
+    access_key_id: ((aws-access-key))
+    secret_access_key: ((aws-secret-access-key))
+- name: s3
+  type: s3
+  source:
+    bucket: ((aws-bucket))
+    regexp: ((tile-regexp))
+    access_key_id: ((aws-access-key))
+    secret_access_key: ((aws-secret-access-key))
+
+jobs:
+- name: build-tile
+  serial: true
+  plan:
+  - get: git
+    trigger: false
+  - get: odb
+    trigger: false
+    params: {filename: on-demand-service-broker-0.15.3.tgz}
+  - get: version
+    trigger: false
+  - task: build-tile
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: andreikrasnitski/tile-pipeline
+      inputs:
+      - name: git
+      - name: odb
+      - name: version
+      outputs:
+      - name: tile
+      run:
+        path: ./git/ci/build-tile
+        args: []
+  - put: s3
+    params:
+      file: tile/mongodb-on-demand-*.pivotal
+      acl: public-read
+- name: deploy-tile
+  serial: true
+  plan:
+  - get: git
+    trigger: false
+    passed: [build-tile]
+  - get: s3
+    trigger: false
+    params: {filename: mongodb-on-demand-*.pivotal}
+  - get: stemcell
+    trigger: false
+    params: {filename: bosh-stemcell-*.tgz}
+  - get: version
+    trigger: false
+  - task: deploy-tile
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: andreikrasnitski/tile-pipeline
+      inputs:
+      - name: git
+      - name: stemcell
+      - name: s3
+      - name: version
+      run:
+        path: ./git/ci/deploy-tile
+        args: []
+      params:
+        PCF_URL: ((pcf-url))
+        PCF_USERNAME: ((pcf-username))
+        PCF_PASSWORD: ((pcf-password))
+        URL: ((mongo-url))
+        USERNAME: ((mongo-username))
+        API_KEY: ((mongo-apikey))
+        VM_TYPE: ((mongo-vm))
+        DISK_TYPE: ((mongo-disk))
+        AZ: ((mongo-az))
+  - put: version
+    params: {bump: patch}

@@ -1,0 +1,60 @@
+#!/usr/bin/dumb-init /bin/bash
+
+set -e
+
+root_dir=$(pwd)
+
+VERSION=$(cat version/number)
+TILE_FILE=`cd s3; ls *-${VERSION}.pivotal`
+if [ -z "${TILE_FILE}" ]; then
+	echo "No files matching s3/*.pivotal"
+	ls -lR s3
+	exit 1
+fi
+STEMCELL_FILE=`cd stemcell; ls bosh-stemcell-*.tgz`
+if [ -z "${STEMCELL_FILE}" ]; then
+	echo "No files matching stemcell/*.tgz"
+	ls -lR stemcell
+	exit 1
+fi
+PRODUCT=`echo "${TILE_FILE}" | sed "s/-[^-]*$//"`
+
+echo "===> Setting up PCF metadata... <==="
+cat > metadata << EOF
+---
+opsmgr:
+  url: "$PCF_URL"
+  username: "$PCF_USERNAME"
+  password: "$PCF_PASSWORD"
+EOF
+
+echo "===> Verifying PCF... <==="
+pcf version
+
+echo "===> Uploading PCF tile... <==="
+pcf import "s3/${TILE_FILE}"
+
+echo "===> Uploading stemcell... <==="
+pcf upload-stemcell "stemcell/${STEMCELL_FILE}"
+
+echo "===> Checking available PCF tiles... <==="
+pcf products
+pcf is-available "${PRODUCT}" "${VERSION}"
+
+echo "===> Installing ${PRODUCT} ${VERSION} PCF tile... <==="
+pcf install "${PRODUCT}" "${VERSION}"
+
+echo "===> Configuring ${PRODUCT} ${VERSION} PCF tile... <==="
+cat > missing-properties.yml << EOF
+---
+.properties.url: "$URL"
+.properties.username: "$USERNAME"
+.properties.api_key: {'secret': "$API_KEY"}
+.properties.vm_type: "$VM_TYPE"
+.properties.disk_type: "$DISK_TYPE"
+.properties.az_multi_select: ["$AZ"]
+EOF
+pcf configure --skip-validation "${PRODUCT}" missing-properties.yml
+
+echo "===> Applying Changes... <==="
+pcf apply-changes

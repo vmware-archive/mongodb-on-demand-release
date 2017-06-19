@@ -63,7 +63,7 @@ packages:
   path: resources/on-demand-service-broker-0.15.3.tgz
 - name: mongodb
   type: bosh-release
-  path: resources/mongodb-0+dev.95.tgz
+  path: resources/mongodb-0.7.9.tgz
   jobs:
   - name: broker
     label: MongoDB-ODB
@@ -106,7 +106,7 @@ packages:
       service_deployment:
         releases:
         - name: mongodb
-          version: "0+dev.95"
+          version: "0.7.9"
           jobs: [mongod_node, mongodb_config_agent]
         stemcell:
           os: ubuntu-trusty

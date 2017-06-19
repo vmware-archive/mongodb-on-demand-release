@@ -1,0 +1,25 @@
+#!/usr/bin/dumb-init /bin/bash
+
+set -e
+
+root_dir=$(pwd)
+
+VERSION=$(cat version/number)
+
+pushd git
+  mkdir -p src/golang
+  wget 'https://storage.googleapis.com/golang/go1.8.3.linux-amd64.tar.gz' -O src/golang/go1.8.3.linux-amd64.tar.gz --tries=7
+  bosh create release --with-tarball --name mongodb --version ${VERSION}
+  cp dev_releases/mongodb/mongodb-*.tgz $root_dir/git/tile/resources
+popd
+
+pushd odb
+  cp on-demand-service-broker-*.tgz $root_dir/git/tile/resources
+popd
+
+pushd git/tile
+  PREVIOUS_VERSION=$(cat tile.yml|grep resources/mongodb|grep -o -P "\\s*[v=]*\\s*([0-9]+)\\.([0-9]+)\\.([0-9]+)")
+  sed -i "s/${PREVIOUS_VERSION}/${VERSION}/g" tile.yml
+  tile build ${VERSION}
+  cp product/mongodb-on-demand-*.pivotal $root_dir/tile
+popd
