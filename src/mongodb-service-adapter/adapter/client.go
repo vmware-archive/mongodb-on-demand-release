@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/AsGz/httpAuthClient"
 	"github.com/aymerick/raymond"
 )
 
@@ -173,12 +172,7 @@ func (oc OMClient) doRequest(method string, path string, body io.Reader) (*http.
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	err = httpAuthClient.ApplyHttpDigestAuth(oc.Username, oc.ApiKey, uri, req)
-	if err != nil {
-		log.Fatal(err)
-		return nil, err
-	}
-
+	req.SetBasicAuth(oc.Username, oc.ApiKey)
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Fatalf("%s %s error: %v", method, uri, err)
