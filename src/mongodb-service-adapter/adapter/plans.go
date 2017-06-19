@@ -238,7 +238,7 @@ var plans = map[string]string{
     ],
     "replicaSets": [{{#each partitionedNodes}}
             {
-                "_id": "shard_{{@index}}",
+                "_id": "shard_{{id}}_{{@index}}",
                 "members": [{{#each this}}
                     {
                         "_id": {{@index}},
@@ -260,14 +260,14 @@ var plans = map[string]string{
                   {{#each partitionedNodes}}
                     {
                         "tags": [],
-                        "_id": "shard_{{@index}}",
-                        "rs": "shard_{{@index}}"
+                        "_id": "shard_{{id}}_{{@index}}",
+                        "rs": "shard_{{id}}_{{@index}}"
                     }{{#if @last}}{{else}},{{/if}}
                     {{/each}}
                 ],
                 "name": "sharded-cluster",
                 "configServer": [],
-                "configServerReplica": "shard_0",
+                "configServerReplica": "shard_{{id}}_0",
                 "collections": []
             }
     ],

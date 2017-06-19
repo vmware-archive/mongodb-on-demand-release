@@ -45,9 +45,17 @@ func (m ManifestGenerator) GenerateManifest(
 
 	oc := &OMClient{Url: url, Username: username, ApiKey: apiKey}
 
-	adminPassword := oc.RandomString(20)
+	adminPassword, err := GenerateString(20)
+	if err != nil {
+		return bosh.BoshManifest{}, err
+	}
 
-	group, err := oc.CreateGroup()
+	id, err := GenerateString(8)
+	if err != nil {
+		return bosh.BoshManifest{}, err
+	}
+
+	group, err := oc.CreateGroup(id)
 	if err != nil {
 		return bosh.BoshManifest{}, fmt.Errorf("could not create new group (%s)", err.Error())
 	}
@@ -155,6 +163,7 @@ func (m ManifestGenerator) GenerateManifest(
 				// See mongodb_config_agent job spec
 				Properties: map[string]interface{}{
 					"mongo_ops": map[string]string{
+						"id":             id,
 						"url":            url,
 						"api_key":        apiKey,
 						"username":       username,

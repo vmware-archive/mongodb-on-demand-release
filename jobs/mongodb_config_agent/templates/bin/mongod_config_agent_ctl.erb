@@ -21,6 +21,7 @@ case $1 in
     <% hosts = link("mongod_node").instances.collect{ |x| "#{x.address}" }.join(",") %>
 
     exec /var/vcap/packages/mongodb-config-agent/bin/mongodb-config-agent \
+      -id <%= p('mongo_ops.id') %> \
       <% if_p('mongo_ops.url') do |url| %>-url <%= url.chomp("/") %> <% end %> \
       -username <%= p('mongo_ops.username') %> \
       -api-key <%= p('mongo_ops.api_key') %> \

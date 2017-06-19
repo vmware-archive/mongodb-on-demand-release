@@ -12,6 +12,8 @@ consumes:
   - {name: mongod_node, type: node}
 
 properties:
+	mongo_ops.id:
+    description: "Service id"
   mongo_ops.url:
     description: "Mongo Ops Manager URL"
   mongo_ops.api_key:

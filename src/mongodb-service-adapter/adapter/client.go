@@ -6,14 +6,11 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/AsGz/httpAuthClient"
 	"github.com/aymerick/raymond"
-	"github.com/nu7hatch/gouuid"
 )
 
 type OMClient struct {
@@ -35,7 +32,11 @@ type GroupHosts struct {
 
 func (oc OMClient) LoadDoc(key string, ctx map[string]interface{}) (string, error) {
 	raymond.RegisterHelper("password", func() string {
-		return oc.RandomString(32)
+		p, err := GenerateString(32)
+		if err != nil {
+			panic(err)
+		}
+		return p
 	})
 
 	raymond.RegisterHelper("isConfig", func(index int) bool {
@@ -79,18 +80,14 @@ func (oc OMClient) LoadDoc(key string, ctx map[string]interface{}) (string, erro
 	return result, nil
 }
 
-func (oc OMClient) CreateGroup() (Group, error) {
+func (oc OMClient) CreateGroup(id string) (Group, error) {
 	var group Group
 
-	u, err := uuid.NewV4()
-	if err != nil {
-		return group, err
-	}
+	name := fmt.Sprintf("pcf_%s", id)
+	resp, err := oc.doRequest("POST", "/api/public/v1.0/groups", strings.NewReader(`{
+		"name": "`+name+`"
+	}`))
 
-	groupName := fmt.Sprintf("pcf_%s", u)
-	body := strings.NewReader(fmt.Sprintf("{\"name\": \"%s\"}", groupName))
-
-	resp, err := oc.doRequest("POST", "/api/public/v1.0/groups", body)
 	if err != nil {
 		return group, err
 	}
@@ -113,6 +110,7 @@ func (oc OMClient) GetGroup(GroupID string) (Group, error) {
 	if err != nil {
 		return group, err
 	}
+	defer resp.Body.Close()
 
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -132,6 +130,7 @@ func (oc OMClient) GetGroupHosts(GroupID string) (GroupHosts, error) {
 	if err != nil {
 		return groupHosts, err
 	}
+	defer resp.Body.Close()
 
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -154,6 +153,7 @@ func (oc OMClient) ConfigureGroup(configurationDoc string, groupId string) error
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -187,17 +187,3 @@ func (oc OMClient) doRequest(method string, path string, body io.Reader) (*http.
 
 	return res, nil
 }
-
-func (oc OMClient) RandomString(strlen int) string {
-	rand.Seed(time.Now().UTC().UnixNano())
-	const chars = "abcdefghijklmnopqrstuvwxyz0123456789"
-	result := make([]byte, strlen)
-	for i := 0; i < strlen; i++ {
-		result[i] = chars[rand.Intn(len(chars))]
-	}
-	return string(result)
-}
-
-// func (oc OMClient) PostDoc(url string, username string, apiKey string) {
-//
-// }

@@ -27,7 +27,10 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 
 	// create an admin level user
 	username := mkUsername(bindingID)
-	password := OMClient{}.RandomString(32)
+	password, err := GenerateString(32)
+	if err != nil {
+		return serviceadapter.Binding{}, err
+	}
 
 	properties, ok := manifest.Properties["mongo_ops"].(map[interface{}]interface{})
 	if !ok {
