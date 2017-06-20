@@ -28,7 +28,7 @@ resources:
     regexp: ((odb-regexp))
     access_key_id: ((aws-access-key))
     secret_access_key: ((aws-secret-access-key))
-- name: s3
+- name: tile
   type: s3
   source:
     bucket: ((aws-bucket))
@@ -63,7 +63,7 @@ jobs:
       run:
         path: ./git/ci/build-tile
         args: []
-  - put: s3
+  - put: tile
     params:
       file: tile/mongodb-on-demand-*.pivotal
       acl: public-read
@@ -73,7 +73,7 @@ jobs:
   - get: git
     trigger: true
     passed: [build-tile]
-  - get: s3
+  - get: tile
     trigger: false
     params: {filename: mongodb-on-demand-*.pivotal}
   - get: stemcell
@@ -91,7 +91,7 @@ jobs:
       inputs:
       - name: git
       - name: stemcell
-      - name: s3
+      - name: tile
       - name: version
       run:
         path: ./git/ci/deploy-tile
