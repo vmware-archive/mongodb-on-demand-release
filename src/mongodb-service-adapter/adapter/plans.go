@@ -5,13 +5,15 @@ import (
 	"text/template"
 )
 
+type Plan string
+
 const (
-	PlanStandalone       = "standalone"
-	PlanShardedSet       = "sharded_set"
-	PlanSingleReplicaSet = "single_replica_set"
+	PlanStandalone       Plan = "standalone"
+	PlanShardedSet            = "sharded_set"
+	PlanSingleReplicaSet      = "single_replica_set"
 )
 
-var plans = map[string]*template.Template{}
+var plans = map[Plan]*template.Template{}
 
 func init() {
 	funcs := template.FuncMap{
@@ -42,20 +44,16 @@ func init() {
 		},
 	}
 
+	var err error
 	for k, s := range plansRaw {
-		t := template.New(k).Funcs(funcs)
-		t, err := t.Parse(s)
+		plans[k], err = template.New(string(k)).Funcs(funcs).Parse(s)
 		if err != nil {
 			panic(err)
 		}
-
-		t = t.Funcs(funcs)
-
-		plans[k] = t
 	}
 }
 
-var plansRaw = map[string]string{
+var plansRaw = map[Plan]string{
 	PlanStandalone: `{
     "options": {
         "downloadBase": "/var/lib/mongodb-mms-automation",

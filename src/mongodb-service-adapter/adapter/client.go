@@ -9,6 +9,8 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/cf-platform-eng/mongodb-on-demand-release/src/mongodb-service-adapter/digest"
 )
 
 type OMClient struct {
@@ -38,10 +40,10 @@ type DocContext struct {
 	Password      string
 }
 
-func (oc *OMClient) LoadDoc(key string, ctx *DocContext) (string, error) {
-	t, ok := plans[key]
+func (oc *OMClient) LoadDoc(p Plan, ctx *DocContext) (string, error) {
+	t, ok := plans[p]
 	if !ok {
-		return "", fmt.Errorf("plan %q not found", key)
+		return "", fmt.Errorf("plan %q not found", p)
 	}
 
 	if ctx.Password == "" {
@@ -63,15 +65,9 @@ func (oc *OMClient) CreateGroup(id string) (Group, error) {
 	var group Group
 
 	name := fmt.Sprintf("pcf_%s", id)
-	resp, err := oc.doRequest("POST", "/api/public/v1.0/groups", strings.NewReader(`{
+	b, err := oc.doRequest("POST", "/api/public/v1.0/groups", strings.NewReader(`{
 		"name": "`+name+`"
 	}`))
-
-	if err != nil {
-		return group, err
-	}
-
-	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return group, err
 	}
@@ -82,16 +78,10 @@ func (oc *OMClient) CreateGroup(id string) (Group, error) {
 	return group, nil
 }
 
-func (oc *OMClient) GetGroup(GroupID string) (Group, error) {
+func (oc *OMClient) GetGroup(groupID string) (Group, error) {
 	var group Group
 
-	resp, err := oc.doRequest("GET", fmt.Sprintf("/api/public/v1.0/groups/%s", GroupID), nil)
-	if err != nil {
-		return group, err
-	}
-	defer resp.Body.Close()
-
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := oc.doRequest("GET", fmt.Sprintf("/api/public/v1.0/groups/%s", groupID), nil)
 	if err != nil {
 		return group, err
 	}
@@ -102,49 +92,32 @@ func (oc *OMClient) GetGroup(GroupID string) (Group, error) {
 	return group, nil
 }
 
-func (oc *OMClient) GetGroupHosts(GroupID string) (GroupHosts, error) {
+func (oc *OMClient) GetGroupHosts(groupID string) (GroupHosts, error) {
 	var groupHosts GroupHosts
 
-	resp, err := oc.doRequest("GET", fmt.Sprintf("/api/public/v1.0/groups/%s/hosts", GroupID), nil)
-	if err != nil {
-		return groupHosts, err
-	}
-	defer resp.Body.Close()
-
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := oc.doRequest("GET", fmt.Sprintf("/api/public/v1.0/groups/%s/hosts", groupID), nil)
 	if err != nil {
 		return groupHosts, err
 	}
 
-	err = json.Unmarshal(b, &groupHosts)
-	if err != nil {
+	if err = json.Unmarshal(b, &groupHosts); err != nil {
 		return groupHosts, err
 	}
-
 	return groupHosts, nil
 }
 
-func (oc *OMClient) ConfigureGroup(configurationDoc string, groupId string) error {
-	url := fmt.Sprintf("/api/public/v1.0/groups/%s/automationConfig", groupId)
-	body := strings.NewReader(configurationDoc)
-
-	resp, err := oc.doRequest("PUT", url, body)
+func (oc *OMClient) ConfigureGroup(configurationDoc string, groupID string) error {
+	u := fmt.Sprintf("/api/public/v1.0/groups/%s/automationConfig", groupID)
+	b, err := oc.doRequest("PUT", u, strings.NewReader(configurationDoc))
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
-
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
 	log.Println(string(b))
 
 	return nil
 }
 
-func (oc *OMClient) doRequest(method string, path string, body io.Reader) (*http.Response, error) {
+func (oc *OMClient) doRequest(method string, path string, body io.Reader) ([]byte, error) {
 	uri := fmt.Sprintf("%s%s", strings.TrimRight(oc.Url, "/"), path)
 	req, err := http.NewRequest(method, uri, body)
 	if err != nil {
@@ -152,12 +125,24 @@ func (oc *OMClient) doRequest(method string, path string, body io.Reader) (*http
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth(oc.Username, oc.ApiKey)
+	if err = digest.ApplyDigestAuth(oc.Username, oc.ApiKey, uri, req); err != nil {
+		return nil, err
+	}
+
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Fatalf("%s %s error: %v", method, uri, err)
 		return nil, err
 	}
+	defer res.Body.Close()
 
-	return res, nil
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode < 200 && res.StatusCode >= 300 {
+		return nil, fmt.Errorf("%s %s request error: code=%d body=%q", method, path, res.StatusCode, b)
+	}
+	return b, nil
 }
