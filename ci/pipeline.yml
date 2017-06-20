@@ -41,7 +41,7 @@ jobs:
   serial: true
   plan:
   - get: git
-    trigger: false
+    trigger: true
   - get: odb
     trigger: false
     params: {filename: on-demand-service-broker-0.15.3.tgz}
@@ -71,7 +71,7 @@ jobs:
   serial: true
   plan:
   - get: git
-    trigger: false
+    trigger: true
     passed: [build-tile]
   - get: s3
     trigger: false
