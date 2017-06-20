@@ -5,10 +5,10 @@ set -e
 root_dir=$(pwd)
 
 VERSION=$(cat version/number)
-TILE_FILE=`cd s3; ls *-${VERSION}.pivotal`
+TILE_FILE=`cd tile; ls *-${VERSION}.pivotal`
 if [ -z "${TILE_FILE}" ]; then
-	echo "No files matching s3/*.pivotal"
-	ls -lR s3
+	echo "No files matching tile/*.pivotal"
+	ls -lR tile
 	exit 1
 fi
 STEMCELL_FILE=`cd stemcell; ls bosh-stemcell-*.tgz`
@@ -32,7 +32,7 @@ echo "===> Verifying PCF... <==="
 pcf version
 
 echo "===> Uploading PCF tile... <==="
-pcf import "s3/${TILE_FILE}"
+pcf import "tile/${TILE_FILE}"
 
 echo "===> Uploading stemcell... <==="
 pcf upload-stemcell "stemcell/${STEMCELL_FILE}"
