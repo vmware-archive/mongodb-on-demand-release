@@ -80,7 +80,7 @@ jobs:
     passed: [run-tests]
   - get: odb
     trigger: false
-    params: {filename: on-demand-service-broker-0.15.3.tgz}
+    params: {filename: on-demand-service-broker-0.16.0.tgz}
   - get: version
     trigger: false
   - task: build-tile
