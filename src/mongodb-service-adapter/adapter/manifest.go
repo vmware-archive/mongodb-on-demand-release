@@ -97,13 +97,23 @@ func (m ManifestGenerator) GenerateManifest(
 		engineVersion = "3.2.7" // TODO: make it configurable in deployment manifest
 	}
 
-	replicas := 0 // needed only by sharded_set
+	// number of replicas passed to the config agent
+	// single_replica_set should change the total number of instances
+	replicas := 0
+
+	// total number of instances
+	//
+	// standalone:         always one
+	// single_replica_set: number of replicas
+	// sharded_set:        shards * replicas
 	instances := mongodInstanceGroup.Instances
+
 	planID := plan.Properties["id"].(string)
 	switch planID {
+	case PlanStandalone:
+		// ok
 	case PlanSingleReplicaSet:
 		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 1 {
-			// Instances number equals replicas number
 			instances = int(r)
 		}
 	case PlanShardedSet:
@@ -117,8 +127,9 @@ func (m ManifestGenerator) GenerateManifest(
 			replicas = int(r)
 		}
 
-		// Number of instances for sharded cluster = shards * replicas
 		instances = shards * replicas
+	default:
+		return bosh.BoshManifest{}, fmt.Errorf("unknown plan: %s", planID)
 	}
 
 	manifest := bosh.BoshManifest{
