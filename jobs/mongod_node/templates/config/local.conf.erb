@@ -21,9 +21,7 @@ mmsApiKey=<%= p('mongo_ops.api_key') %>
 # is 8080.
 #
 # ex. http://opsmanaager.<company>.com:8080
-<% if_p('mongo_ops.url') do |url| %>
-mmsBaseUrl=<%= url.chomp("/") %>
-<% end %>
+mmsBaseUrl=<%= p('mongo_ops.url') %>
 
 #
 # Path to log file

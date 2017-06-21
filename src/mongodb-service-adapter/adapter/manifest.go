@@ -5,9 +5,10 @@ import (
 	"log"
 	"strings"
 
+	"strconv"
+
 	"github.com/pivotal-cf/on-demand-services-sdk/bosh"
 	"github.com/pivotal-cf/on-demand-services-sdk/serviceadapter"
-	"strconv"
 )
 
 const (
@@ -41,7 +42,10 @@ func (m ManifestGenerator) GenerateManifest(
 
 	username := mongoOps["username"].(string)
 	apiKey := mongoOps["api_key"].(string)
+
+	// trim trailing slash
 	url := mongoOps["url"].(string)
+	url = strings.TrimRight(url, "/")
 
 	oc := &OMClient{Url: url, Username: username, ApiKey: apiKey}
 

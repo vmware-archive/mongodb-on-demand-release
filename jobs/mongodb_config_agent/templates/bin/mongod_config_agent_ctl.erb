@@ -22,7 +22,7 @@ case $1 in
 
     exec /var/vcap/packages/mongodb-config-agent/bin/mongodb-config-agent \
       -id <%= p('mongo_ops.id') %> \
-      <% if_p('mongo_ops.url') do |url| %>-url <%= url.chomp("/") %> <% end %> \
+      -url <%= p('mongo_ops.url') %> \
       -username <%= p('mongo_ops.username') %> \
       -api-key <%= p('mongo_ops.api_key') %> \
       -group <%= p('mongo_ops.group_id') %> \

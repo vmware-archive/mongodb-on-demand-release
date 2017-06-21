@@ -118,7 +118,7 @@ func (oc *OMClient) ConfigureGroup(configurationDoc string, groupID string) erro
 }
 
 func (oc *OMClient) doRequest(method string, path string, body io.Reader) ([]byte, error) {
-	uri := fmt.Sprintf("%s%s", strings.TrimRight(oc.Url, "/"), path)
+	uri := fmt.Sprintf("%s%s", oc.Url, path)
 	req, err := http.NewRequest(method, uri, body)
 	if err != nil {
 		return nil, err
