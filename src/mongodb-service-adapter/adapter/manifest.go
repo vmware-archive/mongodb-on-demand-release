@@ -112,7 +112,7 @@ func (m ManifestGenerator) GenerateManifest(
 	// sharded_set:        shards * replicas
 	instances := mongodInstanceGroup.Instances
 
-	planID := plan.Properties["id"].(string)
+	planID := plan.Properties["id"].(Plan)
 	switch planID {
 	case PlanStandalone:
 		// ok
@@ -183,7 +183,7 @@ func (m ManifestGenerator) GenerateManifest(
 						"api_key":        apiKey,
 						"username":       username,
 						"group_id":       group.ID,
-						"plan_id":        planID,
+						"plan_id":        string(planID),
 						"admin_password": adminPassword,
 						"engine_version": engineVersion,
 						"replicas":       strconv.Itoa(replicas),
