@@ -129,7 +129,7 @@ var plansRaw = map[Plan]string{
         "deploymentAuthMechanisms": [
             "SCRAM-SHA-1"
         ],
-        "key": "{{.key}}",
+        "key": "{{.Key}}",
         "keyfile": "/var/vcap/jobs/mongod_node/config/mongo_om.key",
         "disabled": false,
         "usersDeleted": [],
@@ -197,7 +197,7 @@ var plansRaw = map[Plan]string{
                      "role": "readWrite"
                  }
                ],
-               "initPwd": "{{.admin_password}}"
+               "initPwd": "{{.AdminPassword}}"
             }
         ],
         "autoAuthMechanism": "SCRAM-SHA-1"
