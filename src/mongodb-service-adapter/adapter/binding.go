@@ -41,9 +41,9 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 		servers[i] = fmt.Sprintf("%s:28000", node)
 	}
 
-	routers, _ := properties["routers"].(float64)
+	routers := properties["routers"].(int)
 	if routers != 0 {
-		servers = servers[:int(routers)]
+		servers = servers[:routers]
 	}
 
 	dialInfo := &mgo.DialInfo{
