@@ -83,7 +83,7 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 			mgo.RoleReadWrite,
 		},
 		OtherDBRoles: map[string][]mgo.Role{
-			username: []mgo.Role{
+			username: {
 				mgo.RoleUserAdmin,
 				mgo.RoleDBAdmin,
 				mgo.RoleReadWrite,

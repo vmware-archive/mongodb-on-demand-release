@@ -67,20 +67,8 @@
 
 
 [[constraint]]
-  branch = "master"
-  name = "github.com/AsGz/httpAuthClient"
-
-[[constraint]]
-  name = "github.com/aymerick/raymond"
-  version = "2.0.1"
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/nu7hatch/gouuid"
-
-[[constraint]]
   name = "github.com/pivotal-cf/on-demand-services-sdk"
-  version = "0.15.3"
+  version = "0.16.0"
 
 [[constraint]]
   branch = "v2"
