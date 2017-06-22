@@ -120,12 +120,12 @@ func (m ManifestGenerator) GenerateManifest(
 		}
 	case PlanShardedSet:
 		shards := 5
-		if s, ok := arbitraryParams["shards"].(float64); ok && s > 2 {
+		if s, ok := arbitraryParams["shards"].(float64); ok && s > 1 {
 			shards = int(s)
 		}
 
 		replicas = 3
-		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 2 {
+		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 1 {
 			replicas = int(r)
 		}
 
