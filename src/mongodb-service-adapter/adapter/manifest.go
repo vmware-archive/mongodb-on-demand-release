@@ -99,15 +99,16 @@ func (m ManifestGenerator) GenerateManifest(
 		engineVersion = "3.2.7" // TODO: make it configurable in deployment manifest
 	}
 
-	// number of replicas passed to the config agent
-	// single_replica_set should change the total number of instances
+	// sharded_set parameters
 	replicas := 0
+	routers := 0
+	configServers := 0
 
 	// total number of instances
 	//
 	// standalone:         always one
 	// single_replica_set: number of replicas
-	// sharded_set:        shards*replicas + routers (now routers number equals replicas)
+	// sharded_set:        shards*replicas + config_servers + routers
 	instances := mongodInstanceGroup.Instances
 
 	planID := plan.Properties["id"].(string)
@@ -115,21 +116,31 @@ func (m ManifestGenerator) GenerateManifest(
 	case PlanStandalone:
 		// ok
 	case PlanSingleReplicaSet:
-		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 1 {
+		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 0 {
 			instances = int(r)
 		}
 	case PlanShardedSet:
 		shards := 5
-		if s, ok := arbitraryParams["shards"].(float64); ok && s > 1 {
+		if s, ok := arbitraryParams["shards"].(float64); ok && s > 0 {
 			shards = int(s)
 		}
 
 		replicas = 3
-		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 1 {
+		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 0 {
 			replicas = int(r)
 		}
 
-		instances = shards*replicas + replicas
+		configServers = 3
+		if c, ok := arbitraryParams["config_servers"].(float64); ok && c > 0 {
+			configServers = int(c)
+		}
+
+		routers = 3
+		if r, ok := arbitraryParams["routers"].(float64); ok && r > 0 {
+			routers = int(r)
+		}
+
+		instances = routers + configServers + shards*replicas
 	default:
 		return bosh.BoshManifest{}, fmt.Errorf("unknown plan: %s", planID)
 	}
@@ -181,9 +192,11 @@ func (m ManifestGenerator) GenerateManifest(
 						"api_key":        apiKey,
 						"username":       username,
 						"group_id":       group.ID,
-						"plan_id":        string(planID),
+						"plan_id":        planID,
 						"admin_password": adminPassword,
 						"engine_version": engineVersion,
+						"routers":        routers,
+						"config_servers": configServers,
 						"replicas":       replicas,
 					},
 				},
@@ -201,7 +214,12 @@ func (m ManifestGenerator) GenerateManifest(
 				"api_key":        group.AgentAPIKey,
 				"group_id":       group.ID,
 				"admin_password": adminPassword,
-				"routers":        replicas,
+
+				// options needed for binding
+				"plan_id":        planID,
+				"routers":        routers,
+				"config_servers": configServers,
+				"replicas":       replicas,
 			},
 		},
 	}

@@ -21,6 +21,8 @@ var (
 	nodeAddresses string
 	adminPassword string
 	engineVersion string
+	routers       int
+	configServers int
 	replicas      int
 )
 
@@ -34,7 +36,9 @@ func main() {
 	flag.StringVar(&nodeAddresses, "nodes", "", "Comma separated list of addresses")
 	flag.StringVar(&adminPassword, "admin-password", "", "Admin password for the mongo instance")
 	flag.StringVar(&engineVersion, "engine-version", "", "Engine version")
-	flag.IntVar(&replicas, "replicas", 0, "replicas per shard")
+	flag.IntVar(&routers, "routers", 0, "Number of cluster routers")
+	flag.IntVar(&configServers, "config-servers", 0, "Number of cluster configuration replicas")
+	flag.IntVar(&replicas, "replicas", 0, "Replicas per shard")
 	flag.Parse()
 
 	logger := log.New(os.Stderr, "[mongodb-config-agent] ", log.LstdFlags)
@@ -51,7 +55,7 @@ func main() {
 
 	if planID == adapter.PlanShardedSet {
 		var err error
-		ctx.Cluster, err = NodesToCluster(nodes, replicas, replicas, replicas)
+		ctx.Cluster, err = adapter.NodesToCluster(nodes, routers, configServers, replicas)
 		if err != nil {
 			logger.Fatal(err)
 		}
@@ -86,25 +90,4 @@ func main() {
 
 		time.Sleep(30 * time.Second)
 	}
-}
-
-// TODO: validate input
-func NodesToCluster(nodes []string, routers, configServers, replicas int) (*adapter.Cluster, error) {
-	// nodes have to be ordered
-	adapter.SortAddresses(nodes)
-
-	c := &adapter.Cluster{
-		Routers:       nodes[:routers],
-		ConfigServers: nodes[routers : routers+configServers],
-	}
-
-	nodes = nodes[routers+configServers:]
-	c.Shards = make([][]string, 0, len(nodes)/replicas)
-	for i := 0; i < len(nodes)/replicas; i++ {
-		c.Shards = append(c.Shards, make([]string, 0, replicas))
-		for j := 0; j < replicas; j++ {
-			c.Shards[i] = append(c.Shards[i], nodes[i*replicas+j])
-		}
-	}
-	return c, nil
 }

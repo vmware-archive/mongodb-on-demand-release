@@ -41,13 +41,17 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 		servers[i] = fmt.Sprintf("%s:28000", node)
 	}
 
-	// servers list has to be ordered because we
-	// suppose that first nodes are routers/mongos
-	SortAddresses(servers)
+	plan := properties["plan_id"].(string)
+	if plan == PlanShardedSet {
+		routers := properties["routers"].(int)
+		configServers := properties["config_servers"].(int)
+		replicas := properties["replicas"].(int)
 
-	routers := properties["routers"].(int)
-	if routers != 0 {
-		servers = servers[:routers]
+		cluster, err := NodesToCluster(servers, routers, configServers, replicas)
+		if err != nil {
+			return serviceadapter.Binding{}, err
+		}
+		servers = cluster.Routers
 	}
 
 	dialInfo := &mgo.DialInfo{

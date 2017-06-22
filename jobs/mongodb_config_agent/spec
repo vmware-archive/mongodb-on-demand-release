@@ -28,5 +28,9 @@ properties:
     description: "Admin password for mongo"
   mongo_ops.engine_version:
     description: "Engine version"
+  mongo_ops.routers:
+      description: "Number of cluster routers"
+  mongo_ops.config_servers:
+      description: "Number of cluster configuration replicas"
   mongo_ops.replicas:
     description: "Replicas number for each shard"

@@ -28,13 +28,29 @@ func GenerateString(l int) (string, error) {
 	return fmt.Sprintf("%x", b)[:l], nil
 }
 
-// SortAddresses sorts list of ip addresses.
-// It panics if any address cannot be resolved.
-// If port is missing it's considered as zero.
-func SortAddresses(s []string) {
-	sort.Slice(s, func(i, j int) bool {
-		return addrn(s[i]) < addrn(s[j])
+// TODO: validate input
+// NodesToCluster transforms a nodes list into cluster configuration object.
+func NodesToCluster(nodes []string, routers, configServers, replicas int) (*Cluster, error) {
+	// nodes have to be ordered because
+	// bosh provides them in random order
+	sort.Slice(nodes, func(i, j int) bool {
+		return addrn(nodes[i]) < addrn(nodes[j])
 	})
+
+	c := &Cluster{
+		Routers:       nodes[:routers],
+		ConfigServers: nodes[routers : routers+configServers],
+	}
+
+	nodes = nodes[routers+configServers:]
+	c.Shards = make([][]string, 0, len(nodes)/replicas)
+	for i := 0; i < len(nodes)/replicas; i++ {
+		c.Shards = append(c.Shards, make([]string, 0, replicas))
+		for j := 0; j < replicas; j++ {
+			c.Shards[i] = append(c.Shards[i], nodes[i*replicas+j])
+		}
+	}
+	return c, nil
 }
 
 func addrn(addr string) int {
