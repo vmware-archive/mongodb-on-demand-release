@@ -328,57 +328,84 @@ var plansRaw = map[string]string{
         "collections": []
     }],
 
-    "auth":{
-       "disabled":false,
-       "autoPwd": "{{.Password}}",
-       "autoUser":"mms-automation",
-       "deploymentAuthMechanisms": [
-           "MONGODB-CR"
-       ],
-       "key":"{{.Key}}",
-       "keyfile":"/var/vcap/jobs/mongod_node/config/mongo_om.key",
-       "usersWanted":[
-          {
-             "db":"admin",
-             "initPwd":"{{.Password}}",
-             "roles":[
-                {
-                   "db":"admin",
-                   "role":"clusterMonitor"
-                }
-             ],
-             "user":"mms-monitoring-agent"
-          },
-          {
-             "db":"admin",
-             "initPwd":"{{.Password}}",
-             "roles":[
-                {
-                   "db":"admin",
-                   "role":"clusterAdmin"
-                },
-                {
-                   "db":"admin",
-                   "role":"readAnyDatabase"
-                },
-                {
-                   "db":"admin",
-                   "role":"userAdminAnyDatabase"
-                },
-                {
-                   "db":"local",
-                   "role":"readWrite"
-                },
-                {
-                   "db":"admin",
-                   "role":"readWrite"
-                }
-             ],
-             "user":"mms-backup-agent"
-          }
-       ],
-       "usersDeleted":[],
-       "autoAuthMechanism": "MONGODB-CR"
+    "auth": {
+        "autoUser": "mms-automation",
+        "autoPwd": "{{.Password}}",
+        "deploymentAuthMechanisms": [
+            "SCRAM-SHA-1"
+        ],
+        "key": "{{.Key}}",
+        "keyfile": "/var/vcap/jobs/mongod_node/config/mongo_om.key",
+        "disabled": false,
+        "usersDeleted": [],
+        "usersWanted": [
+            {
+                "db": "admin",
+                "roles": [
+                    {
+                        "db": "admin",
+                        "role": "clusterMonitor"
+                    }
+                ],
+                "user": "mms-monitoring-agent",
+                "initPwd": "{{.Password}}"
+            },
+            {
+                "db": "admin",
+                "roles": [
+                    {
+                        "db": "admin",
+                        "role": "clusterAdmin"
+                    },
+                    {
+                        "db": "admin",
+                        "role": "readAnyDatabase"
+                    },
+                    {
+                        "db": "admin",
+                        "role": "userAdminAnyDatabase"
+                    },
+                    {
+                        "db": "local",
+                        "role": "readWrite"
+                    },
+                    {
+                        "db": "admin",
+                        "role": "readWrite"
+                    }
+                ],
+                "user": "mms-backup-agent",
+                "initPwd": "{{.Password}}"
+            },
+            {
+               "db": "admin" ,
+               "user": "admin" ,
+               "roles": [
+                 {
+                     "db": "admin",
+                     "role": "clusterAdmin"
+                 },
+                 {
+                     "db": "admin",
+                     "role": "readAnyDatabase"
+                 },
+                 {
+                     "db": "admin",
+                     "role": "userAdminAnyDatabase"
+                 },
+                 {
+                     "db": "local",
+                     "role": "readWrite"
+                 },
+                 {
+                     "db": "admin",
+                     "role": "readWrite"
+                 }
+               ],
+               "initPwd": "{{.AdminPassword}}"
+            }
+        ],
+        "autoAuthMechanism": "SCRAM-SHA-1"
     }
 }`,
 
