@@ -9,7 +9,7 @@ func TestOMClient_LoadDoc(t *testing.T) {
 	t.Parallel()
 
 	c := &OMClient{}
-	for p, ctx := range map[Plan]*DocContext{
+	for p, ctx := range map[string]*DocContext{
 		PlanStandalone: {
 			ID:            "d3a98gf1",
 			Key:           "key",

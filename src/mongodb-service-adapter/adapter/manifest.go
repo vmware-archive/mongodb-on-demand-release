@@ -5,8 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"strconv"
-
 	"github.com/pivotal-cf/on-demand-services-sdk/bosh"
 	"github.com/pivotal-cf/on-demand-services-sdk/serviceadapter"
 )
@@ -112,7 +110,7 @@ func (m ManifestGenerator) GenerateManifest(
 	// sharded_set:        shards*replicas + routers (now routers number equals replicas)
 	instances := mongodInstanceGroup.Instances
 
-	planID := Plan(plan.Properties["id"].(string))
+	planID := plan.Properties["id"].(string)
 	switch planID {
 	case PlanStandalone:
 		// ok
@@ -131,7 +129,7 @@ func (m ManifestGenerator) GenerateManifest(
 			replicas = int(r)
 		}
 
-		instances = shards * replicas + replicas
+		instances = shards*replicas + replicas
 	default:
 		return bosh.BoshManifest{}, fmt.Errorf("unknown plan: %s", planID)
 	}
@@ -177,7 +175,7 @@ func (m ManifestGenerator) GenerateManifest(
 
 				// See mongodb_config_agent job spec
 				Properties: map[string]interface{}{
-					"mongo_ops": map[string]string{
+					"mongo_ops": map[string]interface{}{
 						"id":             id,
 						"url":            url,
 						"api_key":        apiKey,
@@ -186,7 +184,7 @@ func (m ManifestGenerator) GenerateManifest(
 						"plan_id":        string(planID),
 						"admin_password": adminPassword,
 						"engine_version": engineVersion,
-						"replicas":       strconv.Itoa(replicas),
+						"replicas":       replicas,
 					},
 				},
 			},
@@ -198,11 +196,12 @@ func (m ManifestGenerator) GenerateManifest(
 			MaxInFlight:     4,
 		},
 		Properties: map[string]interface{}{
-			"mongo_ops": map[string]string{
+			"mongo_ops": map[string]interface{}{
 				"url":            url,
 				"api_key":        group.AgentAPIKey,
 				"group_id":       group.ID,
 				"admin_password": adminPassword,
+				"routers":        replicas,
 			},
 		},
 	}

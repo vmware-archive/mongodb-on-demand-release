@@ -58,7 +58,7 @@ func main() {
 	}
 
 	logger.Printf("%+v", nodes)
-	doc, err := omClient.LoadDoc(adapter.Plan(planID), ctx)
+	doc, err := omClient.LoadDoc(planID, ctx)
 	if err != nil {
 		logger.Fatal(err)
 	}

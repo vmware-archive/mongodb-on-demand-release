@@ -5,42 +5,18 @@ import (
 	"text/template"
 )
 
-type Plan string
-
 const (
-	PlanStandalone       Plan = "standalone"
-	PlanShardedSet            = "sharded_set"
-	PlanSingleReplicaSet      = "single_replica_set"
+	PlanStandalone       = "standalone"
+	PlanShardedSet       = "sharded_set"
+	PlanSingleReplicaSet = "single_replica_set"
 )
 
-var plans = map[Plan]*template.Template{}
+var plans = map[string]*template.Template{}
 
 func init() {
 	funcs := template.FuncMap{
 		"last": func(a interface{}, x int) bool {
 			return reflect.ValueOf(a).Len()-1 == x
-		},
-		"isConfig": func(index int) bool {
-			return index >= 9 && index < 12
-		},
-		"isInShard": func(index int) bool {
-			return index < 12
-		},
-		"hasStorage": func(index int) bool {
-			return index < 12
-		},
-		"processType": func(index int) string {
-			if index > 11 && index < 15 {
-				return "mongos"
-			} else {
-				return "mongod"
-			}
-		},
-		"hasShardedCluster": func(index int) bool {
-			return index > 11 && index < 15
-		},
-		"shardNumber": func(index int) int {
-			return index % 3
 		},
 	}
 
@@ -53,7 +29,7 @@ func init() {
 	}
 }
 
-var plansRaw = map[Plan]string{
+var plansRaw = map[string]string{
 	PlanStandalone: `{
     "options": {
         "downloadBase": "/var/lib/mongodb-mms-automation",
@@ -286,6 +262,9 @@ var plansRaw = map[Plan]string{
                   },
                   "replication": {
                       "replSetName": "{{$.ID}}_shard_{{$ii}}"
+                  },
+                  "storage": {
+                       "dbPath": "/var/vcap/store/mongodb-data"
                   },
                   "systemLog": {
                       "destination": "file",

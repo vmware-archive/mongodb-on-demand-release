@@ -46,7 +46,7 @@ type Cluster struct {
 	Shards        [][]string
 }
 
-func (oc *OMClient) LoadDoc(p Plan, ctx *DocContext) (string, error) {
+func (oc *OMClient) LoadDoc(p string, ctx *DocContext) (string, error) {
 	t, ok := plans[p]
 	if !ok {
 		return "", fmt.Errorf("plan %q not found", p)
