@@ -299,7 +299,7 @@ var plansRaw = map[string]string{
         ]
     }
     {{range $i, $shard := .Cluster.Shards}},{
-        "_id": "shard_{{$.ID}}_{{$i}}",
+        "_id": "{{$.ID}}_shard_{{$i}}",
         "members": [{{range $i, $node := $shard}}
             {{if $i}},{{end}}{
                 "_id": {{$i}},
