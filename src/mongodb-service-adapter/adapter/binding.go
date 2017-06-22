@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"log"
+	"sort"
 	"strings"
 
 	"github.com/pivotal-cf/on-demand-services-sdk/bosh"
@@ -40,6 +41,10 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 	for i, node := range deploymentTopology["mongod_node"] {
 		servers[i] = fmt.Sprintf("%s:28000", node)
 	}
+
+	// servers list has to be ordered because we
+	// suppose that first nodes are routers/mongos
+	sort.Strings(servers)
 
 	routers := properties["routers"].(int)
 	if routers != 0 {
