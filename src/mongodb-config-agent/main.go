@@ -4,7 +4,6 @@ import (
 	"flag"
 	"log"
 	"os"
-	"sort"
 	"strings"
 	"time"
 
@@ -92,7 +91,7 @@ func main() {
 // TODO: validate input
 func NodesToCluster(nodes []string, routers, configServers, replicas int) (*adapter.Cluster, error) {
 	// nodes have to be ordered
-	sort.Strings(nodes)
+	adapter.SortAddresses(nodes)
 
 	c := &adapter.Cluster{
 		Routers:       nodes[:routers],
