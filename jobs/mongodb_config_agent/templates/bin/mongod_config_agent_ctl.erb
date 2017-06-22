@@ -31,7 +31,7 @@ case $1 in
       -admin-password <%= p('mongo_ops.admin_password') %> \
       -engine-version <%= p('mongo_ops.engine_version') %> \
       -routers <%= p('mongo_ops.routers') %> \
-      -config-servers <%= p('mongo_ops.config-servers') %> \
+      -config-servers <%= p('mongo_ops.config_servers') %> \
       -replicas <%= p('mongo_ops.replicas') %> \
       >>  ${LOG_DIR}/mongodb_config_agent.stdout.log \
       2>> ${LOG_DIR}/mongodb_config_agent.stderr.log
