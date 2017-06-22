@@ -3,7 +3,6 @@ package adapter
 import (
 	"crypto/md5"
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -32,15 +31,8 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 		return serviceadapter.Binding{}, err
 	}
 
-	properties, ok := manifest.Properties["mongo_ops"].(map[string]interface{})
-	if !ok {
-		return serviceadapter.Binding{}, errors.New("invalid bosh manifest")
-	}
-
-	adminPassword, ok := properties["admin_password"].(string)
-	if !ok {
-		return serviceadapter.Binding{}, errors.New("invalid bosh manifest")
-	}
+	properties := manifest.Properties["mongo_ops"].(map[interface{}]interface{})
+	adminPassword := properties["admin_password"].(string)
 
 	b.logf("properties: %v", properties)
 
