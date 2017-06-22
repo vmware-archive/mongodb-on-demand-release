@@ -205,28 +205,11 @@ var plansRaw = map[Plan]string{
 }`,
 
 	PlanShardedSet: `{
-   "options": {
+    "options": {
         "downloadBase": "/var/lib/mongodb-mms-automation",
         "downloadBaseWindows": "C:\\mongodb-mms-automation"
     },
     "mongoDbVersions": [{
-        "builds": [
-                {
-                    "bits": 64,
-                    "flavor": "",
-                    "gitVersion": "4249c1d2b5999ebbf1fdf3bc0e0e3b3ff5c0aaf2",
-                    "maxOsVersion": "",
-                    "minOsVersion": "",
-                    "modules": [],
-                    "platform": "osx",
-                    "url": "https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-amazon-3.2.7.tgz",
-                    "win2008plus": false,
-                    "winVCRedistDll": "",
-                    "winVCRedistOptions": [],
-                    "winVCRedistUrl": "",
-                    "winVCRedistVersion": ""
-                }
-            ],
         "name": "{{.Version}}"
     }],
     "backupVersions": [
@@ -234,7 +217,7 @@ var plansRaw = map[Plan]string{
 
     "monitoringVersions": [
     {
-        "hostname": "{{index .Nodes 0}}",
+        "hostname": "{{index .Cluster.Routers 0}}",
         "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
         "logRotate": {
             "sizeThresholdMB": 1000,
@@ -242,82 +225,129 @@ var plansRaw = map[Plan]string{
         }
     }
     ],
-    "processes": [{{range $i, $node := .Nodes}}
-      {{if $i}},{{end}}{
-        "args2_6": {
-            "net": {
-                "port": 28000
-            },
-            {{if isInShard $i}}
-            "replication": {
-                "replSetName": "shard_{{shardNumber $i}}"
-            },
-            {{end}}
-            {{if isConfig $i}}
-            "sharding": {
+    "processes": [
+      {{range $i, $node := .Cluster.Routers}}{
+          "args2_6": {
+              "net": {
+                  "port": 28000
+              },
+              "systemLog": {
+                  "destination": "file",
+                  "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
+              }
+          },
+          "name": "{{$node}}",
+          "hostname": "{{$node}}",
+          "logRotate": {
+              "sizeThresholdMB": 1000,
+              "timeThresholdHrs": 24
+          },
+          "version": "{{$.Version}}",
+          "authSchemaVersion": 5,
+          "processType": "mongos",
+          "cluster": "{{$.ID}}_cluster"
+      },{{end}}
+
+      {{range $i, $node := .Cluster.ConfigServers}}{
+          "args2_6": {
+              "net": {
+                  "port": 28000
+              },
+              "replication": {
+                  "replSetName": "{{$.ID}}_config"
+              },
+              "sharding": {
                 "clusterRole": "configsvr"
-            },
-            {{end}}
-            {{if hasStorage $i}}
-            "storage": {
-                "dbPath": "/var/vcap/store/mongodb-data"
-            },
-            {{end}}
-            "systemLog": {
-                "destination": "file",
-                "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
-            }
-        },
-        "hostname": "{{$node}}",
-        "logRotate": {
-            "sizeThresholdMB": 1000,
-            "timeThresholdHrs": 24
-        },
-        "name": "{{$node}}",
-        "processType": "{{processType $i}}",
-        {{if hasShardedCluster $i}}
-        "cluster": "sharded-cluster",
-        {{end}}
-        "version": "{{$.Version}}",
-        "authSchemaVersion": 5
+              },
+              "storage": {
+                  "dbPath": "/var/vcap/store/mongodb-data"
+              },
+              "systemLog": {
+                  "destination": "file",
+                  "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
+              }
+          },
+          "name": "{{$node}}",
+          "hostname": "{{$node}}",
+          "logRotate": {
+              "sizeThresholdMB": 1000,
+              "timeThresholdHrs": 24
+          },
+          "version": "{{$.Version}}",
+          "authSchemaVersion": 5,
+          "processType": "mongod"
+      }{{if last $.Cluster.ConfigServers $i}}{{else}},{{end}}{{end}}
+
+      {{range $ii, $shard := .Cluster.Shards}}
+          {{range $i, $node := $shard}},{
+              "args2_6": {
+                  "net": {
+                      "port": 28000
+                  },
+                  "replication": {
+                      "replSetName": "{{$.ID}}_shard_{{$ii}}"
+                  },
+                  "systemLog": {
+                      "destination": "file",
+                      "path": "/var/vcap/sys/log/mongod_node/mongodb.log"
+                  }
+              },
+              "name": "{{$node}}",
+              "hostname": "{{$node}}",
+              "logRotate": {
+                  "sizeThresholdMB": 1000,
+                  "timeThresholdHrs": 24
+              },
+              "version": "{{$.Version}}",
+              "authSchemaVersion": 5,
+              "processType": "mongod"
+          }{{end}}
+      {{end}}
+    ],
+
+    "replicaSets": [{
+        "_id": "{{$.ID}}_config",
+        "members": [
+            {{range $i, $node := .Cluster.ConfigServers}}{{if $i}},{{end}}{
+                "_id": {{$i}},
+                "arbiterOnly": false,
+                "hidden": false,
+                "host": "{{$node}}",
+                "priority": 1,
+                "slaveDelay": 0,
+                "votes": 1
+            }{{end}}
+        ]
     }
-    {{end}}
-    ],
-    "replicaSets": [{{range $i, $shard := .Shards}}
-        {{if $i}},{{end}}{
-           "_id": "shard_{{$.ID}}_{{$i}}",
-           "members": [{{range $i, $node := $shard}}
-               {{if $i}},{{end}}{
-                   "_id": {{$i}},
-                   "arbiterOnly": false,
-                   "hidden": false,
-                   "host": "{{$node}}",
-                   "priority": 1,
-                   "slaveDelay": 0,
-                   "votes": 1
-               }
-               {{end}}
-           ]
-       }
-       {{end}}
-    ],
-    "sharding": [
-        {
-                "shards": [
-                  {{range $i, $shard := .Shards}}
-                    {{if $i}},{{end}}{
-                        "tags": [],
-                        "_id": "shard_{{$.ID}}_{{$i}}",
-                        "rs": "shard_{{$.ID}}_{{$i}}"
-                    }
-                  {{end}}
-                ],
-                "name": "sharded-cluster",
-                "configServer": [],
-                "configServerReplica": "shard_{{.ID}}_0",
-                "collections": []
+    {{range $i, $shard := .Cluster.Shards}},{
+        "_id": "shard_{{$.ID}}_{{$i}}",
+        "members": [{{range $i, $node := $shard}}
+            {{if $i}},{{end}}{
+                "_id": {{$i}},
+                "arbiterOnly": false,
+                "hidden": false,
+                "host": "{{$node}}",
+                "priority": 1,
+                "slaveDelay": 0,
+                "votes": 1
             }
-    ],
+            {{end}}
+        ]
+    }{{end}}],
+
+    "sharding": [{
+        "shards": [
+             {{range $i, $shard := .Cluster.Shards}}{{if $i}},{{end}}{
+                 "tags": [],
+                 "_id": "{{$.ID}}_shard_{{$i}}",
+                 "rs": "{{$.ID}}_shard_{{$i}}"
+             }{{end}}
+        ],
+        "name": "{{.ID}}_cluster",
+        "configServer": [],
+        "configServerReplica": "{{.ID}}_config",
+        "collections": []
+    }],
 
     "auth":{
        "disabled":false,

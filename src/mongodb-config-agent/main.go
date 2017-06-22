@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"log"
 	"os"
@@ -43,16 +42,16 @@ func main() {
 
 	nodes := strings.Split(nodeAddresses, ",")
 	ctx := &adapter.DocContext{
-		ID:             id,
-		Key:            "GrSLAAsHGXmJOrvElJ2AHTGauvH4O0EFT1r8byvb0G9sTU0viVX21PwUMqBjyXB9WrZP9QvEmCQIF1wOqJofyWmx7wWZqpO69dnc9GUWcpGQLr7eVyKTs99WAPXR3kXpF4MVrHdBMEDfRfhytgomgAso96urN6eC8RaUpjX4Bf9HcAEJwfddZshin97XKJDmqCaqAfORNnf1e8hkfTIwYg1tvIpwemmEF4TkmOgK09N5dINyejyWMU8iWG8FqW5MfQ8A2DrtIdyGSKLH05s7H1dXyADjDECaC77QqLXTx7gWyHca3I0K92PuVFoOs5385vzqTYN3kVgFotSdXgoM8Zt5QIoj2lX4PYqm2TWsVp0s15JELikH8bNVIIMGiSSWJEWGU1PVEXD7V7cYepDb88korMjr3wbh6kZ76Q7F2RtfJqkd4hKw7B5OCX04b5eppkjL598iCpSUUx3X9C6fFavWj2DrHsv9DY86iCWBlcG08DRPKs9EPizCW4jNZtJcm3T7WlcI0MZMKOtsKOCWBZA0C9YnttNrp4eTsQ1U43StiIRPqp2K8rrQAu6etURH0RHedazHeeukTWI7iTG1dZpYk9EyittZ72qKXLNLhi5vJ9TlYw8O91vihB1nJwwA3B1WbiYhkqqRzoL0cQpXJMUsUlsoSP6Q70IMU92vEHbUmna5krESPLeJfQBKGQPNVVE63XYBh2TnvFTdi6koitu209wMFUnHZrzWj3UWGqsyTqqHbPl4RhRLFe24seRwV2SbUuLygBIdptKHnA3kutAbHzsWTT8UxOaiQzFV4auxounrgXj7MoMWEVKKS8AHkELPILGqFVFC8BZsfPC0WacSN5Rg5SaCvfs74hcsCQ3ghq9PyxEb2fbHUiaCjnsBcXqzQw9AjZJG4yX0ubEwicP0bKB6y3w4PUQqdouxH5y16OgkUjrZgodJfRLgP9vqGbHNDpj4yBuswluvCFBh38gBoSIQu11qtQmk43n4G8Dskn0DrJ32l2Gz35q5LaKT",
+		ID:            id,
+		Key:           "GrSLAAsHGXmJOrvElJ2AHTGauvH4O0EFT1r8byvb0G9sTU0viVX21PwUMqBjyXB9WrZP9QvEmCQIF1wOqJofyWmx7wWZqpO69dnc9GUWcpGQLr7eVyKTs99WAPXR3kXpF4MVrHdBMEDfRfhytgomgAso96urN6eC8RaUpjX4Bf9HcAEJwfddZshin97XKJDmqCaqAfORNnf1e8hkfTIwYg1tvIpwemmEF4TkmOgK09N5dINyejyWMU8iWG8FqW5MfQ8A2DrtIdyGSKLH05s7H1dXyADjDECaC77QqLXTx7gWyHca3I0K92PuVFoOs5385vzqTYN3kVgFotSdXgoM8Zt5QIoj2lX4PYqm2TWsVp0s15JELikH8bNVIIMGiSSWJEWGU1PVEXD7V7cYepDb88korMjr3wbh6kZ76Q7F2RtfJqkd4hKw7B5OCX04b5eppkjL598iCpSUUx3X9C6fFavWj2DrHsv9DY86iCWBlcG08DRPKs9EPizCW4jNZtJcm3T7WlcI0MZMKOtsKOCWBZA0C9YnttNrp4eTsQ1U43StiIRPqp2K8rrQAu6etURH0RHedazHeeukTWI7iTG1dZpYk9EyittZ72qKXLNLhi5vJ9TlYw8O91vihB1nJwwA3B1WbiYhkqqRzoL0cQpXJMUsUlsoSP6Q70IMU92vEHbUmna5krESPLeJfQBKGQPNVVE63XYBh2TnvFTdi6koitu209wMFUnHZrzWj3UWGqsyTqqHbPl4RhRLFe24seRwV2SbUuLygBIdptKHnA3kutAbHzsWTT8UxOaiQzFV4auxounrgXj7MoMWEVKKS8AHkELPILGqFVFC8BZsfPC0WacSN5Rg5SaCvfs74hcsCQ3ghq9PyxEb2fbHUiaCjnsBcXqzQw9AjZJG4yX0ubEwicP0bKB6y3w4PUQqdouxH5y16OgkUjrZgodJfRLgP9vqGbHNDpj4yBuswluvCFBh38gBoSIQu11qtQmk43n4G8Dskn0DrJ32l2Gz35q5LaKT",
 		AdminPassword: adminPassword,
-		Nodes:          nodes,
-		Version:        engineVersion,
+		Nodes:         nodes,
+		Version:       engineVersion,
 	}
 
 	if planID == adapter.PlanShardedSet {
 		var err error
-		ctx.Shards, err = nodesToShards(nodes, replicas)
+		ctx.Cluster, err = NodesToCluster(nodes, replicas, replicas, replicas)
 		if err != nil {
 			logger.Fatal(err)
 		}
@@ -89,22 +88,20 @@ func main() {
 	}
 }
 
-// nodesToShards transforms a list of nodes into shards list
-// depending on replicas per shard number.
-// Number of nodes modulo number of replicas has to be zero.
-func nodesToShards(nodes []string, replicas int) ([][]string, error) {
-	if len(nodes) == 0 {
-		return nil, errors.New("len(nodes) == 0")
-	} else if replicas == 0 {
-		return nil, errors.New("replicas == 0")
-	} else if len(nodes)%replicas != 0 {
-		return nil, errors.New("len(nodes) % replicas != 0")
+// TODO: validate input
+func NodesToCluster(nodes []string, routers, configServers, replicas int) (*adapter.Cluster, error) {
+	c := &adapter.Cluster{
+		Routers:       nodes[:routers],
+		ConfigServers: nodes[routers : routers+configServers],
 	}
 
-	b := [][]string{}
-	for i := 0; i < replicas; i++ {
-		b = append(b, []string{})
-		b[i] = nodes[i*replicas : (i*replicas)+replicas]
+	nodes = nodes[routers+configServers:]
+	c.Shards = make([][]string, 0, len(nodes)/replicas)
+	for i := 0; i < len(nodes)/replicas; i++ {
+		c.Shards = append(c.Shards, make([]string, 0, replicas))
+		for j := 0; j < replicas; j++ {
+			c.Shards[i] = append(c.Shards[i], nodes[i*replicas+j])
+		}
 	}
-	return b, nil
+	return c, nil
 }

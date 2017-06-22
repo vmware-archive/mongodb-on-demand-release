@@ -109,10 +109,10 @@ func (m ManifestGenerator) GenerateManifest(
 	//
 	// standalone:         always one
 	// single_replica_set: number of replicas
-	// sharded_set:        shards * replicas
+	// sharded_set:        shards*replicas + routers (now routers number equals replicas)
 	instances := mongodInstanceGroup.Instances
 
-	planID := plan.Properties["id"].(Plan)
+	planID := Plan(plan.Properties["id"].(string))
 	switch planID {
 	case PlanStandalone:
 		// ok
@@ -122,16 +122,16 @@ func (m ManifestGenerator) GenerateManifest(
 		}
 	case PlanShardedSet:
 		shards := 5
-		if s, ok := arbitraryParams["shards"].(float64); ok && s > 1 {
+		if s, ok := arbitraryParams["shards"].(float64); ok && s > 2 {
 			shards = int(s)
 		}
 
 		replicas = 3
-		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 1 {
+		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 2 {
 			replicas = int(r)
 		}
 
-		instances = shards * replicas
+		instances = shards * replicas + replicas
 	default:
 		return bosh.BoshManifest{}, fmt.Errorf("unknown plan: %s", planID)
 	}
@@ -232,7 +232,7 @@ func gatherJobs(releases serviceadapter.ServiceReleases, requiredJobs []string) 
 			Name:    requiredJob,
 			Release: release.Name,
 			Provides: map[string]bosh.ProvidesLink{
-				"mongod_node": bosh.ProvidesLink{As: "mongod_node"},
+				"mongod_node": {As: "mongod_node"},
 			},
 			Consumes: map[string]interface{}{
 				"mongod_node": bosh.ConsumesLink{From: "mongod_node"},

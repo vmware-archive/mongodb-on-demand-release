@@ -36,8 +36,14 @@ type DocContext struct {
 	AdminPassword string
 	Version       string
 	Nodes         []string
-	Shards        [][]string
+	Cluster       *Cluster
 	Password      string
+}
+
+type Cluster struct {
+	Routers       []string
+	ConfigServers []string
+	Shards        [][]string
 }
 
 func (oc *OMClient) LoadDoc(p Plan, ctx *DocContext) (string, error) {

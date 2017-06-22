@@ -1,6 +1,9 @@
 package adapter
 
-import "testing"
+import (
+	"encoding/json"
+	"testing"
+)
 
 func TestOMClient_LoadDoc(t *testing.T) {
 	t.Parallel()
@@ -19,9 +22,15 @@ func TestOMClient_LoadDoc(t *testing.T) {
 			ID:            "d3a98gf1",
 			Key:           "key",
 			AdminPassword: "pwd",
-			Nodes:         []string{"192.168.1.1", "192.168.1.2", "192.168.1.3", "192.168.1.4"},
 			Version:       "3.2.11",
-			Shards:        [][]string{{"192.168.1.1", "192.168.1.2"}, {"192.168.1.3", "192.168.1.4"}},
+			Cluster: &Cluster{
+				Routers:       []string{"192.168.1.1", "192.168.1.2"},
+				ConfigServers: []string{"192.168.1.3", "192.168.1.4"},
+				Shards: [][]string{
+					{"192.168.0.10", "192.168.0.11", "192.168.0.12"},
+					{"192.168.0.13", "192.168.0.14", "192.168.0.15"},
+				},
+			},
 		},
 
 		PlanSingleReplicaSet: {
@@ -33,8 +42,13 @@ func TestOMClient_LoadDoc(t *testing.T) {
 		},
 	} {
 		t.Run(string(p), func(t *testing.T) {
-			_, err := c.LoadDoc(p, ctx)
+			s, err := c.LoadDoc(p, ctx)
 			if err != nil {
+				t.Fatal(err)
+			}
+
+			// validate json output
+			if err := json.Unmarshal([]byte(s), &map[string]interface{}{}); err != nil {
 				t.Fatal(err)
 			}
 		})
