@@ -32,7 +32,7 @@ func init() {
 var plansRaw = map[string]string{
 	PlanStandalone: `{
     "options": {
-        "downloadBase": "/var/lib/mongodb-mms-automation"
+        "downloadBase": "/var/vcap/store/mongodb-mms-automation"
     },
     "mongoDbVersions": [
         {"name": "{{.Version}}"}
@@ -45,16 +45,14 @@ var plansRaw = map[string]string{
             "timeThresholdHrs": 24
         }
     }],
-    "monitoringVersions": [
-        {{range $i, $node := .Nodes}}{{if $i}},{{end}}{
-            "hostname": "{{$node}}",
-            "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
-            "logRotate": {
-                "sizeThresholdMB": 1000,
-                "timeThresholdHrs": 24
-            }
-        }{{end}}
-    ],
+    "monitoringVersions": [{
+        "hostname": "{{index .Nodes 0}}",
+        "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
+        "logRotate": {
+            "sizeThresholdMB": 1000,
+            "timeThresholdHrs": 24
+        }
+    }],
     "processes": [{
         "args2_6": {
             "net": {
@@ -165,23 +163,27 @@ var plansRaw = map[string]string{
 
 	PlanShardedCluster: `{
     "options": {
-        "downloadBase": "/var/lib/mongodb-mms-automation"
+        "downloadBase": "/var/vcap/store/mongodb-mms-automation"
     },
     "mongoDbVersions": [
         {"name": "{{.Version}}"}
     ],
-    "backupVersions": [
-    ],
-    "monitoringVersions": [
-        {{range $i, $node := .Nodes}}{{if $i}},{{end}}{
-            "hostname": "{{$node}}",
-            "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
-            "logRotate": {
-                "sizeThresholdMB": 1000,
-                "timeThresholdHrs": 24
-            }
-        }{{end}}
-    ],
+    "backupVersions": [{
+        "hostname": "{{index .Cluster.ConfigServers 0}}",
+        "logPath": "/var/vcap/sys/log/mongod_node/backup-agent.log",
+        "logRotate": {
+            "sizeThresholdMB": 1000,
+            "timeThresholdHrs": 24
+        }
+    }],
+    "monitoringVersions": [{
+        "hostname": "{{index .Cluster.ConfigServers 0}}",
+        "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
+        "logRotate": {
+            "sizeThresholdMB": 1000,
+            "timeThresholdHrs": 24
+        }
+    }],
     "processes": [
       {{range $i, $node := .Cluster.Routers}}{
           "args2_6": {
@@ -392,7 +394,7 @@ var plansRaw = map[string]string{
 
 	PlanReplicaSet: `{
     "options": {
-        "downloadBase": "/var/lib/mongodb-mms-automation"
+        "downloadBase": "/var/vcap/store/mongodb-mms-automation"
     },
     "mongoDbVersions": [
         {"name": "{{.Version}}"}
@@ -405,16 +407,14 @@ var plansRaw = map[string]string{
             "timeThresholdHrs": 24
         }
     }],
-    "monitoringVersions": [
-        {{range $i, $node := .Nodes}}{{if $i}},{{end}}{
-            "hostname": "{{$node}}",
-            "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
-            "logRotate": {
-                "sizeThresholdMB": 1000,
-                "timeThresholdHrs": 24
-            }
-        }{{end}}
-    ],
+    "monitoringVersions": [{
+        "hostname": "{{index .Nodes 0}}",
+        "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
+        "logRotate": {
+            "sizeThresholdMB": 1000,
+            "timeThresholdHrs": 24
+        }
+    }],
     "processes": [{{range $i, $node := .Nodes}}
       {{if $i}},{{end}}{
         "args2_6": {
