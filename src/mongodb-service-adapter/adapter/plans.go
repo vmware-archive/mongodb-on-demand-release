@@ -47,7 +47,7 @@ var plansRaw = map[string]string{
     }],
     "monitoringVersions": [
         {{range $i, $node := .Nodes}}{{if $i}},{{end}}{
-            "hostname": "$node}}",
+            "hostname": "{{$node}}",
             "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
             "logRotate": {
                 "sizeThresholdMB": 1000,
