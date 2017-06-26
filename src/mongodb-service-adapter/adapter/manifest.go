@@ -136,7 +136,7 @@ func (m ManifestGenerator) GenerateManifest(
 		}
 
 		routers = 3
-		if r, ok := arbitraryParams["routers"].(float64); ok && r > 0 {
+		if r, ok := arbitraryParams["mongos"].(float64); ok && r > 0 {
 			routers = int(r)
 		}
 
