@@ -42,7 +42,7 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 	}
 
 	plan := properties["plan_id"].(string)
-	if plan == PlanShardedSet {
+	if plan == PlanShardedCluster {
 		routers := properties["routers"].(int)
 		configServers := properties["config_servers"].(int)
 		replicas := properties["replicas"].(int)

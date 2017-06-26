@@ -99,27 +99,27 @@ func (m ManifestGenerator) GenerateManifest(
 		engineVersion = "3.2.7" // TODO: make it configurable in deployment manifest
 	}
 
-	// sharded_set parameters
+	// sharded_cluster parameters
 	replicas := 0
 	routers := 0
 	configServers := 0
 
 	// total number of instances
 	//
-	// standalone:         always one
-	// single_replica_set: number of replicas
-	// sharded_set:        shards*replicas + config_servers + routers
+	// standalone:      always one
+	// replica_set:     number of replicas
+	// sharded_cluster: shards*replicas + config_servers + mongos
 	instances := mongodInstanceGroup.Instances
 
 	planID := plan.Properties["id"].(string)
 	switch planID {
 	case PlanStandalone:
 		// ok
-	case PlanSingleReplicaSet:
+	case PlanReplicaSet:
 		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 0 {
 			instances = int(r)
 		}
-	case PlanShardedSet:
+	case PlanShardedCluster:
 		shards := 5
 		if s, ok := arbitraryParams["shards"].(float64); ok && s > 0 {
 			shards = int(s)

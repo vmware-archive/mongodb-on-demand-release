@@ -135,7 +135,7 @@ packages:
               url: (( .properties.url.value ))
               username: (( .properties.username.value ))
               api_key: (( .properties.api_key.value ))
-        - name: single_replica_set
+        - name: replica_set
           plan_id: fee3933e-42cb-4964-b66e-79498f94e968
           description: Replica Set
           instance_groups:
@@ -146,7 +146,7 @@ packages:
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
           properties:
-            id: single_replica_set
+            id: replica_set
             mongo_ops:
               url: (( .properties.url.value ))
               username: (( .properties.username.value ))

@@ -18,7 +18,7 @@ func TestOMClient_LoadDoc(t *testing.T) {
 			Version:       "3.2.11",
 		},
 
-		PlanShardedSet: {
+		PlanShardedCluster: {
 			ID:            "d3a98gf1",
 			Key:           "key",
 			AdminPassword: "pwd",
@@ -33,7 +33,7 @@ func TestOMClient_LoadDoc(t *testing.T) {
 			},
 		},
 
-		PlanSingleReplicaSet: {
+		PlanReplicaSet: {
 			ID:            "d3a98gf1",
 			Key:           "key",
 			AdminPassword: "pwd",

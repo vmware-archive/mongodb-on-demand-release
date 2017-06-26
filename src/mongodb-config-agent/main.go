@@ -53,7 +53,7 @@ func main() {
 		Version:       engineVersion,
 	}
 
-	if planID == adapter.PlanShardedSet {
+	if planID == adapter.PlanShardedCluster {
 		var err error
 		ctx.Cluster, err = adapter.NodesToCluster(nodes, routers, configServers, replicas)
 		if err != nil {

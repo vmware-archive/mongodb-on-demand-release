@@ -54,7 +54,7 @@ instance_groups:
         api_key: ebd5e5aa-cdb4-4431-91a2-ebbb5530cfc7
         group_id: 57bdaa64e4b0344ee0bcbcba
         username: imallika@gmail.com
-        plan_id: sharded_set
+        plan_id: sharded_cluster
 
     vm_type: default
     stemcell: default

@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	PlanStandalone       = "standalone"
-	PlanShardedSet       = "sharded_set"
-	PlanSingleReplicaSet = "single_replica_set"
+	PlanStandalone     = "standalone"
+	PlanReplicaSet     = "replica_set"
+	PlanShardedCluster = "sharded_cluster"
 )
 
 var plans = map[string]*template.Template{}
@@ -180,7 +180,7 @@ var plansRaw = map[string]string{
     }
 }`,
 
-	PlanShardedSet: `{
+	PlanShardedCluster: `{
     "options": {
         "downloadBase": "/var/lib/mongodb-mms-automation",
         "downloadBaseWindows": "C:\\mongodb-mms-automation"
@@ -409,7 +409,7 @@ var plansRaw = map[string]string{
     }
 }`,
 
-	PlanSingleReplicaSet: `{
+	PlanReplicaSet: `{
     "options": {
         "downloadBase": "/var/lib/mongodb-mms-automation",
         "downloadBaseWindows": "C:\\mongodb-mms-automation"
