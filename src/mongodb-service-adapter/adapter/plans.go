@@ -32,7 +32,7 @@ func init() {
 var plansRaw = map[string]string{
 	PlanStandalone: `{
     "options": {
-        "downloadBase": "/var/lib/mongodb-mms-automation",
+        "downloadBase": "/var/lib/mongodb-mms-automation"
     },
     "mongoDbVersions": [
         {"name": "{{.Version}}"}
@@ -165,14 +165,14 @@ var plansRaw = map[string]string{
 
 	PlanShardedCluster: `{
     "options": {
-        "downloadBase": "/var/lib/mongodb-mms-automation",
+        "downloadBase": "/var/lib/mongodb-mms-automation"
     },
     "mongoDbVersions": [
         {"name": "{{.Version}}"}
     ],
     "backupVersions": [
     ],
-    "monitoringVersions": [{
+    "monitoringVersions": [
         {{range $i, $node := .Nodes}}{{if $i}},{{end}}{
             "hostname": "{{$node}}",
             "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
@@ -181,7 +181,7 @@ var plansRaw = map[string]string{
                 "timeThresholdHrs": 24
             }
         }{{end}}
-    }],
+    ],
     "processes": [
       {{range $i, $node := .Cluster.Routers}}{
           "args2_6": {
@@ -392,7 +392,7 @@ var plansRaw = map[string]string{
 
 	PlanReplicaSet: `{
     "options": {
-        "downloadBase": "/var/lib/mongodb-mms-automation",
+        "downloadBase": "/var/lib/mongodb-mms-automation"
     },
     "mongoDbVersions": [
         {"name": "{{.Version}}"}
