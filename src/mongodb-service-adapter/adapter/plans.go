@@ -33,28 +33,10 @@ var plansRaw = map[string]string{
 	PlanStandalone: `{
     "options": {
         "downloadBase": "/var/lib/mongodb-mms-automation",
-        "downloadBaseWindows": "C:\\mongodb-mms-automation"
     },
-    "mongoDbVersions": [{
-        "builds": [
-                {
-                    "bits": 64,
-                    "flavor": "",
-                    "gitVersion": "4249c1d2b5999ebbf1fdf3bc0e0e3b3ff5c0aaf2",
-                    "maxOsVersion": "",
-                    "minOsVersion": "",
-                    "modules": [],
-                    "platform": "osx",
-                    "url": "https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-amazon-3.2.7.tgz",
-                    "win2008plus": false,
-                    "winVCRedistDll": "",
-                    "winVCRedistOptions": [],
-                    "winVCRedistUrl": "",
-                    "winVCRedistVersion": ""
-                }
-            ],
-        "name": "{{.Version}}"
-    }],
+    "mongoDbVersions": [
+        {"name": "{{.Version}}"}
+    ],
     "backupVersions": [{
         "hostname": "{{index .Nodes 0}}",
         "logPath": "/var/vcap/sys/log/mongod_node/backup-agent.log",
@@ -63,7 +45,6 @@ var plansRaw = map[string]string{
             "timeThresholdHrs": 24
         }
     }],
-
     "monitoringVersions": [{
         "hostname": "{{index .Nodes 0}}",
         "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
@@ -183,24 +164,20 @@ var plansRaw = map[string]string{
 	PlanShardedCluster: `{
     "options": {
         "downloadBase": "/var/lib/mongodb-mms-automation",
-        "downloadBaseWindows": "C:\\mongodb-mms-automation"
     },
-    "mongoDbVersions": [{
-        "name": "{{.Version}}"
-    }],
+    "mongoDbVersions": [
+        {"name": "{{.Version}}"}
+    ],
     "backupVersions": [
     ],
-
-    "monitoringVersions": [
-    {
+    "monitoringVersions": [{
         "hostname": "{{index .Cluster.Routers 0}}",
         "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
         "logRotate": {
             "sizeThresholdMB": 1000,
             "timeThresholdHrs": 24
         }
-    }
-    ],
+    }],
     "processes": [
       {{range $i, $node := .Cluster.Routers}}{
           "args2_6": {
@@ -412,28 +389,10 @@ var plansRaw = map[string]string{
 	PlanReplicaSet: `{
     "options": {
         "downloadBase": "/var/lib/mongodb-mms-automation",
-        "downloadBaseWindows": "C:\\mongodb-mms-automation"
     },
-    "mongoDbVersions": [{
-        "builds": [
-                {
-                    "bits": 64,
-                    "flavor": "",
-                    "gitVersion": "4249c1d2b5999ebbf1fdf3bc0e0e3b3ff5c0aaf2",
-                    "maxOsVersion": "",
-                    "minOsVersion": "",
-                    "modules": [],
-                    "platform": "osx",
-                    "url": "https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-amazon-3.2.7.tgz",
-                    "win2008plus": false,
-                    "winVCRedistDll": "",
-                    "winVCRedistOptions": [],
-                    "winVCRedistUrl": "",
-                    "winVCRedistVersion": ""
-                }
-            ],
-        "name": "{{.Version}}"
-    }],
+    "mongoDbVersions": [
+        {"name": "{{.Version}}"}
+    ],
     "backupVersions": [{
         "hostname": "{{index .Nodes 0}}",
         "logPath": "/var/vcap/sys/log/mongod_node/backup-agent.log",
@@ -442,7 +401,6 @@ var plansRaw = map[string]string{
             "timeThresholdHrs": 24
         }
     }],
-
     "monitoringVersions": [{
         "hostname": "{{index .Nodes 0}}",
         "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
