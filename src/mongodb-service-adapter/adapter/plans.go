@@ -45,14 +45,16 @@ var plansRaw = map[string]string{
             "timeThresholdHrs": 24
         }
     }],
-    "monitoringVersions": [{
-        "hostname": "{{index .Nodes 0}}",
-        "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
-        "logRotate": {
-            "sizeThresholdMB": 1000,
-            "timeThresholdHrs": 24
-        }
-    }],
+    "monitoringVersions": [
+        {{range $i, $node := .Nodes}}{{if $i}},{{end}}{
+            "hostname": "$node}}",
+            "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
+            "logRotate": {
+                "sizeThresholdMB": 1000,
+                "timeThresholdHrs": 24
+            }
+        }{{end}}
+    ],
     "processes": [{
         "args2_6": {
             "net": {
@@ -171,12 +173,14 @@ var plansRaw = map[string]string{
     "backupVersions": [
     ],
     "monitoringVersions": [{
-        "hostname": "{{index .Cluster.Routers 0}}",
-        "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
-        "logRotate": {
-            "sizeThresholdMB": 1000,
-            "timeThresholdHrs": 24
-        }
+        {{range $i, $node := .Nodes}}{{if $i}},{{end}}{
+            "hostname": "{{$node}}",
+            "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
+            "logRotate": {
+                "sizeThresholdMB": 1000,
+                "timeThresholdHrs": 24
+            }
+        }{{end}}
     }],
     "processes": [
       {{range $i, $node := .Cluster.Routers}}{
@@ -401,14 +405,16 @@ var plansRaw = map[string]string{
             "timeThresholdHrs": 24
         }
     }],
-    "monitoringVersions": [{
-        "hostname": "{{index .Nodes 0}}",
-        "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
-        "logRotate": {
-            "sizeThresholdMB": 1000,
-            "timeThresholdHrs": 24
-        }
-    }],
+    "monitoringVersions": [
+        {{range $i, $node := .Nodes}}{{if $i}},{{end}}{
+            "hostname": "{{$node}}",
+            "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
+            "logRotate": {
+                "sizeThresholdMB": 1000,
+                "timeThresholdHrs": 24
+            }
+        }{{end}}
+    ],
     "processes": [{{range $i, $node := .Nodes}}
       {{if $i}},{{end}}{
         "args2_6": {
