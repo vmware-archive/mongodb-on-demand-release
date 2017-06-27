@@ -151,7 +151,7 @@ packages:
               url: (( .properties.url.value ))
               username: (( .properties.username.value ))
               api_key: (( .properties.api_key.value ))
-        - name: sharded_set
+        - name: sharded_cluster
           plan_id: 477a196a-9e28-4103-87d3-593767448c9f
           description: Sharded Cluster
           metadata:
@@ -167,7 +167,7 @@ packages:
               networks: [(( $self.service_network ))]
               azs: (( .properties.az_multi_select.value ))
           properties:
-            id: sharded_set
+            id: sharded_cluster
             mongo_ops:
               url: (( .properties.url.value ))
               username: (( .properties.username.value ))
@@ -217,7 +217,6 @@ packages:
         api_url: (( $runtime.system_api_url ))
         admin_username: (( ..cf.uaa.admin_credentials.identity ))
         admin_password: (( ..cf.uaa.admin_credentials.password ))
-
   - name: unregister_on_demand_service_broker
     label: 'On Demand Service Broker Deregistrar'
     lifecycle: errand
