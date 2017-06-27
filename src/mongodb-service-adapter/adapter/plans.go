@@ -2,8 +2,8 @@ package adapter
 
 import (
 	"reflect"
-	"text/template"
 	"strings"
+	"text/template"
 )
 
 const (
@@ -81,7 +81,7 @@ var plansRaw = map[string]string{
         "name": "{{index .Nodes 0}}",
         "processType": "mongod",
         "version": "{{.Version}}",
-        "compatibilityVersion": "{{compatibilityVersion .Version}}",
+        "featureCompatibilityVersion": "{{compatibilityVersion .Version}}",
         "authSchemaVersion": 5
     }],
     "replicaSets": [],
@@ -210,7 +210,7 @@ var plansRaw = map[string]string{
               "timeThresholdHrs": 24
           },
           "version": "{{$.Version}}",
-          "compatibilityVersion": "{{compatibilityVersion $.Version}}",
+          "featureCompatibilityVersion": "{{compatibilityVersion $.Version}}",
           "authSchemaVersion": 5,
           "processType": "mongos",
           "cluster": "{{$.ID}}_cluster"
@@ -242,7 +242,7 @@ var plansRaw = map[string]string{
               "timeThresholdHrs": 24
           },
           "version": "{{$.Version}}",
-          "compatibilityVersion": "{{compatibilityVersion $.Version}}",
+          "featureCompatibilityVersion": "{{compatibilityVersion $.Version}}",
           "authSchemaVersion": 5,
           "processType": "mongod"
       }{{if last $.Cluster.ConfigServers $i}}{{else}},{{end}}{{end}}
@@ -271,7 +271,7 @@ var plansRaw = map[string]string{
                   "timeThresholdHrs": 24
               },
               "version": "{{$.Version}}",
-              "compatibilityVersion": "{{compatibilityVersion $.Version}}",
+              "featureCompatibilityVersion": "{{compatibilityVersion $.Version}}",
               "authSchemaVersion": 5,
               "processType": "mongod"
           }{{end}}
@@ -451,7 +451,7 @@ var plansRaw = map[string]string{
         "name": "{{$node}}",
         "processType": "mongod",
         "version": "{{$.Version}}",
-        "compatibilityVersion": "{{compatibilityVersion $.Version}}",
+        "featureCompatibilityVersion": "{{compatibilityVersion $.Version}}",
         "authSchemaVersion": 5
     }
     {{end}}
