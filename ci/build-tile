@@ -7,8 +7,11 @@ root_dir=$(pwd)
 VERSION=$(cat version/number)
 
 pushd git
-  mkdir -p src/golang
+  mkdir -p src/golang src/libsnmp
   wget 'https://storage.googleapis.com/golang/go1.8.3.linux-amd64.tar.gz' -O src/golang/go1.8.3.linux-amd64.tar.gz --tries=7
+  wget 'http://security.ubuntu.com/ubuntu/pool/main/n/net-snmp/libsnmp30_5.7.2~dfsg-8.1ubuntu3.1_amd64.deb' -P src/libsnmp/ --tries=7
+  wget 'http://security.ubuntu.com/ubuntu/pool/main/n/net-snmp/libsnmp-base_5.7.2~dfsg-8.1ubuntu3.1_all.deb' -P src/libsnmp/ --tries=7
+  wget 'http://security.ubuntu.com/ubuntu/pool/main/p/perl/libperl5.18_5.18.2-2ubuntu1.1_amd64.deb' -P src/libsnmp/ --tries=7
   bosh create release --with-tarball --name mongodb --version ${VERSION}
   cp dev_releases/mongodb/mongodb-*.tgz $root_dir/git/tile/resources
 popd

@@ -3,3 +3,4 @@ set -e
 set -u
 
 cp -a common/* ${BOSH_INSTALL_TARGET}
+cp -a libsnmp/* ${BOSH_INSTALL_TARGET}
