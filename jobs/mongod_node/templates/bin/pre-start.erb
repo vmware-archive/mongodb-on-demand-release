@@ -22,6 +22,4 @@ set -e
   hosts = link("mongod_node").instances.collect{ |x| "#{x.address} #{x.name.gsub('_', '-')}-#{x.index}" }.join("\\n")
 %>
 
-chmod 777 /var/log
-
 hostname <%= spec.address %>

@@ -32,7 +32,7 @@ func init() {
 var plansRaw = map[string]string{
 	PlanStandalone: `{
     "options": {
-        "downloadBase": "/var/vcap/store/mongodb-mms-automation"
+        "downloadBase": "/var/lib/mongodb-mms-automation"
     },
     "mongoDbVersions": [
         {"name": "{{.Version}}"}
@@ -163,7 +163,7 @@ var plansRaw = map[string]string{
 
 	PlanShardedCluster: `{
     "options": {
-        "downloadBase": "/var/vcap/store/mongodb-mms-automation"
+        "downloadBase": "/var/lib/mongodb-mms-automation"
     },
     "mongoDbVersions": [
         {"name": "{{.Version}}"}
@@ -394,7 +394,7 @@ var plansRaw = map[string]string{
 
 	PlanReplicaSet: `{
     "options": {
-        "downloadBase": "/var/vcap/store/mongodb-mms-automation"
+        "downloadBase": "/var/lib/mongodb-mms-automation"
     },
     "mongoDbVersions": [
         {"name": "{{.Version}}"}

@@ -6,11 +6,11 @@ source /var/vcap/packages/mongod-node/utils.sh
 
 RUN_DIR=/var/vcap/sys/run/mongod_node
 LOG_DIR=/var/vcap/sys/log/mongod_node
+AGENT_LOG_DIR=/var/log/mongodb-mms-automation
 TMP_DIR=/var/vcap/sys/tmp/mongod_node
 STORE_DIR=/var/vcap/store/mongod_node
-mkdir -p ${RUN_DIR} ${LOG_DIR} ${TMP_DIR} ${STORE_DIR}
-chown -R vcap:vcap ${RUN_DIR} ${LOG_DIR} ${TMP_DIR} ${STORE_DIR}
-chmod 775 ${RUN_DIR} ${LOG_DIR} ${TMP_DIR} ${STORE_DIR}
+mkdir -p ${RUN_DIR} ${LOG_DIR} ${TMP_DIR} ${STORE_DIR} ${AGENT_LOG_DIR}
+chmod 777 ${AGENT_LOG_DIR}
 
 PIDFILE=${RUN_DIR}/mongo_agent.pid
 
@@ -21,7 +21,7 @@ case $1 in
     echo $$ > ${PIDFILE}
 
     # Start MongoDB Automation Agent
-    exec chpst -u vcap:vcap /var/vcap/packages/mongod-node/bin/mongodb-mms-automation-agent \
+    exec /var/vcap/packages/mongod-node/bin/mongodb-mms-automation-agent \
       --config=/var/vcap/jobs/mongod_node/config/local.conf \
       >>  ${LOG_DIR}/mongodb-automation-agent.stdout.log \
       2>> ${LOG_DIR}/mongodb-automation-agent.stderr.log
