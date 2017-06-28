@@ -2,7 +2,6 @@ package adapter
 
 import (
 	"reflect"
-	"strings"
 	"text/template"
 )
 
@@ -18,12 +17,6 @@ func init() {
 	funcs := template.FuncMap{
 		"last": func(a interface{}, x int) bool {
 			return reflect.ValueOf(a).Len()-1 == x
-		},
-		"compatibilityVersion": func(s string) string {
-			if strings.HasPrefix(s, "3.2") || strings.HasPrefix(s, "3.4") {
-				return s[:3]
-			}
-			return ""
 		},
 	}
 
@@ -81,7 +74,7 @@ var plansRaw = map[string]string{
         "name": "{{index .Nodes 0}}",
         "processType": "mongod",
         "version": "{{.Version}}",
-        "featureCompatibilityVersion": "{{compatibilityVersion .Version}}",
+        "featureCompatibilityVersion": "{{.CompatibilityVersion}}",
         "authSchemaVersion": 5
     }],
     "replicaSets": [],
@@ -210,7 +203,11 @@ var plansRaw = map[string]string{
               "timeThresholdHrs": 24
           },
           "version": "{{$.Version}}",
+<<<<<<< HEAD
           "featureCompatibilityVersion": "{{compatibilityVersion $.Version}}",
+=======
+          "compatibilityVersion": "{{$.CompatibilityVersion}}",
+>>>>>>> Add compatibility version only for mongo 3.4
           "authSchemaVersion": 5,
           "processType": "mongos",
           "cluster": "{{$.ID}}_cluster"
@@ -242,7 +239,7 @@ var plansRaw = map[string]string{
               "timeThresholdHrs": 24
           },
           "version": "{{$.Version}}",
-          "featureCompatibilityVersion": "{{compatibilityVersion $.Version}}",
+          "featureCompatibilityVersion": "{{$.CompatibilityVersion}}",
           "authSchemaVersion": 5,
           "processType": "mongod"
       }{{if last $.Cluster.ConfigServers $i}}{{else}},{{end}}{{end}}
@@ -271,7 +268,7 @@ var plansRaw = map[string]string{
                   "timeThresholdHrs": 24
               },
               "version": "{{$.Version}}",
-              "featureCompatibilityVersion": "{{compatibilityVersion $.Version}}",
+              "featureCompatibilityVersion": "{{$.CompatibilityVersion}}",
               "authSchemaVersion": 5,
               "processType": "mongod"
           }{{end}}
@@ -451,7 +448,7 @@ var plansRaw = map[string]string{
         "name": "{{$node}}",
         "processType": "mongod",
         "version": "{{$.Version}}",
-        "featureCompatibilityVersion": "{{compatibilityVersion $.Version}}",
+        "featureCompatibilityVersion": "{{$.CompatibilityVersion}}",
         "authSchemaVersion": 5
     }
     {{end}}

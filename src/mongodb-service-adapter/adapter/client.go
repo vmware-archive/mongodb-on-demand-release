@@ -31,13 +31,14 @@ type GroupHosts struct {
 }
 
 type DocContext struct {
-	ID            string
-	Key           string
-	AdminPassword string
-	Version       string
-	Nodes         []string
-	Cluster       *Cluster
-	Password      string
+	ID                   string
+	Key                  string
+	AdminPassword        string
+	Version              string
+	CompatibilityVersion string
+	Nodes                []string
+	Cluster              *Cluster
+	Password             string
 }
 
 type Cluster struct {
@@ -58,6 +59,10 @@ func (oc *OMClient) LoadDoc(p string, ctx *DocContext) (string, error) {
 		if err != nil {
 			panic(err)
 		}
+	}
+
+	if strings.HasPrefix(ctx.Version, "3.4") {
+		ctx.CompatibilityVersion = "3.4"
 	}
 
 	b := bytes.Buffer{}
