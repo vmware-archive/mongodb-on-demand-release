@@ -203,11 +203,7 @@ var plansRaw = map[string]string{
               "timeThresholdHrs": 24
           },
           "version": "{{$.Version}}",
-<<<<<<< HEAD
-          "featureCompatibilityVersion": "{{compatibilityVersion $.Version}}",
-=======
-          "compatibilityVersion": "{{$.CompatibilityVersion}}",
->>>>>>> Add compatibility version only for mongo 3.4
+          "featureCompatibilityVersion": "{{$.CompatibilityVersion}}",
           "authSchemaVersion": 5,
           "processType": "mongos",
           "cluster": "{{$.ID}}_cluster"
