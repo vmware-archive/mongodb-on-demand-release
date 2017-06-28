@@ -22,7 +22,7 @@ func TestOMClient_LoadDoc(t *testing.T) {
 			ID:            "d3a98gf1",
 			Key:           "key",
 			AdminPassword: "pwd",
-			Version:       "3.2.11",
+			Version:       "3.4.1",
 			Cluster: &Cluster{
 				Routers:       []string{"192.168.1.1", "192.168.1.2"},
 				ConfigServers: []string{"192.168.1.3", "192.168.1.4"},
