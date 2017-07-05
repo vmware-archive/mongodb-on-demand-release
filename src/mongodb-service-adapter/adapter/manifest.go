@@ -74,7 +74,7 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, err
 	}
 
-	si, err := cc.ServiceInstanceByGuid(arbitraryParams["service_id"].(string))
+	si, err := cc.ServiceInstanceByGuid(requestParams["service_id"].(string))
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
