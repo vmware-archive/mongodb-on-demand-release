@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/cloudfoundry-community/go-cfclient"
 	"github.com/pivotal-cf/on-demand-services-sdk/bosh"
 	"github.com/pivotal-cf/on-demand-services-sdk/serviceadapter"
 )
@@ -57,7 +58,27 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, err
 	}
 
-	group, err := oc.CreateGroup(id)
+	// ugly, but that was the only way to pass CC creds
+	// along with each plan's parameters.
+	cfOps := plan.Properties["cf"].(map[string]interface{})
+
+	c := &cfclient.Config{
+		ApiAddress: cfOps["url"].(string),
+		Username:   cfOps["username"].(string),
+		Password:   cfOps["password"].(string),
+	}
+
+	cc, err := cfclient.NewClient(c)
+	if err != nil {
+		return bosh.BoshManifest{}, err
+	}
+
+	si, err := cc.ServiceInstanceByGuid(arbitraryParams["service_id"].(string))
+	if err != nil {
+		return bosh.BoshManifest{}, err
+	}
+
+	group, err := oc.CreateGroup(si.Name+"_"+id)
 	if err != nil {
 		return bosh.BoshManifest{}, fmt.Errorf("could not create new group (%s)", err.Error())
 	}

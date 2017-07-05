@@ -35,7 +35,7 @@ func main() {
 		usage("<generate-manifest|create-binding|delete-binding|dashboard-url>")
 	}
 
-	logger := log.New(os.Stderr, "[mongodb-config-agent] ", log.LstdFlags)
+	logger := log.New(os.Stderr, "[mongodb-service-adapter] ", log.LstdFlags)
 
 	serviceadapter.HandleCommandLineInvocation(
 		os.Args,

@@ -135,6 +135,10 @@ packages:
               url: (( .properties.url.value ))
               username: (( .properties.username.value ))
               api_key: (( .properties.api_key.value ))
+              cf:
+                url: (( $runtime.system_api_url ))
+                username: (( ..cf.uaa.admin_credentials.identity ))
+                password: (( ..cf.uaa.admin_credentials.password ))
         - name: replica_set
           plan_id: fee3933e-42cb-4964-b66e-79498f94e968
           description: Replica Set
@@ -151,6 +155,10 @@ packages:
               url: (( .properties.url.value ))
               username: (( .properties.username.value ))
               api_key: (( .properties.api_key.value ))
+              cf:
+                url: (( $runtime.system_api_url ))
+                username: (( ..cf.uaa.admin_credentials.identity ))
+                password: (( ..cf.uaa.admin_credentials.password ))
         - name: sharded_cluster
           plan_id: 477a196a-9e28-4103-87d3-593767448c9f
           description: Sharded Cluster
@@ -172,6 +180,10 @@ packages:
               url: (( .properties.url.value ))
               username: (( .properties.username.value ))
               api_key: (( .properties.api_key.value ))
+              cf:
+                url: (( $runtime.system_api_url ))
+                username: (( ..cf.uaa.admin_credentials.identity ))
+                password: (( ..cf.uaa.admin_credentials.password ))
   - name: register_on_demand_service_broker
     label: 'On Demand Service Broker Registrar'
     lifecycle: errand
