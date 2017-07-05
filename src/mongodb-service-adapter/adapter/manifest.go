@@ -63,9 +63,10 @@ func (m ManifestGenerator) GenerateManifest(
 	cfOps := plan.Properties["cf"].(map[string]interface{})
 
 	c := &cfclient.Config{
-		ApiAddress: cfOps["url"].(string),
-		Username:   cfOps["username"].(string),
-		Password:   cfOps["password"].(string),
+		ApiAddress:        cfOps["url"].(string),
+		Username:          cfOps["username"].(string),
+		Password:          cfOps["password"].(string),
+		SkipSslValidation: cfOps["disable_ssl_cert_verification"].(bool),
 	}
 
 	cc, err := cfclient.NewClient(c)
@@ -78,7 +79,7 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, err
 	}
 
-	group, err := oc.CreateGroup(si.Name+"_"+id)
+	group, err := oc.CreateGroup(si.Name + "_" + id)
 	if err != nil {
 		return bosh.BoshManifest{}, fmt.Errorf("could not create new group (%s)", err.Error())
 	}
