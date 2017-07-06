@@ -1,0 +1,20 @@
+<%
+config = {}
+
+config[:service_name] = p("mongodb.service_name")
+config[:apps_domain] = p("cf.apps_domain")
+config[:system_domain] = p("cf.system_domain")
+config[:api] = p("cf.api_url")
+config[:admin_user] = p("cf.admin_username")
+config[:admin_password] = p("cf.admin_password")
+config[:space_name] = "mongodb-on-demand-test-space"
+config[:org_name] = "mongodb-on-demand-test-org"
+config[:skip_ssl_validation] = p("cf.skip_ssl_validation")
+config[:create_permissive_security_group] = false
+config[:retry] = { max_attempts: p("retry.max_attempts"), backoff: p("retry.backoff"), baseline_interval_milliseconds: p("retry.baseline_interval_milliseconds") }
+
+p("mongodb.service_plans").each do |plan|
+  config[:plan_names] << plan
+end
+%>
+<%= config.to_json %>
