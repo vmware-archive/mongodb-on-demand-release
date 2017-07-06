@@ -142,22 +142,22 @@ func (m ManifestGenerator) GenerateManifest(
 			instances = int(r)
 		}
 	case PlanShardedCluster:
-		shards := 5
+		shards := 2
 		if s, ok := arbitraryParams["shards"].(float64); ok && s > 0 {
 			shards = int(s)
 		}
 
-		replicas = 3
+		replicas = 2
 		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 0 {
 			replicas = int(r)
 		}
 
-		configServers = 3
+		configServers = 2
 		if c, ok := arbitraryParams["config_servers"].(float64); ok && c > 0 {
 			configServers = int(c)
 		}
 
-		routers = 3
+		routers = 2
 		if r, ok := arbitraryParams["mongos"].(float64); ok && r > 0 {
 			routers = int(r)
 		}
