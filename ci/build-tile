@@ -7,7 +7,8 @@ root_dir=$(pwd)
 VERSION=$(cat version/number)
 
 pushd git
-  mkdir -p src/golang src/libsnmp
+  mkdir -p src/golang src/libsnmp src/cf-cli
+  wget 'https://s3-us-west-1.amazonaws.com/cf-cli-releases/releases/v6.28.0/cf-cli_6.28.0_linux_x86-64.tgz' -O src/cf-cli/cf-cli_6.28.0_linux_x86-64.tgz --tries=7
   wget 'https://storage.googleapis.com/golang/go1.8.3.linux-amd64.tar.gz' -O src/golang/go1.8.3.linux-amd64.tar.gz --tries=7
   wget 'http://security.ubuntu.com/ubuntu/pool/main/n/net-snmp/libsnmp30_5.7.2~dfsg-8.1ubuntu3.1_amd64.deb' -P src/libsnmp/ --tries=7
   wget 'http://security.ubuntu.com/ubuntu/pool/main/n/net-snmp/libsnmp-base_5.7.2~dfsg-8.1ubuntu3.1_all.deb' -P src/libsnmp/ --tries=7
