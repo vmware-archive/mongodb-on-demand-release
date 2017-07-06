@@ -130,7 +130,7 @@ func (m ManifestGenerator) GenerateManifest(
 			replicas = int(r)
 		}
 
-		configServers = 2
+		configServers = 3
 		if c, ok := arbitraryParams["config_servers"].(float64); ok && c > 0 {
 			configServers = int(c)
 		}
