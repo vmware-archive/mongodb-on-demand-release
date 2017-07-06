@@ -118,7 +118,7 @@ func (m ManifestGenerator) GenerateManifest(
 
 	engineVersion, ok := arbitraryParams["version"].(string)
 	if engineVersion == "" || !ok {
-		engineVersion = "3.2.7" // TODO: make it configurable in deployment manifest
+		engineVersion = "3.4.5" // TODO: make it configurable in deployment manifest
 	}
 
 	// sharded_cluster parameters
