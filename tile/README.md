@@ -14,7 +14,8 @@
 
     ```bash
     cd mongodb-on-demand-release
-    mkdir -p src/golang src/libsnmp
+    mkdir -p src/golang src/libsnmp src/cf-cli
+    wget 'https://s3-us-west-1.amazonaws.com/cf-cli-releases/releases/v6.28.0/cf-cli_6.28.0_linux_x86-64.tgz' -P src/cf-cli
     wget 'https://storage.googleapis.com/golang/go1.8.3.linux-amd64.tar.gz' -P src/golang
     wget 'http://security.ubuntu.com/ubuntu/pool/main/p/perl/libperl5.18_5.18.2-2ubuntu1.1_amd64.deb' -P src/libsnmp
     wget 'http://security.ubuntu.com/ubuntu/pool/main/n/net-snmp/libsnmp-base_5.7.2~dfsg-8.1ubuntu3.1_all.deb' -P src/libsnmp
