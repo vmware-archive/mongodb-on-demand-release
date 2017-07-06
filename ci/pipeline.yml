@@ -55,11 +55,10 @@ jobs:
   - task: run-tests
     config:
       platform: linux
-      image_resource:
+      image_resource: &golang-image
         type: docker-image
         source:
-          repository: golang
-          tag: '1.8'
+          repository: andreikrasnitski/golang-cf-cli
       inputs:
       - name: git
       run:
@@ -143,3 +142,25 @@ jobs:
     on_failure: *slack-alert
   - put: version
     params: {bump: patch}
+- name: smoke-tests
+  serial: true
+  plan:
+  - get: git
+    trigger: true
+    passed: [deploy-tile]
+  - task: smoke-tests
+    config:
+      platform: linux
+      image_resource: *golang-image
+      inputs:
+      - name: git
+      run:
+        path: ./git/ci/smoke-tests
+        args: []
+      params:
+        CF_APPS_DOMAIN: ((cf-apps-domain))
+        CF_SYSTEM_DOMAIN: ((cf-system-domain))
+        CF_API: ((cf-api))
+        CF_USER: ((cf-user))
+        CF_PASSWORD: ((cf-password))
+        SERVICE_NAME: ((service-name))
