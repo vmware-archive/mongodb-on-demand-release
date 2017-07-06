@@ -95,7 +95,7 @@ job_types:
               url: (( .broker.url.value ))
               username: (( .broker.username.value ))
               api_key: (( .broker.api_key.value ))
-        - name: single_replica_set
+        - name: replica_set
           plan_id: fee3933e-42cb-4964-b66e-79498f94e968
           description: Replica Set
           instance_groups:
@@ -106,7 +106,7 @@ job_types:
             networks: [(( $self.service_network ))]
             azs: (( .broker.az_multi_select.value ))
           properties:
-            id: single_replica_set
+            id: replica_set
             mongo_ops:
               url: (( .broker.url.value ))
               username: (( .broker.username.value ))

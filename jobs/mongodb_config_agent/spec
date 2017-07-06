@@ -12,15 +12,25 @@ consumes:
   - {name: mongod_node, type: node}
 
 properties:
+  mongo_ops.id:
+    description: "Service id"
   mongo_ops.url:
     description: "Mongo Ops Manager URL"
   mongo_ops.api_key:
-   description: "API Key for Ops Manager"
+    description: "API Key for Ops Manager"
   mongo_ops.username:
-   description: "Username for Ops Manager"
+    description: "Username for Ops Manager"
   mongo_ops.group_id:
-   description: "Group Id"
+    description: "Group Id"
   mongo_ops.plan_id:
-   description: "Plan identifier"
+    description: "Plan identifier"
   mongo_ops.admin_password:
-   description: "Admin password for mongo"
+    description: "Admin password for mongo"
+  mongo_ops.engine_version:
+    description: "Engine version"
+  mongo_ops.routers:
+      description: "Number of cluster routers"
+  mongo_ops.config_servers:
+      description: "Number of cluster configuration replicas"
+  mongo_ops.replicas:
+    description: "Replicas number for each shard"

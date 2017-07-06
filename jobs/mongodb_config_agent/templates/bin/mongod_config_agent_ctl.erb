@@ -21,6 +21,7 @@ case $1 in
     <% hosts = link("mongod_node").instances.collect{ |x| "#{x.address}" }.join(",") %>
 
     exec /var/vcap/packages/mongodb-config-agent/bin/mongodb-config-agent \
+      -id <%= p('mongo_ops.id') %> \
       -url <%= p('mongo_ops.url') %> \
       -username <%= p('mongo_ops.username') %> \
       -api-key <%= p('mongo_ops.api_key') %> \
@@ -28,6 +29,10 @@ case $1 in
       -plan <%= p('mongo_ops.plan_id') %> \
       -nodes "<%= hosts %>" \
       -admin-password <%= p('mongo_ops.admin_password') %> \
+      -engine-version <%= p('mongo_ops.engine_version') %> \
+      -routers <%= p('mongo_ops.routers') %> \
+      -config-servers <%= p('mongo_ops.config_servers') %> \
+      -replicas <%= p('mongo_ops.replicas') %> \
       >>  ${LOG_DIR}/mongodb_config_agent.stdout.log \
       2>> ${LOG_DIR}/mongodb_config_agent.stderr.log
     ;;

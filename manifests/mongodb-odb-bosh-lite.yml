@@ -149,7 +149,7 @@ properties:
             api_key: ebd5e5aa-cdb4-4431-91a2-ebbb5530cfc7
 
 
-      - name: single_replica_set
+      - name: replica_set
         plan_id: fee3933e-42cb-4964-b66e-79498f94e968
         description: Replica Set
         metadata:
@@ -168,7 +168,7 @@ properties:
               - default
             azs: [z1]
         properties:
-          id: single_replica_set
+          id: replica_set
           mongo_ops:
             url: http://ec2-54-88-23-164.compute-1.amazonaws.com:8080
             username: imallika@gmail.com

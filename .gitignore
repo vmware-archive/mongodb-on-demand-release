@@ -16,4 +16,5 @@ blobs
 *~
 *#
 #*
-pkg
+ci/secret.yml
+src/smoke-tests/integration_config.json
