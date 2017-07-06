@@ -465,10 +465,7 @@ var plansRaw = map[string]string{
           {{range $i, $node := .Nodes}}
           {{if $i}},{{end}}{
             "_id": {{$i}},
-            "host": "{{$node}}"{{if last $.Nodes $i}},
-            "arbiterOnly": true,
-            "priority": 0
-            {{end}}
+            "host": "{{$node}}"
           }
           {{end}}
         ]
