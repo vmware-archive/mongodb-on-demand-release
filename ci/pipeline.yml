@@ -164,3 +164,4 @@ jobs:
         CF_USER: ((cf-user))
         CF_PASSWORD: ((cf-password))
         SERVICE_NAME: ((service-name))
+    on_failure: *slack-alert
