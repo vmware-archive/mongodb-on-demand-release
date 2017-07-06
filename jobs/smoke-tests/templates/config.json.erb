@@ -12,6 +12,7 @@ config[:org_name] = "mongodb-on-demand-test-org"
 config[:skip_ssl_validation] = p("cf.skip_ssl_validation")
 config[:create_permissive_security_group] = false
 config[:retry] = { max_attempts: p("retry.max_attempts"), backoff: p("retry.backoff"), baseline_interval_milliseconds: p("retry.baseline_interval_milliseconds") }
+config[:plan_names] = []
 
 p("mongodb.service_plans").each do |plan|
   config[:plan_names] << plan
