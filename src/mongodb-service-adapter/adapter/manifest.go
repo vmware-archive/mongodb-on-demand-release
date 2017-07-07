@@ -125,7 +125,7 @@ func (m ManifestGenerator) GenerateManifest(
 			shards = int(s)
 		}
 
-		replicas = 2
+		replicas = 3
 		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 0 {
 			replicas = int(r)
 		}
