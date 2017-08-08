@@ -111,7 +111,7 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 		Credentials: map[string]interface{}{
 			"username": username,
 			"password": password,
-			"database": username,
+			"database": database,
 			"servers":  servers,
 			"uri":      url,
 		},
