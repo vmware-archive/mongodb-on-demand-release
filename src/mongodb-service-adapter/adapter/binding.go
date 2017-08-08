@@ -72,6 +72,7 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 	defer session.Close()
 
 	adminDB := session.DB("admin")
+	database := "default"
 
 	// add user to admin database with admin privileges
 	user := &mgo.User{
@@ -83,7 +84,7 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 			mgo.RoleReadWrite,
 		},
 		OtherDBRoles: map[string][]mgo.Role{
-			username: {
+			database: {
 				mgo.RoleUserAdmin,
 				mgo.RoleDBAdmin,
 				mgo.RoleReadWrite,
@@ -96,7 +97,7 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 		username,
 		password,
 		strings.Join(servers, ","),
-		username,
+		database,
 	)
 
 	b.logf("url: %s", url)
