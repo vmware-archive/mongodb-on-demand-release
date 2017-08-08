@@ -22,6 +22,11 @@ func (b *Binder) logf(msg string, v ...interface{}) {
 	}
 }
 
+const (
+	adminDB   = "admin"
+	defaultDB = "default"
+)
+
 func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest, requestParams serviceadapter.RequestParameters) (serviceadapter.Binding, error) {
 
 	// create an admin level user
@@ -54,25 +59,11 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 		servers = cluster.Routers
 	}
 
-	dialInfo := &mgo.DialInfo{
-		Addrs:     servers,
-		Username:  "admin",
-		Password:  adminPassword,
-		Mechanism: "SCRAM-SHA-1",
-		Database:  "admin",
-		FailFast:  true,
-	}
-
-	b.logf("dialInfo: %v", dialInfo)
-
-	session, err := mgo.DialWithInfo(dialInfo)
+	session, err := mgo.DialWithInfo(dialInfo(servers, adminPassword))
 	if err != nil {
 		return serviceadapter.Binding{}, err
 	}
 	defer session.Close()
-
-	adminDB := session.DB("admin")
-	database := "default"
 
 	// add user to admin database with admin privileges
 	user := &mgo.User{
@@ -84,7 +75,7 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 			mgo.RoleReadWrite,
 		},
 		OtherDBRoles: map[string][]mgo.Role{
-			database: {
+			defaultDB: {
 				mgo.RoleUserAdmin,
 				mgo.RoleDBAdmin,
 				mgo.RoleReadWrite,
@@ -92,7 +83,7 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 		},
 	}
 
-	if err := adminDB.UpsertUser(user); err != nil {
+	if err = session.DB(adminDB).UpsertUser(user); err != nil {
 		return serviceadapter.Binding{}, err
 	}
 
@@ -100,7 +91,7 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 		username,
 		password,
 		strings.Join(servers, ","),
-		database,
+		defaultDB,
 	)
 
 	b.logf("url: %s", url)
@@ -111,7 +102,7 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 		Credentials: map[string]interface{}{
 			"username": username,
 			"password": password,
-			"database": database,
+			"database": defaultDB,
 			"servers":  servers,
 			"uri":      url,
 		},
@@ -130,22 +121,24 @@ func (Binder) DeleteBinding(bindingID string, deploymentTopology bosh.BoshVMs, m
 		servers[i] = fmt.Sprintf("%s:28000", node)
 	}
 
-	dialInfo := &mgo.DialInfo{
-		Addrs:     servers,
-		Username:  "admin",
-		Password:  adminPassword,
-		Mechanism: "SCRAM-SHA-1",
-		Database:  "admin",
-		FailFast:  true,
-	}
-
-	session, err := mgo.DialWithInfo(dialInfo)
+	session, err := mgo.DialWithInfo(dialInfo(servers, adminPassword))
 	if err != nil {
 		return err
 	}
 	defer session.Close()
 
-	return session.DB("admin").RemoveUser(username)
+	return session.DB(adminDB).RemoveUser(username)
+}
+
+func dialInfo(addrs []string, adminPassword string) *mgo.DialInfo {
+	return &mgo.DialInfo{
+		Addrs:     addrs,
+		Username:  "admin",
+		Password:  adminPassword,
+		Mechanism: "SCRAM-SHA-1",
+		Database:  adminDB,
+		FailFast:  true,
+	}
 }
 
 func mkUsername(binddingID string) string {
