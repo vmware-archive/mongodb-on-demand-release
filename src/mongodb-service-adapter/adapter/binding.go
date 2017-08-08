@@ -145,10 +145,7 @@ func (Binder) DeleteBinding(bindingID string, deploymentTopology bosh.BoshVMs, m
 	}
 	defer session.Close()
 
-	adminDB := session.DB("admin")
-	adminDB.RemoveUser(username)
-
-	return nil
+	return session.DB("admin").RemoveUser(username)
 }
 
 func mkUsername(binddingID string) string {
