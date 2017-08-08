@@ -91,7 +91,10 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 			},
 		},
 	}
-	adminDB.UpsertUser(user)
+
+	if err := adminDB.UpsertUser(user); err != nil {
+		return serviceadapter.Binding{}, err
+	}
 
 	url := fmt.Sprintf("mongodb://%s:%s@%s/%s?authSource=admin",
 		username,
