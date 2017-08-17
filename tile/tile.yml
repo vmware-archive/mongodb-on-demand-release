@@ -8,7 +8,7 @@ service_broker: true
 
 stemcell_criteria:
   os: ubuntu-trusty
-  version: '3421.9'
+  version: '3421'
 
 properties:
 - name: broker_basic_auth
@@ -110,7 +110,7 @@ packages:
           jobs: [mongod_node, mongodb_config_agent]
         stemcell:
           os: ubuntu-trusty
-          version: "3421.9"
+          version: "3421.19"
       service_catalog:
         id: D94A086D-203D-4966-A6F1-60A9E2300F72
         service_name: mongodb-odb
