@@ -24,3 +24,7 @@
 [[constraint]]
   branch = "v2"
   name = "gopkg.in/mgo.v2"
+
+[[constraint]]
+  name = "github.com/pivotal-cf/on-demand-services-sdk"
+  version = "0.17.0"

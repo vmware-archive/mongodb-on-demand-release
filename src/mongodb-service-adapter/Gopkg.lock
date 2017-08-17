@@ -4,8 +4,8 @@
 [[projects]]
   name = "github.com/pivotal-cf/on-demand-services-sdk"
   packages = ["bosh","serviceadapter"]
-  revision = "bf8b26982862f8d354ad582473f9b9f222e9e31f"
-  version = "v0.16.1"
+  revision = "83eb5c00e7195e469f13085469b6321d20bb1db8"
+  version = "v0.17.0"
 
 [[projects]]
   name = "gopkg.in/go-playground/validator.v8"
@@ -28,6 +28,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "109159a1ee2862cce6c411258a668e671ce6e9f7d9faa065c99e1fa4ecad34bb"
+  inputs-digest = "c02134a423b55c9f9ef0fea02dd1721e00df5f88d39cdc8cee9cebfd40f0bc05"
   solver-name = "gps-cdcl"
   solver-version = 1
