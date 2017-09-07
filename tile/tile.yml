@@ -110,7 +110,7 @@ packages:
           jobs: [mongod_node, mongodb_config_agent]
         stemcell:
           os: ubuntu-trusty
-          version: "3421.19"
+          version: "3421.20"
       service_catalog:
         id: D94A086D-203D-4966-A6F1-60A9E2300F72
         service_name: mongodb-odb
@@ -126,7 +126,7 @@ packages:
           - name: mongod_node
             vm_type: (( .properties.vm_type.value ))
             instances: 1
-            persistent_disk: (( .properties.disk_type.value ))
+            persistent_disk_type: (( .properties.disk_type.value ))
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
           properties:
@@ -142,7 +142,7 @@ packages:
           - name: mongod_node
             vm_type: (( .properties.vm_type.value ))
             instances: 3
-            persistent_disk: (( .properties.disk_type.value ))
+            persistent_disk_type: (( .properties.disk_type.value ))
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
           properties:
@@ -163,7 +163,7 @@ packages:
             - name: mongod_node
               vm_type: (( .properties.vm_type.value ))
               instances: 15
-              persistent_disk: (( .properties.disk_type.value ))
+              persistent_disk_type: (( .properties.disk_type.value ))
               networks: [(( $self.service_network ))]
               azs: (( .properties.az_multi_select.value ))
           properties:
