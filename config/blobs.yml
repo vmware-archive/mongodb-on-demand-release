@@ -1,1 +1,20 @@
---- {}
+cf-cli/cf-cli_6.28.0_linux_x86-64.tgz:
+  size: 5715491
+  object_id: 24341322-c994-409e-5fd9-96008d6c95c7
+  sha: 19e7a8f3d1c094fd008704c685d5c4595306b0f5
+golang/go1.8.3.linux-amd64.tar.gz:
+  size: 90029041
+  object_id: 158bf8e1-1996-458b-46a7-72c526afba3f
+  sha: 838c415896ef5ecd395dfabde5e7e6f8ac943c8e
+libsnmp/libperl5.18_5.18.2-2ubuntu1.1_amd64.deb:
+  size: 1332
+  object_id: b5d9ee70-6ecb-4946-7003-6512214247bf
+  sha: e92cfdba78f00c9625814d10c2d608e92549f8d4
+libsnmp/libsnmp-base_5.7.2~dfsg-8.1ubuntu3.1_all.deb:
+  size: 203322
+  object_id: 7a3e0187-c447-4e5d-46a3-12d5020bc6e8
+  sha: 142b0f5a913ae2c46da0c10030e7b1786b3294d2
+libsnmp/libsnmp30_5.7.2~dfsg-8.1ubuntu3.1_amd64.deb:
+  size: 787350
+  object_id: ce9144b5-ceeb-462e-4cc8-c8b87e35cd75
+  sha: 6532a6ec10a3b50bb676df27011ab7421bd95333
