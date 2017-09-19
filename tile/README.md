@@ -43,3 +43,7 @@
     ```bash
     tile build $VERSION_NUMBER
     ```
+# Release dependency graph
+
+![Dependency Grapg](dependency_graph.png)
+
