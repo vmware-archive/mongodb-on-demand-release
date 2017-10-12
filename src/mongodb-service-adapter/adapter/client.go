@@ -19,6 +19,14 @@ type OMClient struct {
 	ApiKey   string
 }
 
+type Automation struct {
+	MongoDbVersions []MongoDbVersionsType
+}
+
+type MongoDbVersionsType struct {
+	Name string
+}
+
 type Group struct {
 	ID          string         `json:"id"`
 	Name        string         `json:"name"`
@@ -126,6 +134,31 @@ func (oc *OMClient) ConfigureGroup(configurationDoc string, groupID string) erro
 	log.Println(string(b))
 
 	return nil
+}
+
+func (oc *OMClient) GetAvailableVersions(groupID string) (Automation, error) {
+	var versions Automation
+
+	b, err := oc.doRequest("GET", fmt.Sprintf("/api/public/v1.0/groups/%s/automationConfig", groupID), nil)
+	if err != nil {
+		return versions, err
+	}
+
+	if err = json.Unmarshal(b, &versions); err != nil {
+		return versions, err
+	}
+	return versions, nil
+}
+
+func (oc *OMClient) GetLatestVersion(groupID string) string {
+	cfg, err := oc.GetAvailableVersions(groupID)
+	if err != nil {
+		panic(err)
+	}
+
+	b := cfg.MongoDbVersions[len(cfg.MongoDbVersions)-1].Name
+
+	return b
 }
 
 func (oc *OMClient) doRequest(method string, path string, body io.Reader) ([]byte, error) {
