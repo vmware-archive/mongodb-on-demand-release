@@ -22,6 +22,8 @@ import (
 
 	"strings"
 
+	"path/filepath"
+
 	"github.com/pivotal-cf/on-demand-services-sdk/bosh"
 	"gopkg.in/yaml.v2"
 )
@@ -45,17 +47,24 @@ func HandleCommandLineInvocation(args []string, manifestGenerator ManifestGenera
 	switch args[1] {
 	case "generate-manifest":
 		if handler.manifestGenerator != nil {
+			if len(args) < 7 {
+				failWithMissingArgsError(args, "<service-deployment-JSON> <plan-JSON> <request-params-JSON> <previous-manifest-YAML> <previous-plan-JSON>")
+			}
 			serviceDeploymentJSON := args[2]
 			planJSON := args[3]
 			argsJSON := args[4]
 			previousManifestYAML := args[5]
 			previousPlanJSON := args[6]
 			handler.generateManifest(serviceDeploymentJSON, planJSON, argsJSON, previousManifestYAML, previousPlanJSON)
+
 		} else {
 			failWithCode(NotImplementedExitCode, "manifest generator not implemented")
 		}
 	case "create-binding":
 		if handler.binder != nil {
+			if len(args) < 6 {
+				failWithMissingArgsError(args, "<binding-ID> <bosh-VMs-JSON> <manifest-YAML> <request-params-JSON>")
+			}
 			bindingID := args[2]
 			boshVMsJSON := args[3]
 			manifestYAML := args[4]
@@ -66,6 +75,9 @@ func HandleCommandLineInvocation(args []string, manifestGenerator ManifestGenera
 		}
 	case "delete-binding":
 		if handler.binder != nil {
+			if len(args) < 6 {
+				failWithMissingArgsError(args, "<binding-ID> <bosh-VMs-JSON> <manifest-YAML> <request-params-JSON>")
+			}
 			bindingID := args[2]
 			boshVMsJSON := args[3]
 			manifestYAML := args[4]
@@ -76,6 +88,9 @@ func HandleCommandLineInvocation(args []string, manifestGenerator ManifestGenera
 		}
 	case "dashboard-url":
 		if dashboardUrlGenerator != nil {
+			if len(args) < 5 {
+				failWithMissingArgsError(args, "<instance-ID> <plan-JSON> <manifest-YAML>")
+			}
 			instanceID := args[2]
 			planJSON := args[3]
 			manifestYAML := args[4]
@@ -86,6 +101,18 @@ func HandleCommandLineInvocation(args []string, manifestGenerator ManifestGenera
 	default:
 		failWithCode(ErrorExitCode, fmt.Sprintf("unknown subcommand: %s. The following commands are supported: %s", args[1], supportedCommands))
 	}
+}
+func failWithMissingArgsError(args []string, argumentNames string) {
+	failWithCode(
+		ErrorExitCode,
+		fmt.Sprintf(
+			"Missing arguments for %s. Usage: %s %s %s",
+			args[1],
+			filepath.Base(args[0]),
+			args[1],
+			argumentNames,
+		),
+	)
 }
 func generateSupportedCommandsMessage(handler commandLineHandler, dashboardUrlGenerator DashboardUrlGenerator) string {
 	var commands []string
@@ -133,7 +160,7 @@ func (p commandLineHandler) generateManifest(serviceDeploymentJSON, planJSON, ar
 		fail("error marshalling bosh manifest: %s", err)
 	}
 
-	fmt.Fprintf(os.Stdout, string(manifestBytes))
+	fmt.Fprint(os.Stdout, string(manifestBytes))
 }
 
 func (p commandLineHandler) createBinding(bindingID, boshVMsJSON, manifestYAML, requestParams string) {
