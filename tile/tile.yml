@@ -52,6 +52,15 @@ forms:
     configurable: true
     label: MongoDB availability zone(s)
     description: Select one or more availability zones
+  - name: vm_extensions
+    type: multi_select_options
+    optional: true
+    configurable: true
+    label: MongoDB VM options
+    description: Please refer to the Ops Manager documentation for IaaS specific behavior
+    options:
+    - name: public_ip
+      label: Allow outbound internet access from service instances (IaaS-dependent)
 
 requires_product_versions:
 - name: cf
@@ -129,6 +138,7 @@ packages:
             persistent_disk_type: (( .properties.disk_type.value ))
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
+            vm_extensions: (( .properties.vm_extensions.value ))
           properties:
             id: standalone
             mongo_ops:
@@ -145,6 +155,7 @@ packages:
             persistent_disk_type: (( .properties.disk_type.value ))
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
+            vm_extensions: (( .properties.vm_extensions.value ))
           properties:
             id: replica_set
             mongo_ops:
@@ -166,6 +177,7 @@ packages:
               persistent_disk_type: (( .properties.disk_type.value ))
               networks: [(( $self.service_network ))]
               azs: (( .properties.az_multi_select.value ))
+              vm_extensions: (( .properties.vm_extensions.value ))
           properties:
             id: sharded_cluster
             mongo_ops:
