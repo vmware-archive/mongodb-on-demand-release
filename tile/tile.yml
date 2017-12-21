@@ -64,7 +64,7 @@ forms:
 
 requires_product_versions:
 - name: cf
-  version: "~> 1.3"
+  version: ">= 1.3"
 
 packages:
 - name: on-demand-service-broker
@@ -235,7 +235,7 @@ packages:
         admin_username: (( ..cf.uaa.admin_credentials.identity ))
         admin_password: (( ..cf.uaa.admin_credentials.password ))
   - name: upgrade_all_service_instances_on_demand_service_broker
-    label: 'Upgrade all On Demand Service Instances'
+    label: 'Upgrade all instances deployed by the On Demand Service Broker'
     lifecycle: errand
     post_deploy: true
     run_post_deploy_errand_default: when-changed
@@ -251,12 +251,7 @@ packages:
     dynamic_ip: 1
     single_az_only: true
     instances: 1
-    properties:
-      disable_ssl_cert_verification: (( ..cf.ha_proxy.skip_cert_verify.value ))
-      cf:
-        api_url: (( $runtime.system_api_url ))
-        admin_username: (( ..cf.uaa.admin_credentials.identity ))
-        admin_password: (( ..cf.uaa.admin_credentials.password ))
+    properties: {}
   - name: delete_subdeployments_on_demand_service_broker
     label: 'Delete all instances deployed by the On Demand Service Broker'
     lifecycle: errand
