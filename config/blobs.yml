@@ -18,3 +18,7 @@ libsnmp/libsnmp30_5.7.2~dfsg-8.1ubuntu3.1_amd64.deb:
   size: 787350
   object_id: ce9144b5-ceeb-462e-4cc8-c8b87e35cd75
   sha: 6532a6ec10a3b50bb676df27011ab7421bd95333
+libsnmp/perl-base_5.18.2-2ubuntu1.1_amd64.deb:
+  size: 1146330
+  object_id: 1e5d83f9-bb6c-43fb-7584-acf47c48d9e6
+  sha: d76aecc6e5a86f722816981daddf2be1ddef1f27

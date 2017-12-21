@@ -25,6 +25,7 @@ set -e
 hostname <%= spec.address %>
 
 # Install libsnmp30
+dpkg -i /var/vcap/packages/mongod-node/perl-base_5*.deb
 dpkg -i /var/vcap/packages/mongod-node/libperl5*.deb
 dpkg -i /var/vcap/packages/mongod-node/libsnmp-base_5*.deb
 dpkg -i /var/vcap/packages/mongod-node/libsnmp30*.deb
