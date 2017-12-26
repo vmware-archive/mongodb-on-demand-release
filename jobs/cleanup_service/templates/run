@@ -1,0 +1,10 @@
+#!/bin/bash
+# vim: set ft=sh
+
+set -e
+
+<% conn = link('mongodb_config_agent') %>
+
+curl --fail -u "<%= conn.p('mongo_ops.username') %>:<%= conn.p('mongo_ops.api_key') %>" \
+  -X DELETE --digest \
+  -i "<%= conn.p('mongo_ops.url') %>/api/public/v1.0/groups/<%= conn.p('mongo_ops.group_id') %>"

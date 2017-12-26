@@ -13,6 +13,7 @@ const (
 	StemcellAlias           = "mongodb-stemcell"
 	MongodInstanceGroupName = "mongod_node"
 	MongodJobName           = "mongod_node"
+	LifecycleErrandType     = "errand"
 )
 
 type ManifestGenerator struct {
@@ -47,21 +48,27 @@ func (m ManifestGenerator) GenerateManifest(
 
 	oc := &OMClient{Url: url, Username: username, ApiKey: apiKey}
 
-	adminPassword, err := GenerateString(20)
+	var previousMongoProperties map[interface{}]interface{}
+
+	if previousManifest != nil {
+		previousMongoProperties = mongoPlanProperties(*previousManifest)
+	}
+
+	adminPassword, err := passwordForMongoServer(previousMongoProperties)
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
 
-	id, err := GenerateString(8)
+	id, err := idForMongoServer(previousMongoProperties)
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
 
-	group, err := oc.CreateGroup(id)
+	group, err := groupForMongoServer(id, oc, previousMongoProperties)
 	if err != nil {
 		return bosh.BoshManifest{}, fmt.Errorf("could not create new group (%s)", err.Error())
 	}
-	m.logf("created group %s (%s)", group.Name, group.ID)
+	m.logf("created group %s", group.ID)
 
 	releases := []bosh.Release{}
 	for _, release := range serviceDeployment.Releases {
@@ -161,6 +168,7 @@ func (m ManifestGenerator) GenerateManifest(
 				Instances:          instances,
 				Jobs:               mongodJobs,
 				VMType:             mongodInstanceGroup.VMType,
+				VMExtensions:       mongodInstanceGroup.VMExtensions,
 				Stemcell:           StemcellAlias,
 				PersistentDiskType: mongodInstanceGroup.PersistentDiskType,
 				AZs:                mongodInstanceGroup.AZs,
@@ -174,21 +182,26 @@ func (m ManifestGenerator) GenerateManifest(
 					{
 						Name:    "mongodb_config_agent",
 						Release: configAgentRelease.Name,
+						Provides: map[string]bosh.ProvidesLink{
+							"mongodb_config_agent": {As: "mongodb_config_agent"},
+						},
 						Consumes: map[string]interface{}{
 							"mongod_node": bosh.ConsumesLink{From: "mongod_node"},
 						},
 					},
 				},
-				VMType:   mongodInstanceGroup.VMType,
-				Stemcell: StemcellAlias,
-				AZs:      mongodInstanceGroup.AZs,
-				Networks: mongodNetworks,
+				VMType:       mongodInstanceGroup.VMType,
+				VMExtensions: mongodInstanceGroup.VMExtensions,
+				Stemcell:     StemcellAlias,
+				AZs:          mongodInstanceGroup.AZs,
+				Networks:     mongodNetworks,
 
 				// See mongodb_config_agent job spec
 				Properties: map[string]interface{}{
 					"mongo_ops": map[string]interface{}{
 						"id":             id,
 						"url":            url,
+						"agent_api_key":  group.AgentAPIKey,
 						"api_key":        apiKey,
 						"username":       username,
 						"group_id":       group.ID,
@@ -200,6 +213,26 @@ func (m ManifestGenerator) GenerateManifest(
 						"replicas":       replicas,
 					},
 				},
+			},
+			{
+				Name:      "cleanup-service",
+				Instances: 1,
+				Jobs: []bosh.Job{
+					{
+						Name:    "cleanup_service",
+						Release: configAgentRelease.Name,
+						Consumes: map[string]interface{}{
+							"mongodb_config_agent": bosh.ConsumesLink{From: "mongodb_config_agent"},
+						},
+					},
+				},
+				VMType:       mongodInstanceGroup.VMType,
+				VMExtensions: mongodInstanceGroup.VMExtensions,
+				Stemcell:     StemcellAlias,
+				AZs:          mongodInstanceGroup.AZs,
+				Networks:     mongodNetworks,
+				Lifecycle:    LifecycleErrandType,
+				Properties:   map[string]interface{}{},
 			},
 		},
 		Update: bosh.Update{
@@ -252,7 +285,8 @@ func gatherJobs(releases serviceadapter.ServiceReleases, requiredJobs []string) 
 				"mongod_node": {As: "mongod_node"},
 			},
 			Consumes: map[string]interface{}{
-				"mongod_node": bosh.ConsumesLink{From: "mongod_node"},
+				"mongod_node":          bosh.ConsumesLink{From: "mongod_node"},
+				"mongodb_config_agent": bosh.ConsumesLink{From: "mongodb_config_agent"},
 			},
 		}
 
@@ -260,6 +294,34 @@ func gatherJobs(releases serviceadapter.ServiceReleases, requiredJobs []string) 
 	}
 
 	return jobs, nil
+}
+
+func mongoPlanProperties(manifest bosh.BoshManifest) map[interface{}]interface{} {
+	return manifest.InstanceGroups[1].Properties["mongo_ops"].(map[interface{}]interface{})
+}
+
+func passwordForMongoServer(previousManifestProperties map[interface{}]interface{}) (string, error) {
+	if previousManifestProperties != nil {
+		return previousManifestProperties["admin_password"].(string), nil
+	}
+
+	return GenerateString(20)
+}
+
+func idForMongoServer(previousManifestProperties map[interface{}]interface{}) (string, error) {
+	if previousManifestProperties != nil {
+		return previousManifestProperties["id"].(string), nil
+	}
+
+	return GenerateString(8)
+}
+
+func groupForMongoServer(mongoID string, oc *OMClient, previousManifestProperties map[interface{}]interface{}) (Group, error) {
+	if previousManifestProperties != nil {
+		return oc.GetGroup(previousManifestProperties["group_id"].(string))
+	}
+
+	return oc.CreateGroup(mongoID)
 }
 
 func findReleaseForJob(releases serviceadapter.ServiceReleases, requiredJob string) (serviceadapter.ServiceRelease, error) {

@@ -1,25 +1,26 @@
 #!/bin/bash
+# vim: set ft=sh
 
 set -e
 
-<% if_p('mongo_ops.url') do |url| %>
-  TMP_DIR=/var/vcap/sys/tmp/mongod_agent
-  mkdir -p ${TMP_DIR}
+<% conn = link('mongodb_config_agent') %>
 
-  DOWNLOAD="<%= url.chomp("/") %>/download/agent/automation/mongodb-mms-automation-agent-latest.linux_x86_64.tar.gz"
+TMP_DIR=/var/vcap/sys/tmp/mongod_agent
+mkdir -p ${TMP_DIR}
 
-  echo "*** Downloading MongoDB agent from <%= url %>"
-  wget --quiet --no-check-certificate -O ${TMP_DIR}/mongodb.agent.tgz "${DOWNLOAD}"
+DOWNLOAD="<%= conn.p('mongo_ops.url').chomp("/") %>/download/agent/automation/mongodb-mms-automation-agent-latest.linux_x86_64.tar.gz"
 
-  tar xvzf ${TMP_DIR}/mongodb.agent.tgz -C ${TMP_DIR}
+echo "*** Downloading MongoDB agent from <%= conn.p('mongo_ops.url') %>"
+wget --quiet --no-check-certificate -O ${TMP_DIR}/mongodb.agent.tgz "${DOWNLOAD}"
 
-  mkdir -p  /var/vcap/packages/mongod-node/bin
-  cp -f ${TMP_DIR}/**/mongodb-mms-automation-agent /var/vcap/packages/mongod-node/bin
-<% end %>
+tar xvzf ${TMP_DIR}/mongodb.agent.tgz -C ${TMP_DIR}
+
+mkdir -p  /var/vcap/packages/mongod-node/bin
+cp -f ${TMP_DIR}/**/mongodb-mms-automation-agent /var/vcap/packages/mongod-node/bin
 
 <%
   this_host = "#{spec.name.gsub('_', '-')}-#{spec.index}"
-  hosts = link("mongod_node").instances.collect{ |x| "#{x.address} #{x.name.gsub('_', '-')}-#{x.index}" }.join("\\n")
+  hosts = link('mongod_node').instances.collect{ |x| "#{x.address} #{x.name.gsub('_', '-')}-#{x.index}" }.join("\\n")
 %>
 
 hostname <%= spec.address %>

@@ -6,10 +6,20 @@ packages:
 
 templates:
   bin/mongod_config_agent_ctl.erb: bin/mongod_config_agent_ctl
-  bin/drain.erb: bin/drain
+
+provides:
+- name: mongodb_config_agent
+  type: config_agent
+  properties:
+  - mongo_ops.url
+  - mongo_ops.username
+  - mongo_ops.agent_api_key
+  - mongo_ops.api_key
+  - mongo_ops.group_id
 
 consumes:
-  - {name: mongod_node, type: node}
+- name: mongod_node
+  type: node
 
 properties:
   mongo_ops.id:
@@ -18,6 +28,8 @@ properties:
     description: "Mongo Ops Manager URL"
   mongo_ops.api_key:
     description: "API Key for Ops Manager"
+  mongo_ops.agent_api_key:
+    description: "Agent API Key for Ops Manager"
   mongo_ops.username:
     description: "Username for Ops Manager"
   mongo_ops.group_id:

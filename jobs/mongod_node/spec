@@ -10,15 +10,13 @@ packages:
   - mongod-node
 
 provides:
-  - {name: mongod_node, type: node}
+- name: mongod_node
+  type: node
 
 consumes:
-  - {name: mongod_node, type: node}
+- name: mongodb_config_agent
+  type: config_agent
+- name: mongod_node
+  type: node
 
-properties:
-  mongo_ops.url:
-    description: "Mongo Ops Manager URL"
-  mongo_ops.api_key:
-    description: "API Key for Ops Manager"
-  mongo_ops.group_id:
-    description: "Group Id"
+properties: {}
