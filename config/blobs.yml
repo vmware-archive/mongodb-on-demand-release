@@ -6,10 +6,10 @@ golang/go1.8.5.linux-amd64.tar.gz:
   size: 99077377
   object_id: ad1ef640-fa46-45e1-57bb-1271a8b4e00f
   sha: 71d2e29b7ea053e411ed4ba6200db967481ddead
-libsnmp/libperl5.18_5.18.2-2ubuntu1.1_amd64.deb:
-  size: 1332
-  object_id: b5d9ee70-6ecb-4946-7003-6512214247bf
-  sha: e92cfdba78f00c9625814d10c2d608e92549f8d4
+libsnmp/libperl5.18_5.18.2-2ubuntu1.3_amd64.deb:
+  size: 1326
+  object_id: 1c6b35d8-5230-4f1b-7dc6-4ae008dee6b7
+  sha: de1854a46271e04e79ca632928dbbf090f956774
 libsnmp/libsnmp-base_5.7.2~dfsg-8.1ubuntu3.1_all.deb:
   size: 203322
   object_id: 7a3e0187-c447-4e5d-46a3-12d5020bc6e8
@@ -18,7 +18,7 @@ libsnmp/libsnmp30_5.7.2~dfsg-8.1ubuntu3.1_amd64.deb:
   size: 787350
   object_id: ce9144b5-ceeb-462e-4cc8-c8b87e35cd75
   sha: 6532a6ec10a3b50bb676df27011ab7421bd95333
-libsnmp/perl-base_5.18.2-2ubuntu1.1_amd64.deb:
-  size: 1146330
-  object_id: 1e5d83f9-bb6c-43fb-7584-acf47c48d9e6
-  sha: d76aecc6e5a86f722816981daddf2be1ddef1f27
+libsnmp/perl-base_5.18.2-2ubuntu1.3_amd64.deb:
+  size: 1149076
+  object_id: bc8667ca-c74e-4cdf-7846-87b01e030d36
+  sha: 7356c1dd7da3c31c683c4d1ac7e9558e6f1b6e67
