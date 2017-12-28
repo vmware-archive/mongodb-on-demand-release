@@ -1,0 +1,19 @@
+<%=
+  require 'json'
+
+  config = {
+    "id" => p("mongo_ops.id"),
+    "url" => p("mongo_ops.url"),
+    "username" => p("mongo_ops.username"),
+    "api_key" => p("mongo_ops.api_key"),
+    "group" => p("mongo_ops.group_id"),
+    "plan" => p("mongo_ops.plan_id"),
+    "nodes" => link("mongod_node").instances.collect{ |x| "#{x.address}" }.join(","),
+    "admin_password" => p("mongo_ops.admin_password"),
+    "engine_version" => p("mongo_ops.engine_version"),
+    "routers" => p("mongo_ops.routers"),
+    "config_servers" => p("mongo_ops.config_servers"),
+    "replicas" => p("mongo_ops.replicas"),
+  }
+  JSON.pretty_generate(config)
+%>

@@ -1,9 +1,11 @@
 #!/bin/bash
+# vim: set ft=sh
 
 set -e # exit immediately if a simple command exits with a non-zero status
 
 source /var/vcap/packages/mongodb-config-agent/utils.sh
 
+JOB_DIR=/var/vcap/jobs/mongodb_config_agent
 RUN_DIR=/var/vcap/sys/run/mongodb_config_agent
 LOG_DIR=/var/vcap/sys/log/mongodb_config_agent
 TMP_DIR=/var/vcap/sys/tmp/mongodb_config_agent
@@ -18,21 +20,8 @@ case $1 in
     pid_guard ${PIDFILE} "mongodb_config_agent"
     echo $$ > ${PIDFILE}
 
-    <% hosts = link("mongod_node").instances.collect{ |x| "#{x.address}" }.join(",") %>
-
     exec /var/vcap/packages/mongodb-config-agent/bin/mongodb-config-agent \
-      -id <%= p('mongo_ops.id') %> \
-      -url <%= p('mongo_ops.url') %> \
-      -username <%= p('mongo_ops.username') %> \
-      -api-key <%= p('mongo_ops.api_key') %> \
-      -group <%= p('mongo_ops.group_id') %> \
-      -plan <%= p('mongo_ops.plan_id') %> \
-      -nodes "<%= hosts %>" \
-      -admin-password <%= p('mongo_ops.admin_password') %> \
-      -engine-version <%= p('mongo_ops.engine_version') %> \
-      -routers <%= p('mongo_ops.routers') %> \
-      -config-servers <%= p('mongo_ops.config_servers') %> \
-      -replicas <%= p('mongo_ops.replicas') %> \
+      -config=$JOB_DIR/config/mongodb_config_agent.json \
       >>  ${LOG_DIR}/mongodb_config_agent.stdout.log \
       2>> ${LOG_DIR}/mongodb_config_agent.stderr.log
     ;;

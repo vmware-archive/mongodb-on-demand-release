@@ -5,7 +5,8 @@ packages:
   - mongodb-config-agent
 
 templates:
-  bin/mongod_config_agent_ctl.erb: bin/mongod_config_agent_ctl
+  mongodb_config_agent_ctl.erb: bin/mongodb_config_agent_ctl
+  mongodb_config_agent.json.erb: config/mongodb_config_agent.json
 
 provides:
 - name: mongodb_config_agent
