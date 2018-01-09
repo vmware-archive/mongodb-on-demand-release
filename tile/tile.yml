@@ -36,13 +36,13 @@ forms:
     description: This will be the API Key for your MongoDB Ops Manager.
   - name: vm_type
     type: vm_type_dropdown
-    optional: true
+    optional: false
     configurable: true
     label: MongoDB VM Type
     description: Select the VM Type
   - name: disk_type
     type: disk_type_dropdown
-    optional: true
+    optional: false
     configurable: true
     label: MongoDB disk type
     description: Select the Disk Type
