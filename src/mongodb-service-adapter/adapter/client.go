@@ -71,6 +71,8 @@ func (oc *OMClient) LoadDoc(p string, ctx *DocContext) (string, error) {
 
 	if strings.HasPrefix(ctx.Version, "3.4") {
 		ctx.CompatibilityVersion = "3.4"
+	} else if strings.HasPrefix(ctx.Version, "3.6") {
+		ctx.CompatibilityVersion = "3.6"
 	}
 
 	b := bytes.Buffer{}
