@@ -6,6 +6,9 @@ set -e
 <% conn = link('mongodb_config_agent') %>
 
 TMP_DIR=/var/vcap/sys/tmp/mongod_agent
+if [ -d "$TMP_DIR" ]; then
+  rm -r $TMP_DIR
+fi
 mkdir -p ${TMP_DIR}
 
 DOWNLOAD="<%= conn.p('mongo_ops.url').chomp("/") %>/download/agent/automation/mongodb-mms-automation-agent-latest.linux_x86_64.tar.gz"
