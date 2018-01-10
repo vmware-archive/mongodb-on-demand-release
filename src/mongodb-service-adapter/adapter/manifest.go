@@ -151,6 +151,10 @@ func (m ManifestGenerator) GenerateManifest(
 	default:
 		return bosh.BoshManifest{}, fmt.Errorf("unknown plan: %s", planID)
 	}
+	authKey, err := GenerateString(512)
+	if err != nil {
+		return bosh.BoshManifest{}, err
+	}
 
 	manifest := bosh.BoshManifest{
 		Name:     serviceDeployment.DeploymentName,
@@ -203,6 +207,7 @@ func (m ManifestGenerator) GenerateManifest(
 						"url":            url,
 						"agent_api_key":  group.AgentAPIKey,
 						"api_key":        apiKey,
+						"auth_key":       authKey,
 						"username":       username,
 						"group_id":       group.ID,
 						"plan_id":        planID,

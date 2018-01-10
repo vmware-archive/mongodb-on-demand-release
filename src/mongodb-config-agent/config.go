@@ -13,6 +13,7 @@ type Config struct {
 	URL           string `json:"url"`
 	Username      string `json:"username"`
 	APIKey        string `json:"api_key"`
+	AuthKey       string `json:"auth_key"`
 	GroupID       string `json:"group"`
 	PlanID        string `json:"plan"`
 	NodeAddresses string `json:"nodes"`

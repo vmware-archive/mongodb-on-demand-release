@@ -3,6 +3,7 @@ name: mongod_node
 
 templates:
   config/local.conf.erb: config/local.conf
+  config/mongo_om.key.erb: config/mongo_om.key
   bin/pre-start.erb: bin/pre-start
   bin/mongod_agent_ctl.erb: bin/mongod_agent_ctl
 

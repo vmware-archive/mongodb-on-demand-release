@@ -16,6 +16,7 @@ provides:
   - mongo_ops.username
   - mongo_ops.agent_api_key
   - mongo_ops.api_key
+  - mongo_ops.auth_key
   - mongo_ops.group_id
 
 consumes:
@@ -29,6 +30,8 @@ properties:
     description: "Mongo Ops Manager URL"
   mongo_ops.api_key:
     description: "API Key for Ops Manager"
+  mongo_ops.auth_key:
+    description: "Key, that is used for internal authentication of the members of the replica set"
   mongo_ops.agent_api_key:
     description: "Agent API Key for Ops Manager"
   mongo_ops.username:

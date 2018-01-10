@@ -6,6 +6,7 @@
     "url" => p("mongo_ops.url"),
     "username" => p("mongo_ops.username"),
     "api_key" => p("mongo_ops.api_key"),
+    "auth_key" => p("mongo_ops.auth_key"),
     "group" => p("mongo_ops.group_id"),
     "plan" => p("mongo_ops.plan_id"),
     "nodes" => link("mongod_node").instances.collect{ |x| "#{x.address}" }.join(","),
