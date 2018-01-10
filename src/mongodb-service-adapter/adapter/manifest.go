@@ -318,7 +318,19 @@ func idForMongoServer(previousManifestProperties map[interface{}]interface{}) (s
 
 func groupForMongoServer(mongoID string, oc *OMClient, previousManifestProperties map[interface{}]interface{}) (Group, error) {
 	if previousManifestProperties != nil {
-		return oc.GetGroup(previousManifestProperties["group_id"].(string))
+		group, err := oc.GetGroup(previousManifestProperties["group_id"].(string))
+		if err != nil {
+			return group, err
+		}
+
+		if group.AgentAPIKey == "" { // this might happen because of the bug in MMS 3.6 API
+			err := oc.DeleteGroup(previousManifestProperties["group_id"].(string))
+			if err != nil {
+				return Group{}, err
+			}
+		} else {
+			return group, nil
+		}
 	}
 
 	return oc.CreateGroup(mongoID)

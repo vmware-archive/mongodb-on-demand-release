@@ -111,6 +111,11 @@ func (oc *OMClient) GetGroup(groupID string) (Group, error) {
 	return group, nil
 }
 
+func (oc *OMClient) DeleteGroup(groupID string) error {
+	_, err := oc.doRequest("DELETE", fmt.Sprintf("/api/public/v1.0/groups/%s", groupID), nil)
+	return err
+}
+
 func (oc *OMClient) GetGroupHosts(groupID string) (GroupHosts, error) {
 	var groupHosts GroupHosts
 
