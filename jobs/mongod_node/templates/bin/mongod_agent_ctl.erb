@@ -13,10 +13,7 @@ mkdir -p ${RUN_DIR} ${LOG_DIR} ${TMP_DIR} ${STORE_DIR} ${AGENT_LOG_DIR}
 chmod 777 ${AGENT_LOG_DIR}
 
 PIDFILE=${RUN_DIR}/mongo_agent.pid
-
-function pid_exists() {
-  ps -p $1 &> /dev/null
-}
+MONGOD_PIDFILE=/var/vcap/store/mongodb-data/mongod.lock
 
 case $1 in
 
@@ -34,14 +31,9 @@ case $1 in
   stop)
     # Stop MongoDB Automation Agent
     kill_and_wait ${PIDFILE}
+
     # Stop mongod process
-    MONGOD_PIDFILE=/var/vcap/store/mongodb-data/mongod.lock
-    PID=$(head -1 $MONGOD_PIDFILE)
-    if [ ! -z $PID ] && pid_exists $PID; then
-      kill $PID
-    fi
-    while [ -e /proc/$PID ]; do sleep 0.1; done
-    rm -f $MONGOD_PIDFILE
+    kill_and_wait ${MONGOD_PIDFILE}
     ;;
   *)
     echo "Usage: $0 {start|stop}"

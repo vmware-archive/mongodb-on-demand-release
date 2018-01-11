@@ -35,3 +35,8 @@ dpkg -i /var/vcap/packages/mongod-node/libsnmp-base_5*.deb
 dpkg -i /var/vcap/packages/mongod-node/libsnmp30*.deb
 
 chmod 600 /var/vcap/jobs/mongod_node/config/mongo_om.key
+
+# verions 0.8.4 of the tile leaves mongod running after stop, so we tries to stop the process here
+source /var/vcap/packages/mongod-node/utils.sh
+MONGOD_PIDFILE=/var/vcap/store/mongodb-data/mongod.lock
+kill_and_wait ${MONGOD_PIDFILE}
