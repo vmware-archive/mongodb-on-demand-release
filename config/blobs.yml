@@ -2,10 +2,10 @@ cf-cli/cf-cli_6.28.0_linux_x86-64.tgz:
   size: 5715491
   object_id: 24341322-c994-409e-5fd9-96008d6c95c7
   sha: 19e7a8f3d1c094fd008704c685d5c4595306b0f5
-golang/go1.8.5.linux-amd64.tar.gz:
-  size: 99077377
-  object_id: ad1ef640-fa46-45e1-57bb-1271a8b4e00f
-  sha: 71d2e29b7ea053e411ed4ba6200db967481ddead
+golang/go1.9.2.linux-amd64.tar.gz:
+  size: 104247844
+  object_id: 191fd907-e6e2-4055-56b1-0571c8015a6f
+  sha: 94c889e039e3d2e94ed95e8f8cb747c5bc1c2b58
 libsnmp/libperl5.18_5.18.2-2ubuntu1.3_amd64.deb:
   size: 1326
   object_id: 1c6b35d8-5230-4f1b-7dc6-4ae008dee6b7
