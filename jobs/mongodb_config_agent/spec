@@ -2,11 +2,13 @@
 name: mongodb_config_agent
 
 packages:
+  - mongodb
   - mongodb-config-agent
 
 templates:
   mongodb_config_agent_ctl.erb: bin/mongodb_config_agent_ctl
   mongodb_config_agent.json.erb: config/mongodb_config_agent.json
+  post-start.erb: bin/post-start
 
 provides:
 - name: mongodb_config_agent
