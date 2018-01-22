@@ -64,7 +64,7 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, err
 	}
 
-	group, err := groupForMongoServer(id, oc, previousMongoProperties)
+	group, err := groupForMongoServer(id, oc, plan.Properties, previousManifest, arbitraryParams)
 	if err != nil {
 		return bosh.BoshManifest{}, fmt.Errorf("could not create new group (%s)", err.Error())
 	}
@@ -321,24 +321,49 @@ func idForMongoServer(previousManifestProperties map[interface{}]interface{}) (s
 	return GenerateString(8)
 }
 
-func groupForMongoServer(mongoID string, oc *OMClient, previousManifestProperties map[interface{}]interface{}) (Group, error) {
-	if previousManifestProperties != nil {
-		group, err := oc.GetGroup(previousManifestProperties["group_id"].(string))
+func groupForMongoServer(mongoID string, oc *OMClient,
+	planProperties map[string]interface{},
+	previousManifest *bosh.BoshManifest,
+	requestParams map[string]interface{}) (Group, error) {
+
+	req := GroupCreateRequest{}
+	if name, found := requestParams["projectName"]; found {
+		req.Name = name.(string)
+	}
+	if orgId, found := requestParams["orgId"]; found {
+		req.OrgId = orgId.(string)
+	}
+	tags := planProperties["mongo_ops"].(map[string]interface{})["tags"]
+	if tags != nil {
+		t := tags.([]interface{})
+		for _, tag := range t {
+			req.Tags = append(req.Tags, tag.(map[string]interface{})["tag_name"].(string))
+		}
+	}
+
+	if previousManifest != nil {
+		mongoProperties := mongoPlanProperties(*previousManifest)
+		group, err := oc.GetGroup(mongoProperties["group_id"].(string))
 		if err != nil {
 			return group, err
 		}
 
 		if group.AgentAPIKey == "" { // this might happen because of the bug in MMS 3.6 API
-			err := oc.DeleteGroup(previousManifestProperties["group_id"].(string))
-			if err != nil {
-				return Group{}, err
-			}
-		} else {
-			return group, nil
+			// we take api_key only from top level properties, because in 0.8.4 version of the tile agent api key wasn't present in agent properties
+			group.AgentAPIKey = previousManifest.Properties["mongo_ops"].(map[interface{}]interface{})["api_key"].(string)
 		}
+
+		if len(req.Tags) > 0 {
+			err = oc.UpdateGroup(group.ID, GroupUpdateRequest{req.Tags})
+			if err != nil {
+				return group, err
+			}
+		}
+
+		return group, nil
 	}
 
-	return oc.CreateGroup(mongoID)
+	return oc.CreateGroup(mongoID, req)
 }
 
 func findReleaseForJob(releases serviceadapter.ServiceReleases, requiredJob string) (serviceadapter.ServiceRelease, error) {

@@ -34,6 +34,19 @@ forms:
     configurable: true
     label: MongoDB Ops Manager API key
     description: This will be the API Key for your MongoDB Ops Manager.
+  - name: tags
+    type: collection
+    optional: true
+    configurable: true
+    label: Tags 
+    description: One or more tags that will be assigned to each of the MongoDB projects.
+    property_blueprints:
+    - name: tag_name
+      type: string
+      label: Tag name 
+      constraints:
+      - must_match_regex: '^[A-Z,0-9,.,_,-]{1,32}$'
+        error_message: 'Tag name must contain either: uppercase letters [A-Z], numbers [0-9], . (period), _ (underscore), - (dash). Tag names are limited to 32 characters.'
   - name: vm_type
     type: vm_type_dropdown
     optional: false
@@ -72,7 +85,7 @@ packages:
   path: resources/on-demand-service-broker-0.19.0.tgz
 - name: mongodb
   type: bosh-release
-  path: resources/mongodb-0.8.5.tgz
+  path: resources/mongodb-0.8.6.tgz
   jobs:
   - name: broker
     label: MongoDB-ODB
@@ -115,7 +128,7 @@ packages:
       service_deployment:
         releases:
         - name: mongodb
-          version: "0.8.5"
+          version: "0.8.6"
           jobs:
           - mongod_node
           - mongodb_config_agent
@@ -152,6 +165,7 @@ packages:
               url: (( .properties.url.value ))
               username: (( .properties.username.value ))
               api_key: (( .properties.api_key.value ))
+              tags:  (( .properties.tags.value || [] ))
         - name: replica_set
           plan_id: fee3933e-42cb-4964-b66e-79498f94e968
           description: Replica Set
@@ -173,6 +187,7 @@ packages:
               url: (( .properties.url.value ))
               username: (( .properties.username.value ))
               api_key: (( .properties.api_key.value ))
+              tags:  (( .properties.tags.value || [] ))
         - name: sharded_cluster
           plan_id: 477a196a-9e28-4103-87d3-593767448c9f
           description: Sharded Cluster
@@ -199,6 +214,7 @@ packages:
               url: (( .properties.url.value ))
               username: (( .properties.username.value ))
               api_key: (( .properties.api_key.value ))
+              tags:  (( .properties.tags.value || [] ))
   - name: smoke_tests
     label: 'Smoke Tests'
     lifecycle: errand
