@@ -3,6 +3,14 @@
 
 set -e
 
+# Disable Linux transparent huge pages
+if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
+   echo never > /sys/kernel/mm/transparent_hugepage/enabled
+fi
+if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
+   echo never > /sys/kernel/mm/transparent_hugepage/defrag
+fi
+
 <% conn = link('mongodb_config_agent') %>
 
 TMP_DIR=/var/vcap/sys/tmp/mongod_agent
@@ -36,7 +44,8 @@ dpkg -i /var/vcap/packages/mongod-node/libsnmp30*.deb
 
 chmod 600 /var/vcap/jobs/mongod_node/config/mongo_om.key
 
-# verions 0.8.4 of the tile leaves mongod running after stop, so we tries to stop the process here
+# verions 0.8.4 of the tile leaves mongod and mongos running after stop, so we tries to stop the process here
 source /var/vcap/packages/mongod-node/utils.sh
 MONGOD_PIDFILE=/var/vcap/store/mongodb-data/mongod.lock
 kill_and_wait ${MONGOD_PIDFILE}
+ensure_no_more_mongos

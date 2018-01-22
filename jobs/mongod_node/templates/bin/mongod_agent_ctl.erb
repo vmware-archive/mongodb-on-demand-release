@@ -32,8 +32,9 @@ case $1 in
     # Stop MongoDB Automation Agent
     kill_and_wait ${PIDFILE}
 
-    # Stop mongod process
+    # Stop mongod and mongos process
     kill_and_wait ${MONGOD_PIDFILE}
+    ensure_no_more_mongos
     ;;
   *)
     echo "Usage: $0 {start|stop}"

@@ -86,3 +86,10 @@ kill_and_wait() {
 running_in_container() {
   grep -q '/instance' /proc/self/cgroup
 }
+
+ensure_no_more_mongos() {
+  for mongos_pid in $(ps -ef | grep "[m]ongos-$(hostname)" | awk '{print $2}'); do
+    echo "Found leftover mongos process - killing($mongos_pid) if running: `ps -fp $mongos_pid`"
+    kill -9 $mongos_pid
+  done
+}
