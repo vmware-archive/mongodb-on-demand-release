@@ -64,7 +64,7 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, err
 	}
 
-	group, err := groupForMongoServer(id, oc, plan.Properties, previousManifest, arbitraryParams)
+	group, err := groupForMongoServer(id, oc, plan.Properties, previousMongoProperties, arbitraryParams)
 	if err != nil {
 		return bosh.BoshManifest{}, fmt.Errorf("could not create new group (%s)", err.Error())
 	}
@@ -323,7 +323,7 @@ func idForMongoServer(previousManifestProperties map[interface{}]interface{}) (s
 
 func groupForMongoServer(mongoID string, oc *OMClient,
 	planProperties map[string]interface{},
-	previousManifest *bosh.BoshManifest,
+	previousManifestProperties map[interface{}]interface{},
 	requestParams map[string]interface{}) (Group, error) {
 
 	req := GroupCreateRequest{}
@@ -341,26 +341,14 @@ func groupForMongoServer(mongoID string, oc *OMClient,
 		}
 	}
 
-	if previousManifest != nil {
-		mongoProperties := mongoPlanProperties(*previousManifest)
-		group, err := oc.GetGroup(mongoProperties["group_id"].(string))
+	if previousManifestProperties != nil {
+		// deleting old group unconditionaly, because  drain script in the tile 0.8.4 version can delete this group at a later time
+		// another reason is the because of the bug in 3.6 mongo API agen api key will not be rutrned to us in a result of getGroup request
+		// by recreating group we also make sure that all new parameters (like new tags, or new OrgId will be applied)
+		err := oc.DeleteGroup(previousManifestProperties["group_id"].(string))
 		if err != nil {
-			return group, err
+			return Group{}, err
 		}
-
-		if group.AgentAPIKey == "" { // this might happen because of the bug in MMS 3.6 API
-			// we take api_key only from top level properties, because in 0.8.4 version of the tile agent api key wasn't present in agent properties
-			group.AgentAPIKey = previousManifest.Properties["mongo_ops"].(map[interface{}]interface{})["api_key"].(string)
-		}
-
-		if len(req.Tags) > 0 {
-			err = oc.UpdateGroup(group.ID, GroupUpdateRequest{req.Tags})
-			if err != nil {
-				return group, err
-			}
-		}
-
-		return group, nil
 	}
 
 	return oc.CreateGroup(mongoID, req)
