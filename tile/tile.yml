@@ -24,6 +24,9 @@ forms:
     configurable: true
     label: MongoDB Ops Manager URL
     description: This will be the URL for your MongoDB Ops Manager. Please ensure that it is reachable.
+    constraints:
+    - must_match_regex: '^https?://.*$'
+      error_message: 'MongoDB Ops Manager address should start with "http://" or "https://"'
   - name: username
     type: string
     configurable: true
@@ -38,12 +41,12 @@ forms:
     type: collection
     optional: true
     configurable: true
-    label: Tags 
+    label: Tags
     description: One or more tags that will be assigned to each of the MongoDB projects.
     property_blueprints:
     - name: tag_name
       type: string
-      label: Tag name 
+      label: Tag name
       constraints:
       - must_match_regex: '^[A-Z,0-9,.,_,-]{1,32}$'
         error_message: 'Tag name must contain either: uppercase letters [A-Z], numbers [0-9], . (period), _ (underscore), - (dash). Tag names are limited to 32 characters.'
