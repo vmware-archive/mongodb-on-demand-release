@@ -13,14 +13,14 @@ until mongo \
 done
 <% elsif p("mongo_ops.plan_id") == 'replica_set' %>
 until mongo \
-  --host <% link("mongod_node").instances.map {|e| e.address}.join(',') %> --port 28000 -p <%= p("mongo_ops.admin_password") %> \
+  --host <%= link("mongod_node").instances.map {|e| e.address}.join(',') %> --port 28000 -p <%= p("mongo_ops.admin_password") %> \
   -u admin admin --eval 'quit(db.runCommand({ping: 1}).ok ? 0 : 1)' \
   --quiet &> /dev/null; do
   sleep 15
 done
 <% elsif p("mongo_ops.plan_id") == 'sharded_cluster' %>
 until mongo \
-  --host <% link("mongod_node").instances.map {|e| e.address}.join(',') %> --port 28000 -p <%= p("mongo_ops.admin_password") %> \
+  --host <%= link("mongod_node").instances.map {|e| e.address}.join(',') %> --port 28000 -p <%= p("mongo_ops.admin_password") %> \
   -u admin admin --eval 'quit(db.runCommand({ping: 1}).ok ? 0 : 1)' \
   --quiet &> /dev/null; do
   sleep 15
