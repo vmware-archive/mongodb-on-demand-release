@@ -3,26 +3,31 @@
 
 export PATH=/var/vcap/packages/mongodb/bin:$PATH
 
-echo "Waiting for MongoDB to accept connections..."
+echo "Waiting 600s for MongoDB to accept connections..."
+elapsed=0
+until [ $elapsed -ge 600 ]
+do
 <% if p("mongo_ops.plan_id") == 'standalone' %>
-until mongo \
-  --host <%= link("mongod_node").instances.first.address %> --port 28000 -p <%= p("mongo_ops.admin_password") %> \
-  -u admin admin --eval 'quit(db.runCommand({ping: 1}).ok ? 0 : 1)' \
-  --quiet &> /dev/null; do
-  sleep 15
-done
+  mongo \
+    --host <%= link("mongod_node").instances.first.address %> --port 28000 -p <%= p("mongo_ops.admin_password") %> \
+    -u admin admin --eval 'quit(db.runCommand({ping: 1}).ok ? 0 : 1)' \
+    --quiet &> /dev/null && break
 <% elsif p("mongo_ops.plan_id") == 'replica_set' %>
-until mongo \
-  --host <%= link("mongod_node").instances.map {|e| e.address}.join(',') %> --port 28000 -p <%= p("mongo_ops.admin_password") %> \
-  -u admin admin --eval 'quit(db.runCommand({ping: 1}).ok ? 0 : 1)' \
-  --quiet &> /dev/null; do
-  sleep 15
-done
+  mongo \
+    --host <%= link("mongod_node").instances.map {|e| e.address}.join(',') %> --port 28000 -p <%= p("mongo_ops.admin_password") %> \
+    -u admin admin --eval 'quit(db.runCommand({ping: 1}).ok ? 0 : 1)' \
+    --quiet &> /dev/null && break
 <% elsif p("mongo_ops.plan_id") == 'sharded_cluster' %>
-until mongo \
-  --host <%= link("mongod_node").instances.map {|e| e.address}.join(',') %> --port 28000 -p <%= p("mongo_ops.admin_password") %> \
-  -u admin admin --eval 'quit(db.runCommand({ping: 1}).ok ? 0 : 1)' \
-  --quiet &> /dev/null; do
-  sleep 15
-done
+  mongo \
+    --host <%= link("mongod_node").instances.map {|e| e.address}.join(',') %> --port 28000 -p <%= p("mongo_ops.admin_password") %> \
+    -u admin admin --eval 'quit(db.runCommand({ping: 1}).ok ? 0 : 1)' \
+    --quiet &> /dev/null && break
 <% end %>
+  elapsed=$[$elapsed+5]
+  sleep 5
+done
+
+if [ "$elapsed" -ge "600" ]; then
+   echo "ERROR: Cannot connect to elasticsearch. Exiting..."
+   exit 1
+fi
