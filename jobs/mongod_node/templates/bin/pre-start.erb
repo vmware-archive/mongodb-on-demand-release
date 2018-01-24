@@ -11,6 +11,14 @@ if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
    echo never > /sys/kernel/mm/transparent_hugepage/defrag
 fi
 
+# Set Resource Limits
+ulimit -f unlimited
+ulimit -t unlimited
+ulimit -v unlimited
+ulimit -n 64000
+ulimit -m unlimited
+ulimit -u 64000
+
 <% conn = link('mongodb_config_agent') %>
 
 TMP_DIR=/var/vcap/sys/tmp/mongod_agent
