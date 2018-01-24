@@ -34,6 +34,16 @@ type Group struct {
 	HostCounts  map[string]int `json:"hostCounts"`
 }
 
+type GroupCreateRequest struct {
+	Name  string   `json:"name"`
+	OrgId string   `json:"orgId,omitempty"`
+	Tags  []string `json:"tags"`
+}
+
+type GroupUpdateRequest struct {
+	Tags []string `json:"tags"`
+}
+
 type GroupHosts struct {
 	TotalCount int `json:"totalCount"`
 }
@@ -71,6 +81,8 @@ func (oc *OMClient) LoadDoc(p string, ctx *DocContext) (string, error) {
 
 	if strings.HasPrefix(ctx.Version, "3.4") {
 		ctx.CompatibilityVersion = "3.4"
+	} else if strings.HasPrefix(ctx.Version, "3.6") {
+		ctx.CompatibilityVersion = "3.6"
 	}
 
 	b := bytes.Buffer{}
@@ -80,13 +92,17 @@ func (oc *OMClient) LoadDoc(p string, ctx *DocContext) (string, error) {
 	return b.String(), nil
 }
 
-func (oc *OMClient) CreateGroup(id string) (Group, error) {
+func (oc *OMClient) CreateGroup(id string, request GroupCreateRequest) (Group, error) {
 	var group Group
 
-	name := fmt.Sprintf("pcf_%s", id)
-	b, err := oc.doRequest("POST", "/api/public/v1.0/groups", strings.NewReader(`{
-		"name": "`+name+`"
-	}`))
+	if request.Name == "" {
+		request.Name = fmt.Sprintf("pcf_%s", id)
+	}
+	req, err := json.Marshal(request)
+	if err != nil {
+		return group, err
+	}
+	b, err := oc.doRequest("POST", "/api/public/v1.0/groups", bytes.NewReader(req))
 	if err != nil {
 		return group, err
 	}
@@ -95,6 +111,15 @@ func (oc *OMClient) CreateGroup(id string) (Group, error) {
 		return group, err
 	}
 	return group, nil
+}
+
+func (oc *OMClient) UpdateGroup(id string, request GroupUpdateRequest) error {
+	req, err := json.Marshal(request)
+	if err != nil {
+		return err
+	}
+	_, err = oc.doRequest("PATCH", fmt.Sprintf("/api/public/v1.0/groups/%s", id), bytes.NewReader(req))
+	return err
 }
 
 func (oc *OMClient) GetGroup(groupID string) (Group, error) {
@@ -109,6 +134,11 @@ func (oc *OMClient) GetGroup(groupID string) (Group, error) {
 		return group, err
 	}
 	return group, nil
+}
+
+func (oc *OMClient) DeleteGroup(groupID string) error {
+	_, err := oc.doRequest("DELETE", fmt.Sprintf("/api/public/v1.0/groups/%s", groupID), nil)
+	return err
 }
 
 func (oc *OMClient) GetGroupHosts(groupID string) (GroupHosts, error) {

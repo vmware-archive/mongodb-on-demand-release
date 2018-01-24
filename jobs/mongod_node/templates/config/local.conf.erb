@@ -1,10 +1,11 @@
+<% conn = link('mongodb_config_agent') %>
 #
 # REQUIRED
 #
 # Enter your Group Id - It can be found in the Ops Manager UI under Settings ->
 # Group Settings.
 #
-mmsGroupId=<%= p('mongo_ops.group_id') %>
+mmsGroupId=<%= conn.p('mongo_ops.group_id') %>
 
 
 #
@@ -13,7 +14,7 @@ mmsGroupId=<%= p('mongo_ops.group_id') %>
 # Enter your API key - It can be found in the Ops Manager UI under Settings ->
 # Group Settings.
 #
-mmsApiKey=<%= p('mongo_ops.api_key') %>
+mmsApiKey=<%= conn.p('mongo_ops.agent_api_key') %>
 
 #
 # Hostname of the Ops Manager web server. The hostname will match what is used
@@ -21,7 +22,7 @@ mmsApiKey=<%= p('mongo_ops.api_key') %>
 # is 8080.
 #
 # ex. http://opsmanaager.<company>.com:8080
-mmsBaseUrl=<%= p('mongo_ops.url') %>
+mmsBaseUrl=<%= conn.p('mongo_ops.url').chomp("/") %>
 
 #
 # Path to log file

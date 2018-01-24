@@ -13,6 +13,7 @@ mkdir -p ${RUN_DIR} ${LOG_DIR} ${TMP_DIR} ${STORE_DIR} ${AGENT_LOG_DIR}
 chmod 777 ${AGENT_LOG_DIR}
 
 PIDFILE=${RUN_DIR}/mongo_agent.pid
+MONGOD_PIDFILE=/var/vcap/store/mongodb-data/mongod.lock
 
 case $1 in
 
@@ -30,6 +31,10 @@ case $1 in
   stop)
     # Stop MongoDB Automation Agent
     kill_and_wait ${PIDFILE}
+
+    # Stop mongod and mongos process
+    kill_and_wait ${MONGOD_PIDFILE}
+    ensure_no_more_mongos
     ;;
   *)
     echo "Usage: $0 {start|stop}"

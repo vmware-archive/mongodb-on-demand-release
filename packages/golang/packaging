@@ -1,9 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -e # exit immediately if a simple command exits with a non-zero status
-set -u # report the usage of uninitialized variables
+set -e
 
-tar xzvf ${BOSH_COMPILE_TARGET}/golang/go1.8.3.linux-amd64.tar.gz
-
-mkdir -p ${BOSH_INSTALL_TARGET}/bin
-cp -a ${BOSH_COMPILE_TARGET}/go/* ${BOSH_INSTALL_TARGET}
+tar xzf golang/go1.9.2.linux-amd64.tar.gz
+cp -R go/* ${BOSH_INSTALL_TARGET}
