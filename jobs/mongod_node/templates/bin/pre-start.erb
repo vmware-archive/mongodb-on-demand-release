@@ -3,6 +3,15 @@
 
 set -e
 
+# Set readahead setting
+mount_point=$(df | grep -w /var/vcap/store | awk {'print $1'})
+blockdev --setra 0 $mount_point
+
+# Use noatime for the dbPath mount point
+if mountpoint -q /var/vcap/store; then
+  mount -o remount,noatime /var/vcap/store
+fi
+
 # Disable Linux transparent huge pages
 if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
    echo never > /sys/kernel/mm/transparent_hugepage/enabled
@@ -10,6 +19,14 @@ fi
 if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
    echo never > /sys/kernel/mm/transparent_hugepage/defrag
 fi
+
+# Configure sufficient file handles, kernel pid limit and maximum threads per process
+echo 98000 > /proc/sys/fs/file-max
+echo 64000 > /proc/sys/kernel/pid_max
+echo 64000 > /proc/sys/kernel/threads-max
+
+# Set system default TCP keepalive
+echo 300 > /proc/sys/net/ipv4/tcp_keepalive_time
 
 # Set Resource Limits
 ulimit -f unlimited
