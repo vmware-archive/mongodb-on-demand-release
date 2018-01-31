@@ -8,7 +8,7 @@ service_broker: true
 
 stemcell_criteria:
   os: ubuntu-trusty
-  version: '3421'
+  version: '3468'
 
 properties:
 - name: broker_basic_auth
