@@ -266,7 +266,7 @@ packages:
     label: 'On Demand Service Broker Registrar'
     lifecycle: errand
     post_deploy: true
-    run_post_deploy_errand_default: when-changed
+    run_post_deploy_errand_default: on
     templates:
     - name: register-broker
       release: on-demand-service-broker
@@ -290,7 +290,7 @@ packages:
     label: 'Upgrade all instances deployed by the On Demand Service Broker'
     lifecycle: errand
     post_deploy: true
-    run_post_deploy_errand_default: when-changed
+    run_post_deploy_errand_default: on
     templates:
     - name: upgrade-all-service-instances
       release: on-demand-service-broker
