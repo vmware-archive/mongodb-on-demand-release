@@ -2,6 +2,7 @@
 name: mongodb_config_agent
 
 packages:
+  - jq
   - mongodb
   - mongodb-config-agent
 
@@ -20,6 +21,7 @@ provides:
   - mongo_ops.api_key
   - mongo_ops.auth_key
   - mongo_ops.group_id
+  - mongo_ops.backup_enabled
 
 consumes:
 - name: mongod_node
@@ -52,3 +54,5 @@ properties:
       description: "Number of cluster configuration replicas"
   mongo_ops.replicas:
     description: "Replicas number for each shard"
+  mongo_ops.backup_enabled:
+    description: "Enables backup for all clusters in a deployment."

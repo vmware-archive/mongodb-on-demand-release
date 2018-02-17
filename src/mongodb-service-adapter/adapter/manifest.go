@@ -155,6 +155,14 @@ func (m ManifestGenerator) GenerateManifest(
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
+	backupEnabled := false
+	if planID != PlanStandalone {
+		if e, ok := arbitraryParams["backup_enabled"].(bool); ok {
+			backupEnabled = e
+		} else {
+			backupEnabled = mongoOps["backup_enabled"].(bool)
+		}
+	}
 
 	manifest := bosh.BoshManifest{
 		Name:     serviceDeployment.DeploymentName,
@@ -216,6 +224,7 @@ func (m ManifestGenerator) GenerateManifest(
 						"routers":        routers,
 						"config_servers": configServers,
 						"replicas":       replicas,
+						"backup_enabled": backupEnabled,
 					},
 				},
 			},

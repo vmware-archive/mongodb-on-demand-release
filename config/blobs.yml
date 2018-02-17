@@ -1,3 +1,4 @@
+jq/jq-linux64-1.5: {}
 cf-cli/cf-cli_6.28.0_linux_x86-64.tgz:
   size: 5715491
   object_id: 24341322-c994-409e-5fd9-96008d6c95c7
