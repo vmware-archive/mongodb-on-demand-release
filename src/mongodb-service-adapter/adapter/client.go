@@ -114,13 +114,22 @@ func (oc *OMClient) CreateGroup(id string, request GroupCreateRequest) (Group, e
 	return group, nil
 }
 
-func (oc *OMClient) UpdateGroup(id string, request GroupUpdateRequest) error {
+func (oc *OMClient) UpdateGroup(id string, request GroupUpdateRequest) (Group, error) {
+	var group Group
+
 	req, err := json.Marshal(request)
 	if err != nil {
-		return err
+		return group, err
 	}
-	_, err = oc.doRequest("PATCH", fmt.Sprintf("/api/public/v1.0/groups/%s", id), bytes.NewReader(req))
-	return err
+	b, err := oc.doRequest("PATCH", fmt.Sprintf("/api/public/v1.0/groups/%s", id), bytes.NewReader(req))
+	if err != nil {
+		return group, err
+	}
+
+	if err = json.Unmarshal(b, &group); err != nil {
+		return group, err
+	}
+	return group, nil
 }
 
 func (oc *OMClient) GetGroup(groupID string) (Group, error) {

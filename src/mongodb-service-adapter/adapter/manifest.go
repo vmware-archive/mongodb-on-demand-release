@@ -151,7 +151,7 @@ func (m ManifestGenerator) GenerateManifest(
 	default:
 		return bosh.BoshManifest{}, fmt.Errorf("unknown plan: %s", planID)
 	}
-	authKey, err := GenerateString(512)
+	authKey, err := authKeyForMongoServer(previousMongoProperties)
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
@@ -330,9 +330,17 @@ func idForMongoServer(previousManifestProperties map[interface{}]interface{}) (s
 	return GenerateString(8)
 }
 
+func authKeyForMongoServer(previousManifestProperties map[interface{}]interface{}) (string, error) {
+	if previousManifestProperties != nil {
+		return previousManifestProperties["auth_key"].(string), nil
+	}
+
+	return GenerateString(8)
+}
+
 func groupForMongoServer(mongoID string, oc *OMClient,
 	planProperties map[string]interface{},
-	previousManifestProperties map[interface{}]interface{},
+	previousMongoProperties map[interface{}]interface{},
 	requestParams map[string]interface{}) (Group, error) {
 
 	req := GroupCreateRequest{}
@@ -350,17 +358,17 @@ func groupForMongoServer(mongoID string, oc *OMClient,
 		}
 	}
 
-	if previousManifestProperties != nil {
-		// deleting old group unconditionaly, because  drain script in the tile 0.8.4 version can delete this group at a later time
-		// another reason is the because of the bug in 3.6 mongo API agen api key will not be rutrned to us in a result of getGroup request
-		// by recreating group we also make sure that all new parameters (like new tags, or new OrgId will be applied)
-		err := oc.DeleteGroup(previousManifestProperties["group_id"].(string))
+	if previousMongoProperties != nil {
+		group, err := oc.UpdateGroup(previousMongoProperties["group_id"].(string), GroupUpdateRequest{req.Tags})
 		if err != nil {
 			return Group{}, err
 		}
+		// AgentAPIKey is empty for PATCH and GET requests in OM 3.6, taking the value from previous manifest instead
+		group.AgentAPIKey = previousMongoProperties["agent_api_key"].(string)
+		return group, nil
+	} else {
+		return oc.CreateGroup(mongoID, req)
 	}
-
-	return oc.CreateGroup(mongoID, req)
 }
 
 func findReleaseForJob(releases serviceadapter.ServiceReleases, requiredJob string) (serviceadapter.ServiceRelease, error) {

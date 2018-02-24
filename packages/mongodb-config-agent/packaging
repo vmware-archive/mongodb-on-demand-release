@@ -1,6 +1,6 @@
 set -e
 
-cp common/utils.sh ${BOSH_INSTALL_TARGET}
+cp common/* ${BOSH_INSTALL_TARGET}
 
 export GOROOT=$(readlink -nf /var/vcap/packages/golang)
 export GOPATH=${BOSH_COMPILE_TARGET}/go

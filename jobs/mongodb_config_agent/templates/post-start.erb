@@ -3,6 +3,12 @@
 
 export PATH=/var/vcap/packages/jq/bin:/var/vcap/packages/mongodb/bin:$PATH
 
+source /var/vcap/packages/mongodb-config-agent/mongo_utils.sh
+export MONGO_OM_URL='<%= p('mongo_ops.url') %>'
+export MONGO_OM_USER='<%= p('mongo_ops.username') %>'
+export MONGO_OM_API_KEY='<%= p('mongo_ops.api_key') %>'
+export MONGO_OM_GROUP_ID='<%= p('mongo_ops.group_id') %>'
+
 echo "Waiting 600s for MongoDB to accept connections..."
 elapsed=0
 until [ $elapsed -ge 600 ]
@@ -34,7 +40,7 @@ else
 <% if p("mongo_ops.backup_enabled") %>
   while true
   do
-    clusters=($(curl --fail --digest  -u "<%= p('mongo_ops.username') %>:<%= p('mongo_ops.api_key') %>" <%= p('mongo_ops.url') %>/api/public/v1.0/groups/<%= p('mongo_ops.group_id') %>/clusters | jq -r ".results[].id"))
+    clusters=($(om_api_call "GET" "clusters" | jq -r ".results[].id"))
 
     if [ ${#clusters[@]} -eq 0 ]; then
         sleep 5
@@ -43,12 +49,16 @@ else
 
     for cluster in "${clusters[@]}"
     do
-      curl -H "Content-Type: application/json" -X PATCH --fail --digest  -u "<%= p('mongo_ops.username') %>:<%= p('mongo_ops.api_key') %>" <%= p('mongo_ops.url') %>/api/public/v1.0/groups/<%= p('mongo_ops.group_id') %>/backupConfigs/${cluster} -d '{"statusName": "STARTED"}'
+        stat=$(om_api_call "GET" "backupConfigs/${cluster}" | jq -r ".statusName")
+        if [ $stat != "STARTED" ]; then
+                om_api_call "PATCH" "backupConfigs/${cluster}" '{"statusName": "STARTED"}'
+        fi
     done
 
-    exit 0
+    break
   done
 <% end %>
+  exit 0 
 fi
 
 

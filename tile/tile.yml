@@ -5,6 +5,7 @@ label: MongoDB-On-Demand
 description: 'MongoDB On Demand'
 metadata_version: 1.8
 service_broker: true
+minimum_version_for_upgrade: 1.0.1
 
 stemcell_criteria:
   os: ubuntu-trusty

@@ -9,15 +9,29 @@ set -e
 
 export PATH=/var/vcap/packages/jq/bin:$PATH
 
-  clusters=($(curl --fail --digest  -u "<%= conn.p('mongo_ops.username') %>:<%= conn.p('mongo_ops.api_key') %>" <%= conn.p('mongo_ops.url') %>/api/public/v1.0/groups/<%= conn.p('mongo_ops.group_id') %>/clusters | jq -r ".results[].id"))
+source /var/vcap/packages/mongodb-config-agent/mongo_utils.sh
+export MONGO_OM_URL='<%= conn.p('mongo_ops.url') %>'
+export MONGO_OM_USER='<%= conn.p('mongo_ops.username') %>'
+export MONGO_OM_API_KEY='<%= conn.p('mongo_ops.api_key') %>'
+export MONGO_OM_GROUP_ID='<%= conn.p('mongo_ops.group_id') %>'
+
+  clusters=($(om_api_call "GET" "clusters" | jq -r ".results[].id"))
   for cluster in "${clusters[@]}"
   do
-    curl -H "Content-Type: application/json" -X PATCH --fail --digest  -u "<%= conn.p('mongo_ops.username') %>:<%= conn.p('mongo_ops.api_key') %>" <%= conn.p('mongo_ops.url') %>/api/public/v1.0/groups/<%= conn.p('mongo_ops.group_id') %>/backupConfigs/${cluster} -d '{"statusName": "STOPPED"}'
-
-    curl -H "Content-Type: application/json" -X PATCH --fail --digest  -u "<%= conn.p('mongo_ops.username') %>:<%= conn.p('mongo_ops.api_key') %>" <%= conn.p('mongo_ops.url') %>/api/public/v1.0/groups/<%= conn.p('mongo_ops.group_id') %>/backupConfigs/${cluster} -d '{"statusName": "TERMINATING"}'
+      om_api_call "PATCH" "backupConfigs/${cluster}" '{"statusName": "STOPPED"}'
+      om_api_call "PATCH" "backupConfigs/${cluster}" '{"statusName": "TERMINATING"}'
+      while true
+      do
+	stat=$(om_api_call "GET" "backupConfigs/${cluster}" | jq -r ".statusName")
+	if [ $stat == "INACTIVE" ]; then
+	    break
+	else
+	    sleep 5
+	fi
+      done
   done
+
+
 <% end %>
 
-curl --fail -u "<%= conn.p('mongo_ops.username') %>:<%= conn.p('mongo_ops.api_key') %>" \
-  -X DELETE --digest \
-  -i "<%= conn.p('mongo_ops.url') %>/api/public/v1.0/groups/<%= conn.p('mongo_ops.group_id') %>"
+om_api_call "DELETE" "" 

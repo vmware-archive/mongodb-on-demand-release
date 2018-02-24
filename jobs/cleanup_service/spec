@@ -10,5 +10,6 @@ consumes:
 
 packages: 
 - jq
+- mongodb-config-agent
 
 properties: {}
