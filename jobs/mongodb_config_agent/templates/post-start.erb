@@ -4,7 +4,7 @@
 export PATH=/var/vcap/packages/jq/bin:/var/vcap/packages/mongodb/bin:$PATH
 
 source /var/vcap/packages/mongodb-config-agent/mongo_utils.sh
-export MONGO_OM_URL='<%= p('mongo_ops.url') %>'
+export MONGO_OM_URL='<%= p('mongo_ops.url').chomp("/") %>'
 export MONGO_OM_USER='<%= p('mongo_ops.username') %>'
 export MONGO_OM_API_KEY='<%= p('mongo_ops.api_key') %>'
 export MONGO_OM_GROUP_ID='<%= p('mongo_ops.group_id') %>'
@@ -58,7 +58,7 @@ else
     break
   done
 <% end %>
-  exit 0 
+  exit 0
 fi
 
 

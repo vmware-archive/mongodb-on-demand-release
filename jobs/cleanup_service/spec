@@ -8,8 +8,8 @@ consumes:
 - name: mongodb_config_agent
   type: config_agent
 
-packages: 
-- jq
-- mongodb-config-agent
+packages:
+  - jq
+  - mongodb-config-agent
 
 properties: {}

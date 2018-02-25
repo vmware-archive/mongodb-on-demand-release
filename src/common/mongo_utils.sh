@@ -1,4 +1,3 @@
-
 om_api_call() {
   method=$1
   path=$2

@@ -5,15 +5,17 @@ set -e
 
 <% conn = link('mongodb_config_agent') %>
 
+source /var/vcap/packages/mongodb-config-agent/mongo_utils.sh
+
+export MONGO_OM_URL='<%= conn.p('mongo_ops.url').chomp("/") %>'
+export MONGO_OM_USER='<%= conn.p('mongo_ops.username') %>'
+export MONGO_OM_API_KEY='<%= conn.p('mongo_ops.api_key') %>'
+export MONGO_OM_GROUP_ID='<%= conn.p('mongo_ops.group_id') %>'
+
 <% if conn.p("mongo_ops.backup_enabled") %>
 
 export PATH=/var/vcap/packages/jq/bin:$PATH
 
-source /var/vcap/packages/mongodb-config-agent/mongo_utils.sh
-export MONGO_OM_URL='<%= conn.p('mongo_ops.url') %>'
-export MONGO_OM_USER='<%= conn.p('mongo_ops.username') %>'
-export MONGO_OM_API_KEY='<%= conn.p('mongo_ops.api_key') %>'
-export MONGO_OM_GROUP_ID='<%= conn.p('mongo_ops.group_id') %>'
 
   clusters=($(om_api_call "GET" "clusters" | jq -r ".results[].id"))
   for cluster in "${clusters[@]}"
@@ -34,4 +36,4 @@ export MONGO_OM_GROUP_ID='<%= conn.p('mongo_ops.group_id') %>'
 
 <% end %>
 
-om_api_call "DELETE" "" 
+om_api_call "DELETE" ""
