@@ -41,7 +41,7 @@ forms:
   - name: backup_enabled
     type: boolean
     configurable: true
-    label: Backup enabled by default 
+    label: Backup enabled by default
     description: Enables or disables backup by default for Replica Set and Sharded Cluster service plans. Can be overwritten by "enable_backup" parameter at service creation time.
   - name: tags
     type: collection
@@ -73,7 +73,7 @@ forms:
       label: Allow outbound internet access from service instances (IaaS-dependent)
 - name: plan_standalone
   label: Standalone Service Plan
-  description: Standalone service plan configuration 
+  description: Standalone service plan configuration
   properties:
   - name: vm_type_standalone_small
     type: vm_type_dropdown
@@ -110,7 +110,7 @@ forms:
     description: Select the Disk Type for the standalone medium service plan.
     resource_definitions:
       - name: persistent_disk
-        default: 50_000 
+        default: 50_000
   - name: vm_type_standalone_large
     type: vm_type_dropdown
     optional: false
@@ -128,10 +128,10 @@ forms:
     description: Select the Disk Type for the standalone large service plan.
     resource_definitions:
       - name: persistent_disk
-        default: 200_000 
+        default: 200_000
 - name: plan_replica_set
   label: Replica Set Service Plan
-  description: Replica Set service plan configuration 
+  description: Replica Set service plan configuration
   properties:
   - name: vm_type_replica_set_small
     type: vm_type_dropdown
@@ -150,7 +150,7 @@ forms:
     description: Select the Disk Type for the replica set small service plan.
     resource_definitions:
       - name: persistent_disk
-        default: 20_000 
+        default: 20_000
   - name: vm_type_replica_set_medium
     type: vm_type_dropdown
     optional: false
@@ -168,7 +168,7 @@ forms:
     description: Select the Disk Type for the replica set medium service plan.
     resource_definitions:
       - name: persistent_disk
-        default: 50_000 
+        default: 50_000
   - name: vm_type_replica_set_large
     type: vm_type_dropdown
     optional: false
@@ -186,10 +186,10 @@ forms:
     description: Select the Disk Type for the replica set large service plan.
     resource_definitions:
       - name: persistent_disk
-        default: 200_000 
+        default: 200_000
 - name: plan_sharded_cluster
   label: Sharded Cluster Service Plan
-  description: Sharded Cluster service plan configuration 
+  description: Sharded Cluster service plan configuration
   properties:
   - name: vm_type_sharded_cluster_small
     type: vm_type_dropdown
@@ -208,7 +208,7 @@ forms:
     description: Select the Disk Type for the sharded cluster small service plan.
     resource_definitions:
       - name: persistent_disk
-        default: 20_000 
+        default: 20_000
   - name: vm_type_sharded_cluster_medium
     type: vm_type_dropdown
     optional: false
@@ -226,7 +226,7 @@ forms:
     description: Select the Disk Type for the sharded cluster medium service plan.
     resource_definitions:
       - name: persistent_disk
-        default: 50_000 
+        default: 50_000
   - name: vm_type_sharded_cluster_large
     type: vm_type_dropdown
     optional: false
@@ -244,7 +244,7 @@ forms:
     description: Select the Disk Type for the sharded cluster large service plan.
     resource_definitions:
       - name: persistent_disk
-        default: 200_000 
+        default: 200_000
 
 requires_product_versions:
 - name: cf

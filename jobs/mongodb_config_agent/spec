@@ -22,7 +22,7 @@ provides:
   - mongo_ops.auth_key
   - mongo_ops.group_id
   - mongo_ops.backup_enabled
-  - mongo_ops.plan_id:
+  - mongo_ops.plan_id
 
 consumes:
 - name: mongod_node
