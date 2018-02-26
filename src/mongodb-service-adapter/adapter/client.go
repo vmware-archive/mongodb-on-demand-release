@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"strings"
 
 	"github.com/cf-platform-eng/mongodb-on-demand-release/src/mongodb-service-adapter/digest"
@@ -113,13 +114,22 @@ func (oc *OMClient) CreateGroup(id string, request GroupCreateRequest) (Group, e
 	return group, nil
 }
 
-func (oc *OMClient) UpdateGroup(id string, request GroupUpdateRequest) error {
+func (oc *OMClient) UpdateGroup(id string, request GroupUpdateRequest) (Group, error) {
+	var group Group
+
 	req, err := json.Marshal(request)
 	if err != nil {
-		return err
+		return group, err
 	}
-	_, err = oc.doRequest("PATCH", fmt.Sprintf("/api/public/v1.0/groups/%s", id), bytes.NewReader(req))
-	return err
+	b, err := oc.doRequest("PATCH", fmt.Sprintf("/api/public/v1.0/groups/%s", id), bytes.NewReader(req))
+	if err != nil {
+		return group, err
+	}
+
+	if err = json.Unmarshal(b, &group); err != nil {
+		return group, err
+	}
+	return group, nil
 }
 
 func (oc *OMClient) GetGroup(groupID string) (Group, error) {
@@ -203,6 +213,12 @@ func (oc *OMClient) doRequest(method string, path string, body io.Reader) ([]byt
 		return nil, err
 	}
 
+	dump, err := httputil.DumpRequestOut(req, true)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("API Request: %q", dump)
+
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Fatalf("%s %s error: %v", method, uri, err)
@@ -210,12 +226,18 @@ func (oc *OMClient) doRequest(method string, path string, body io.Reader) ([]byt
 	}
 	defer res.Body.Close()
 
+	dump, err = httputil.DumpResponse(res, true)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("API Response: %q", dump)
+
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	if res.StatusCode < 200 && res.StatusCode >= 300 {
+	if res.StatusCode < 200 || res.StatusCode >= 300 {
 		return nil, fmt.Errorf("%s %s request error: code=%d body=%q", method, path, res.StatusCode, b)
 	}
 	return b, nil

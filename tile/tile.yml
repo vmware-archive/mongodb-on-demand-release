@@ -5,10 +5,11 @@ label: MongoDB-On-Demand
 description: 'MongoDB On Demand'
 metadata_version: 1.8
 service_broker: true
+minimum_version_for_upgrade: 1.0.1
 
 stemcell_criteria:
   os: ubuntu-trusty
-  version: '3421'
+  version: '3468'
 
 properties:
 - name: broker_basic_auth
@@ -37,6 +38,11 @@ forms:
     configurable: true
     label: MongoDB Ops Manager API key
     description: This will be the API Key for your MongoDB Ops Manager.
+  - name: backup_enabled
+    type: boolean
+    configurable: true
+    label: Backup enabled by default
+    description: Enables or disables backup by default for Replica Set and Sharded Cluster service plans. Can be overwritten by "enable_backup" parameter at service creation time.
   - name: tags
     type: collection
     optional: true
@@ -50,18 +56,6 @@ forms:
       constraints:
       - must_match_regex: '^[A-Z,0-9,.,_,-]{1,32}$'
         error_message: 'Tag name must contain either: uppercase letters [A-Z], numbers [0-9], . (period), _ (underscore), - (dash). Tag names are limited to 32 characters.'
-  - name: vm_type
-    type: vm_type_dropdown
-    optional: false
-    configurable: true
-    label: MongoDB VM Type
-    description: Select the VM Type
-  - name: disk_type
-    type: disk_type_dropdown
-    optional: false
-    configurable: true
-    label: MongoDB disk type
-    description: Select the Disk Type
   - name: az_multi_select
     type: service_network_az_multi_select
     optional: false
@@ -77,6 +71,180 @@ forms:
     options:
     - name: public_ip
       label: Allow outbound internet access from service instances (IaaS-dependent)
+- name: plan_standalone
+  label: Standalone Service Plan
+  description: Standalone service plan configuration
+  properties:
+  - name: vm_type_standalone_small
+    type: vm_type_dropdown
+    optional: false
+    configurable: true
+    label: Small VM Type
+    description: Select the VM Type for the standalone small service plan.
+    resource_definitions:
+    - name: ram
+      default: 2000
+  - name: disk_type_standalone_small
+    type: disk_type_dropdown
+    optional: false
+    configurable: true
+    label: Small disk type
+    description: Select the Disk Type for the standalone small service plan.
+    resource_definitions:
+      - name: persistent_disk
+        default: 20_000
+  - name: vm_type_standalone_medium
+    type: vm_type_dropdown
+    optional: false
+    configurable: true
+    label: Medium VM Type
+    description: Select the VM Type for the standalone medium service plan.
+    resource_definitions:
+    - name: ram
+      default: 4000
+  - name: disk_type_standalone_medium
+    type: disk_type_dropdown
+    optional: false
+    configurable: true
+    label: Medium disk type
+    description: Select the Disk Type for the standalone medium service plan.
+    resource_definitions:
+      - name: persistent_disk
+        default: 50_000
+  - name: vm_type_standalone_large
+    type: vm_type_dropdown
+    optional: false
+    configurable: true
+    label: Large VM Type
+    description: Select the VM Type for the standalone large service plan.
+    resource_definitions:
+    - name: ram
+      default: 8000
+  - name: disk_type_standalone_large
+    type: disk_type_dropdown
+    optional: false
+    configurable: true
+    label: Large disk type
+    description: Select the Disk Type for the standalone large service plan.
+    resource_definitions:
+      - name: persistent_disk
+        default: 200_000
+- name: plan_replica_set
+  label: Replica Set Service Plan
+  description: Replica Set service plan configuration
+  properties:
+  - name: vm_type_replica_set_small
+    type: vm_type_dropdown
+    optional: false
+    configurable: true
+    label: Small VM Type
+    description: Select the VM Type for the replica set small service plan.
+    resource_definitions:
+    - name: ram
+      default: 2000
+  - name: disk_type_replica_set_small
+    type: disk_type_dropdown
+    optional: false
+    configurable: true
+    label: Small disk type
+    description: Select the Disk Type for the replica set small service plan.
+    resource_definitions:
+      - name: persistent_disk
+        default: 20_000
+  - name: vm_type_replica_set_medium
+    type: vm_type_dropdown
+    optional: false
+    configurable: true
+    label: Medium VM Type
+    description: Select the VM Type for the replica set medium service plan.
+    resource_definitions:
+    - name: ram
+      default: 4000
+  - name: disk_type_replica_set_medium
+    type: disk_type_dropdown
+    optional: false
+    configurable: true
+    label: Medium disk type
+    description: Select the Disk Type for the replica set medium service plan.
+    resource_definitions:
+      - name: persistent_disk
+        default: 50_000
+  - name: vm_type_replica_set_large
+    type: vm_type_dropdown
+    optional: false
+    configurable: true
+    label: Large VM Type
+    description: Select the VM Type for the replica set large service plan.
+    resource_definitions:
+    - name: ram
+      default: 8000
+  - name: disk_type_replica_set_large
+    type: disk_type_dropdown
+    optional: false
+    configurable: true
+    label: Large disk type
+    description: Select the Disk Type for the replica set large service plan.
+    resource_definitions:
+      - name: persistent_disk
+        default: 200_000
+- name: plan_sharded_cluster
+  label: Sharded Cluster Service Plan
+  description: Sharded Cluster service plan configuration
+  properties:
+  - name: vm_type_sharded_cluster_small
+    type: vm_type_dropdown
+    optional: false
+    configurable: true
+    label: Small VM Type
+    description: Select the VM Type for the sharded cluster small service plan.
+    resource_definitions:
+    - name: ram
+      default: 2000
+  - name: disk_type_sharded_cluster_small
+    type: disk_type_dropdown
+    optional: false
+    configurable: true
+    label: Small disk type
+    description: Select the Disk Type for the sharded cluster small service plan.
+    resource_definitions:
+      - name: persistent_disk
+        default: 20_000
+  - name: vm_type_sharded_cluster_medium
+    type: vm_type_dropdown
+    optional: false
+    configurable: true
+    label: Medium VM Type
+    description: Select the VM Type for the sharded cluster medium service plan.
+    resource_definitions:
+    - name: ram
+      default: 4000
+  - name: disk_type_sharded_cluster_medium
+    type: disk_type_dropdown
+    optional: false
+    configurable: true
+    label: Medium disk type
+    description: Select the Disk Type for the sharded cluster medium service plan.
+    resource_definitions:
+      - name: persistent_disk
+        default: 50_000
+  - name: vm_type_sharded_cluster_large
+    type: vm_type_dropdown
+    optional: false
+    configurable: true
+    label: Large VM Type
+    description: Select the VM Type for the sharded cluster large service plan.
+    resource_definitions:
+    - name: ram
+      default: 8000
+  - name: disk_type_sharded_cluster_large
+    type: disk_type_dropdown
+    optional: false
+    configurable: true
+    label: Large disk type
+    description: Select the Disk Type for the sharded cluster large service plan.
+    resource_definitions:
+      - name: persistent_disk
+        default: 200_000
 
 requires_product_versions:
 - name: cf
@@ -88,7 +256,7 @@ packages:
   path: resources/on-demand-service-broker-0.19.0.tgz
 - name: mongodb
   type: bosh-release
-  path: resources/mongodb-0.8.6.tgz
+  path: resources/mongodb-1.0.2.tgz
   jobs:
   - name: broker
     label: MongoDB-ODB
@@ -131,7 +299,7 @@ packages:
       service_deployment:
         releases:
         - name: mongodb
-          version: "0.8.6"
+          version: "1.0.2"
           jobs:
           - mongod_node
           - mongodb_config_agent
@@ -159,21 +327,21 @@ packages:
           provider_display_name: MongoDB
           documentation_url: https://docs.pivotal.io/partners/mongodb/index.html
         plans:
-        - name: standalone
-          plan_id: f40cf0fa-4eb9-446c-a429-0b1ea2ae6ae7
-          description: Standalone Instance
+        - name: standalone_small
+          plan_id: 2c4a6fc4-f666-4446-8406-2ef5bbbbe9e4
+          description: Standalone Small Instance
           lifecycle_errands:
             pre_delete:
               name: cleanup_service
               instances: [cleanup-service/0]
           metadata:
-            display_name: Standalone
+            display_name: Standalone Small
             bullets: []
           instance_groups:
           - name: mongod_node
-            vm_type: (( .properties.vm_type.value ))
+            vm_type: (( .properties.vm_type_standalone_small.value ))
             instances: 1
-            persistent_disk_type: (( .properties.disk_type.value ))
+            persistent_disk_type: (( .properties.disk_type_standalone_small.value ))
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
             vm_extensions: (( .properties.vm_extensions.value ))
@@ -184,21 +352,74 @@ packages:
               username: (( .properties.username.value ))
               api_key: (( .properties.api_key.value ))
               tags:  (( .properties.tags.value || [] ))
-        - name: replica_set
-          plan_id: fee3933e-42cb-4964-b66e-79498f94e968
-          description: Replica Set
+              backup_enabled:  false
+        - name: standalone_medium
+          plan_id: f40cf0fa-4eb9-446c-a429-0b1ea2ae6ae7
+          description: Standalone Medium Instance
           lifecycle_errands:
             pre_delete:
               name: cleanup_service
               instances: [cleanup-service/0]
           metadata:
-            display_name: Replica Set
+            display_name: Standalone Medium
             bullets: []
           instance_groups:
           - name: mongod_node
-            vm_type: (( .properties.vm_type.value ))
+            vm_type: (( .properties.vm_type_standalone_medium.value ))
+            instances: 1
+            persistent_disk_type: (( .properties.disk_type_standalone_medium.value ))
+            networks: [(( $self.service_network ))]
+            azs: (( .properties.az_multi_select.value ))
+            vm_extensions: (( .properties.vm_extensions.value ))
+          properties:
+            id: standalone
+            mongo_ops:
+              url: (( .properties.url.value ))
+              username: (( .properties.username.value ))
+              api_key: (( .properties.api_key.value ))
+              tags:  (( .properties.tags.value || [] ))
+              backup_enabled:  false
+        - name: standalone_large
+          plan_id: 44cad965-9182-4a89-8246-af719f5f699a
+          description: Standalone Large Instance
+          lifecycle_errands:
+            pre_delete:
+              name: cleanup_service
+              instances: [cleanup-service/0]
+          metadata:
+            display_name: Standalone Large
+            bullets: []
+          instance_groups:
+          - name: mongod_node
+            vm_type: (( .properties.vm_type_standalone_large.value ))
+            instances: 1
+            persistent_disk_type: (( .properties.disk_type_standalone_large.value ))
+            networks: [(( $self.service_network ))]
+            azs: (( .properties.az_multi_select.value ))
+            vm_extensions: (( .properties.vm_extensions.value ))
+          properties:
+            id: standalone
+            mongo_ops:
+              url: (( .properties.url.value ))
+              username: (( .properties.username.value ))
+              api_key: (( .properties.api_key.value ))
+              tags:  (( .properties.tags.value || [] ))
+              backup_enabled:  false
+        - name: replica_set_small
+          plan_id: 02d95e8f-a0ee-4c25-9407-6ca5d1989741
+          description: Replica Set Small
+          lifecycle_errands:
+            pre_delete:
+              name: cleanup_service
+              instances: [cleanup-service/0]
+          metadata:
+            display_name: Replica Set Small
+            bullets: []
+          instance_groups:
+          - name: mongod_node
+            vm_type: (( .properties.vm_type_replica_set_small.value ))
             instances: 3
-            persistent_disk_type: (( .properties.disk_type.value ))
+            persistent_disk_type: (( .properties.disk_type_replica_set_small.value ))
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
             vm_extensions: (( .properties.vm_extensions.value ))
@@ -209,23 +430,76 @@ packages:
               username: (( .properties.username.value ))
               api_key: (( .properties.api_key.value ))
               tags:  (( .properties.tags.value || [] ))
-        - name: sharded_cluster
-          plan_id: 477a196a-9e28-4103-87d3-593767448c9f
-          description: Sharded Cluster
+              backup_enabled: (( .properties.backup_enabled.value ))
+        - name: replica_set_medium
+          plan_id: fee3933e-42cb-4964-b66e-79498f94e968
+          description: Replica Set Medium
           lifecycle_errands:
             pre_delete:
               name: cleanup_service
               instances: [cleanup-service/0]
           metadata:
-            display_name: Sharded Cluster
+            display_name: Replica Set Medium
+            bullets: []
+          instance_groups:
+          - name: mongod_node
+            vm_type: (( .properties.vm_type_replica_set_medium.value ))
+            instances: 3
+            persistent_disk_type: (( .properties.disk_type_replica_set_medium.value ))
+            networks: [(( $self.service_network ))]
+            azs: (( .properties.az_multi_select.value ))
+            vm_extensions: (( .properties.vm_extensions.value ))
+          properties:
+            id: replica_set
+            mongo_ops:
+              url: (( .properties.url.value ))
+              username: (( .properties.username.value ))
+              api_key: (( .properties.api_key.value ))
+              tags:  (( .properties.tags.value || [] ))
+              backup_enabled: (( .properties.backup_enabled.value ))
+        - name: replica_set_large
+          plan_id: 317e003c-30a4-4384-b51d-9bf686e395e9
+          description: Replica Set Large
+          lifecycle_errands:
+            pre_delete:
+              name: cleanup_service
+              instances: [cleanup-service/0]
+          metadata:
+            display_name: Replica Set Large
+            bullets: []
+          instance_groups:
+          - name: mongod_node
+            vm_type: (( .properties.vm_type_replica_set_large.value ))
+            instances: 3
+            persistent_disk_type: (( .properties.disk_type_replica_set_large.value ))
+            networks: [(( $self.service_network ))]
+            azs: (( .properties.az_multi_select.value ))
+            vm_extensions: (( .properties.vm_extensions.value ))
+          properties:
+            id: replica_set
+            mongo_ops:
+              url: (( .properties.url.value ))
+              username: (( .properties.username.value ))
+              api_key: (( .properties.api_key.value ))
+              tags:  (( .properties.tags.value || [] ))
+              backup_enabled: (( .properties.backup_enabled.value ))
+        - name: sharded_cluster_small
+          plan_id: f2677585-4020-407c-87c2-b8260e816ef8
+          description: Sharded Cluster Small
+          lifecycle_errands:
+            pre_delete:
+              name: cleanup_service
+              instances: [cleanup-service/0]
+          metadata:
+            display_name: Sharded Cluster Small
             bullets: []
           quotas:
             service_instance_limit: 10
           instance_groups:
           - name: mongod_node
-            vm_type: (( .properties.vm_type.value ))
+            vm_type: (( .properties.vm_type_sharded_cluster_small.value ))
             instances: 15
-            persistent_disk_type: (( .properties.disk_type.value ))
+            persistent_disk_type: (( .properties.disk_type_sharded_cluster_small.value ))
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
             vm_extensions: (( .properties.vm_extensions.value ))
@@ -236,6 +510,63 @@ packages:
               username: (( .properties.username.value ))
               api_key: (( .properties.api_key.value ))
               tags:  (( .properties.tags.value || [] ))
+              backup_enabled: (( .properties.backup_enabled.value ))
+        - name: sharded_cluster_medium
+          plan_id: 477a196a-9e28-4103-87d3-593767448c9f
+          description: Sharded Cluster Medium
+          lifecycle_errands:
+            pre_delete:
+              name: cleanup_service
+              instances: [cleanup-service/0]
+          metadata:
+            display_name: Sharded Cluster Medium
+            bullets: []
+          quotas:
+            service_instance_limit: 10
+          instance_groups:
+          - name: mongod_node
+            vm_type: (( .properties.vm_type_sharded_cluster_medium.value ))
+            instances: 15
+            persistent_disk_type: (( .properties.disk_type_sharded_cluster_medium.value ))
+            networks: [(( $self.service_network ))]
+            azs: (( .properties.az_multi_select.value ))
+            vm_extensions: (( .properties.vm_extensions.value ))
+          properties:
+            id: sharded_cluster
+            mongo_ops:
+              url: (( .properties.url.value ))
+              username: (( .properties.username.value ))
+              api_key: (( .properties.api_key.value ))
+              tags:  (( .properties.tags.value || [] ))
+              backup_enabled: (( .properties.backup_enabled.value ))
+        - name: sharded_cluster_large
+          plan_id: 7a5977ed-4a45-4e32-8eb4-e4b371dd3b95
+          description: Sharded Cluster Large
+          lifecycle_errands:
+            pre_delete:
+              name: cleanup_service
+              instances: [cleanup-service/0]
+          metadata:
+            display_name: Sharded Cluster Large
+            bullets: []
+          quotas:
+            service_instance_limit: 10
+          instance_groups:
+          - name: mongod_node
+            vm_type: (( .properties.vm_type_sharded_cluster_large.value ))
+            instances: 15
+            persistent_disk_type: (( .properties.disk_type_sharded_cluster_large.value ))
+            networks: [(( $self.service_network ))]
+            azs: (( .properties.az_multi_select.value ))
+            vm_extensions: (( .properties.vm_extensions.value ))
+          properties:
+            id: sharded_cluster
+            mongo_ops:
+              url: (( .properties.url.value ))
+              username: (( .properties.username.value ))
+              api_key: (( .properties.api_key.value ))
+              tags:  (( .properties.tags.value || [] ))
+              backup_enabled: (( .properties.backup_enabled.value ))
   - name: smoke_tests
     label: 'Smoke Tests'
     lifecycle: errand
@@ -266,7 +597,7 @@ packages:
     label: 'On Demand Service Broker Registrar'
     lifecycle: errand
     post_deploy: true
-    run_post_deploy_errand_default: when-changed
+    run_post_deploy_errand_default: on
     templates:
     - name: register-broker
       release: on-demand-service-broker
@@ -290,7 +621,7 @@ packages:
     label: 'Upgrade all instances deployed by the On Demand Service Broker'
     lifecycle: errand
     post_deploy: true
-    run_post_deploy_errand_default: when-changed
+    run_post_deploy_errand_default: on
     templates:
     - name: upgrade-all-service-instances
       release: on-demand-service-broker
