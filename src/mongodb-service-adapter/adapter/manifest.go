@@ -101,13 +101,17 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, err
 	}
 
-	engineVersion, ok := arbitraryParams["version"].(string)
-	if engineVersion == "" || !ok {
+	var engineVersion string
+	version := getArbitraryParam("version", "engine_version", arbitraryParams, previousMongoProperties)
+	if version == nil {
 		engineVersion = oc.GetLatestVersion(group.ID)
+	} else {
+		engineVersion = version.(string)
 	}
 
 	// sharded_cluster parameters
 	replicas := 0
+	shards := 0
 	routers := 0
 	configServers := 0
 
@@ -123,28 +127,34 @@ func (m ManifestGenerator) GenerateManifest(
 	case PlanStandalone:
 		// ok
 	case PlanReplicaSet:
-		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 0 {
-			instances = int(r)
+		r := getArbitraryParam("replicas", "replicas", arbitraryParams, previousMongoProperties)
+		if r != nil {
+			instances = r.(int)
 		}
+		replicas = instances
 	case PlanShardedCluster:
-		shards := 2
-		if s, ok := arbitraryParams["shards"].(float64); ok && s > 0 {
-			shards = int(s)
+		shards = 2
+		s := getArbitraryParam("shards", "shards", arbitraryParams, previousMongoProperties)
+		if s != nil {
+			shards = s.(int)
 		}
 
 		replicas = 3
-		if r, ok := arbitraryParams["replicas"].(float64); ok && r > 0 {
-			replicas = int(r)
+		r := getArbitraryParam("replicas", "replicas", arbitraryParams, previousMongoProperties)
+		if r != nil {
+			replicas = r.(int)
 		}
 
 		configServers = 3
-		if c, ok := arbitraryParams["config_servers"].(float64); ok && c > 0 {
-			configServers = int(c)
+		c := getArbitraryParam("config_servers", "config_servers", arbitraryParams, previousMongoProperties)
+		if c != nil {
+			configServers = c.(int)
 		}
 
 		routers = 2
-		if r, ok := arbitraryParams["mongos"].(float64); ok && r > 0 {
-			routers = int(r)
+		r = getArbitraryParam("mongos", "routers", arbitraryParams, previousMongoProperties)
+		if r != nil {
+			routers = r.(int)
 		}
 
 		instances = routers + configServers + shards*replicas
@@ -157,8 +167,9 @@ func (m ManifestGenerator) GenerateManifest(
 	}
 	backupEnabled := false
 	if planID != PlanStandalone {
-		if e, ok := arbitraryParams["backup_enabled"].(bool); ok {
-			backupEnabled = e
+		e := getArbitraryParam("backup_enabled", "backup_enabled", arbitraryParams, previousMongoProperties)
+		if e != nil {
+			backupEnabled = e.(bool)
 		} else {
 			backupEnabled = mongoOps["backup_enabled"].(bool)
 		}
@@ -224,6 +235,7 @@ func (m ManifestGenerator) GenerateManifest(
 						"routers":        routers,
 						"config_servers": configServers,
 						"replicas":       replicas,
+						"shards":         shards,
 						"backup_enabled": backupEnabled,
 					},
 				},
@@ -341,13 +353,13 @@ func authKeyForMongoServer(previousManifestProperties map[interface{}]interface{
 func groupForMongoServer(mongoID string, oc *OMClient,
 	planProperties map[string]interface{},
 	previousMongoProperties map[interface{}]interface{},
-	requestParams map[string]interface{}) (Group, error) {
+	arbitraryParams map[string]interface{}) (Group, error) {
 
 	req := GroupCreateRequest{}
-	if name, found := requestParams["projectName"]; found {
+	if name, found := arbitraryParams["projectName"]; found {
 		req.Name = name.(string)
 	}
-	if orgId, found := requestParams["orgId"]; found {
+	if orgId, found := arbitraryParams["orgId"]; found {
 		req.OrgId = orgId.(string)
 	}
 	tags := planProperties["mongo_ops"].(map[string]interface{})["tags"]
@@ -396,4 +408,22 @@ func findReleaseForJob(releases serviceadapter.ServiceReleases, requiredJob stri
 	}
 
 	return releasesThatProvideRequiredJob[0], nil
+}
+
+func getArbitraryParam(propName string, manifestName string, arbitraryParams map[string]interface{}, previousMongoProperties map[interface{}]interface{}) interface{} {
+	var prop interface{}
+	var found bool
+	if prop, found = arbitraryParams[propName]; found {
+		goto found
+	}
+	if prop, found = previousMongoProperties[manifestName]; found {
+		goto found
+	}
+	return nil
+found:
+	// we are interested only in string, bool and int properties, though json conversion returns float64 for all integer properties
+	if p, ok := prop.(float64); ok {
+		return int(p)
+	}
+	return prop
 }
