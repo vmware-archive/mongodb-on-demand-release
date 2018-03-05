@@ -67,12 +67,8 @@ update:
   canaries: 1
   canary_watch_time: 30000-180000
   update_watch_time: 30000-180000
-  max_in_flight: 4
+  max_in_flight: {{.MaxInFlight}}
   serial: false
 tags:
   quadrata: parrot
   secondTag: tagValue
-features:
-  randomize_az_placement: true
-  use_short_dns_addresses: false
-  another_feature: ok
