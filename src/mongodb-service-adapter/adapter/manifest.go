@@ -175,6 +175,13 @@ func (m ManifestGenerator) GenerateManifest(
 		}
 	}
 
+	updateBlock := &bosh.Update{
+		Canaries:        1,
+		CanaryWatchTime: "3000-180000",
+		UpdateWatchTime: "3000-180000",
+		MaxInFlight:     4,
+	}
+
 	manifest := bosh.BoshManifest{
 		Name:     serviceDeployment.DeploymentName,
 		Releases: releases,
@@ -261,12 +268,7 @@ func (m ManifestGenerator) GenerateManifest(
 				Properties:   map[string]interface{}{},
 			},
 		},
-		Update: bosh.Update{
-			Canaries:        1,
-			CanaryWatchTime: "3000-180000",
-			UpdateWatchTime: "3000-180000",
-			MaxInFlight:     4,
-		},
+		Update: updateBlock,
 		Properties: map[string]interface{}{
 			"mongo_ops": map[string]interface{}{
 				"url":            url,
