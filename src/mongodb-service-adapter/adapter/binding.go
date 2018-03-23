@@ -2,9 +2,11 @@ package adapter
 
 import (
 	"crypto/md5"
+	"crypto/tls"
 	"encoding/base64"
 	"fmt"
 	"log"
+	"net"
 	"strings"
 
 	"github.com/pivotal-cf/on-demand-services-sdk/bosh"
@@ -23,8 +25,12 @@ func (b *Binder) logf(msg string, v ...interface{}) {
 }
 
 const (
-	adminDB   = "admin"
-	defaultDB = "default"
+	adminDB        = "admin"
+	defaultDB      = "default"
+	caCertPath     = "/var/vcap/jobs/mongodb_service_adapter/config/cacert.pem"
+	serverPEMPath  = "/var/vcap/jobs/mongodb_service_adapter/config/server.pem"
+	serverKeyPath  = "/var/vcap/jobs/mongodb_service_adapter/config/server.key"
+	serverCertPath = "/var/vcap/jobs/mongodb_service_adapter/config/server.crt"
 )
 
 func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest, requestParams serviceadapter.RequestParameters) (serviceadapter.Binding, error) {
@@ -59,7 +65,13 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 		servers = cluster.Routers
 	}
 
-	session, err := mgo.DialWithInfo(dialInfo(servers, adminPassword))
+	ssl := properties["ssl_enabled"].(bool)
+	sslOption := ""
+	if ssl {
+		sslOption = "&ssl=true"
+	}
+
+	session, err := GetWithCredentials(servers, adminPassword, ssl)
 	if err != nil {
 		return serviceadapter.Binding{}, err
 	}
@@ -87,11 +99,12 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 		return serviceadapter.Binding{}, err
 	}
 
-	url := fmt.Sprintf("mongodb://%s:%s@%s/%s?authSource=admin",
+	url := fmt.Sprintf("mongodb://%s:%s@%s/%s?authSource=admin%s",
 		username,
 		password,
 		strings.Join(servers, ","),
 		defaultDB,
+		sslOption,
 	)
 
 	b.logf("url: %s", url)
@@ -115,13 +128,14 @@ func (Binder) DeleteBinding(bindingID string, deploymentTopology bosh.BoshVMs, m
 	username := mkUsername(bindingID)
 	properties := manifest.Properties["mongo_ops"].(map[interface{}]interface{})
 	adminPassword := properties["admin_password"].(string)
+	ssl := properties["ssl_enabled"].(bool)
 
 	servers := make([]string, len(deploymentTopology["mongod_node"]))
 	for i, node := range deploymentTopology["mongod_node"] {
 		servers[i] = fmt.Sprintf("%s:28000", node)
 	}
 
-	session, err := mgo.DialWithInfo(dialInfo(servers, adminPassword))
+	session, err := GetWithCredentials(servers, adminPassword, ssl)
 	if err != nil {
 		return err
 	}
@@ -130,8 +144,8 @@ func (Binder) DeleteBinding(bindingID string, deploymentTopology bosh.BoshVMs, m
 	return session.DB(adminDB).RemoveUser(username)
 }
 
-func dialInfo(addrs []string, adminPassword string) *mgo.DialInfo {
-	return &mgo.DialInfo{
+func GetWithCredentials(addrs []string, adminPassword string, ssl bool) (*mgo.Session, error) {
+	dialInfo := &mgo.DialInfo{
 		Addrs:     addrs,
 		Username:  "admin",
 		Password:  adminPassword,
@@ -139,6 +153,21 @@ func dialInfo(addrs []string, adminPassword string) *mgo.DialInfo {
 		Database:  adminDB,
 		FailFast:  true,
 	}
+	if ssl {
+		tlsConfig := &tls.Config{}
+		tlsConfig.InsecureSkipVerify = true
+		cert, err := tls.LoadX509KeyPair(serverCertPath, serverKeyPath)
+		if err != nil {
+			return nil, err
+		}
+		tlsConfig.Certificates = []tls.Certificate{cert}
+
+		dialInfo.DialServer = func(addrs *mgo.ServerAddr) (net.Conn, error) {
+			conn, err := tls.Dial("tcp", addrs.String(), tlsConfig)
+			return conn, err
+		}
+	}
+	return mgo.DialWithInfo(dialInfo)
 }
 
 func mkUsername(binddingID string) string {

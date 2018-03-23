@@ -13,6 +13,10 @@ const (
 	StemcellAlias           = "mongodb-stemcell"
 	MongodInstanceGroupName = "mongod_node"
 	MongodJobName           = "mongod_node"
+	AliasesJobName          = "mongodb-dns-aliases"
+	BoshDNSEnableJobName    = "bosh-dns-enable"
+	ConfigAgentJobName      = "mongodb_config_agent"
+	CleanupErrandJobName    = "cleanup_service"
 	LifecycleErrandType     = "errand"
 )
 
@@ -88,17 +92,27 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, err
 	}
 
+	configAgentJobs, err := gatherJobs(serviceDeployment.Releases, []string{ConfigAgentJobName})
+	if err != nil {
+		return bosh.BoshManifest{}, err
+	}
+
+	cleanupErrandJobs, err := gatherJobs(serviceDeployment.Releases, []string{CleanupErrandJobName})
+	if err != nil {
+		return bosh.BoshManifest{}, err
+	}
+
+	addonsJobs, err := gatherJobs(serviceDeployment.Releases, []string{AliasesJobName, BoshDNSEnableJobName})
+	if err != nil {
+		return bosh.BoshManifest{}, err
+	}
+
 	mongodNetworks := []bosh.Network{}
 	for _, network := range mongodInstanceGroup.Networks {
 		mongodNetworks = append(mongodNetworks, bosh.Network{Name: network})
 	}
 	if len(mongodNetworks) == 0 {
 		return bosh.BoshManifest{}, fmt.Errorf("no networks definition found for instance group '%s'", MongodInstanceGroupName)
-	}
-
-	configAgentRelease, err := findReleaseForJob(serviceDeployment.Releases, "mongodb_config_agent")
-	if err != nil {
-		return bosh.BoshManifest{}, err
 	}
 
 	var engineVersion string
@@ -174,6 +188,20 @@ func (m ManifestGenerator) GenerateManifest(
 			backupEnabled = mongoOps["backup_enabled"].(bool)
 		}
 	}
+	tlsEnabled := false
+	e := getArbitraryParam("ssl_enabled", "ssl_enabled", arbitraryParams, previousMongoProperties)
+	if e != nil {
+		tlsEnabled = e.(bool)
+	}
+
+	caCert := ""
+	if mongoOps["ssl_ca_cert"] != "" {
+		caCert = mongoOps["ssl_ca_cert"].(string)
+	}
+	sslPem := ""
+	if mongoOps["ssl_pem"] != "" {
+		sslPem = mongoOps["ssl_pem"].(string)
+	}
 
 	updateBlock := &bosh.Update{
 		Canaries:        1,
@@ -185,6 +213,12 @@ func (m ManifestGenerator) GenerateManifest(
 	manifest := bosh.BoshManifest{
 		Name:     serviceDeployment.DeploymentName,
 		Releases: releases,
+		Addons: []bosh.Addon{
+			bosh.Addon{
+				Name: "mongodb-dns-helpers",
+				Jobs: addonsJobs,
+			},
+		},
 		Stemcells: []bosh.Stemcell{
 			{
 				Alias:   StemcellAlias,
@@ -206,20 +240,9 @@ func (m ManifestGenerator) GenerateManifest(
 				Properties:         map[string]interface{}{},
 			},
 			{
-				Name:      "mongodb-config-agent",
-				Instances: 1,
-				Jobs: []bosh.Job{
-					{
-						Name:    "mongodb_config_agent",
-						Release: configAgentRelease.Name,
-						Provides: map[string]bosh.ProvidesLink{
-							"mongodb_config_agent": {As: "mongodb_config_agent"},
-						},
-						Consumes: map[string]interface{}{
-							"mongod_node": bosh.ConsumesLink{From: "mongod_node"},
-						},
-					},
-				},
+				Name:         "mongodb-config-agent",
+				Instances:    1,
+				Jobs:         configAgentJobs,
 				VMType:       mongodInstanceGroup.VMType,
 				VMExtensions: mongodInstanceGroup.VMExtensions,
 				Stemcell:     StemcellAlias,
@@ -244,21 +267,16 @@ func (m ManifestGenerator) GenerateManifest(
 						"replicas":       replicas,
 						"shards":         shards,
 						"backup_enabled": backupEnabled,
+						"ssl_enabled":    tlsEnabled,
+						"ssl_ca_cert":    caCert,
+						"ssl_pem":        sslPem,
 					},
 				},
 			},
 			{
-				Name:      "cleanup-service",
-				Instances: 1,
-				Jobs: []bosh.Job{
-					{
-						Name:    "cleanup_service",
-						Release: configAgentRelease.Name,
-						Consumes: map[string]interface{}{
-							"mongodb_config_agent": bosh.ConsumesLink{From: "mongodb_config_agent"},
-						},
-					},
-				},
+				Name:         "cleanup-service",
+				Instances:    1,
+				Jobs:         cleanupErrandJobs,
 				VMType:       mongodInstanceGroup.VMType,
 				VMExtensions: mongodInstanceGroup.VMExtensions,
 				Stemcell:     StemcellAlias,
@@ -275,6 +293,7 @@ func (m ManifestGenerator) GenerateManifest(
 				"api_key":        group.AgentAPIKey,
 				"group_id":       group.ID,
 				"admin_password": adminPassword,
+				"ssl_enabled":    tlsEnabled,
 
 				// options needed for binding
 				"plan_id":        planID,
@@ -307,15 +326,10 @@ func gatherJobs(releases serviceadapter.ServiceReleases, requiredJobs []string) 
 		}
 
 		job := bosh.Job{
-			Name:    requiredJob,
-			Release: release.Name,
-			Provides: map[string]bosh.ProvidesLink{
-				"mongod_node": {As: "mongod_node"},
-			},
-			Consumes: map[string]interface{}{
-				"mongod_node":          bosh.ConsumesLink{From: "mongod_node"},
-				"mongodb_config_agent": bosh.ConsumesLink{From: "mongodb_config_agent"},
-			},
+			Name:     requiredJob,
+			Release:  release.Name,
+			Consumes: map[string]interface{}{},
+			Provides: map[string]bosh.ProvidesLink{},
 		}
 
 		jobs = append(jobs, job)
