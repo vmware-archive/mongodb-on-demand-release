@@ -4,7 +4,7 @@
 [[projects]]
   name = "code.cloudfoundry.org/lager"
   packages = ["."]
-  revision = "0bfa98e49e7a976af91e918d47978f07c00b081f"
+  revision = "25ee72f227fe10c5671d8a99d05a2faf388ccfeb"
 
 [[projects]]
   name = "github.com/gorilla/context"
@@ -16,7 +16,7 @@
   name = "github.com/gorilla/mux"
   packages = ["."]
   revision = "7f08801859139f86dfafd1c296e2cba9a80d292e"
-  version = "v1.6.0"
+  version = "v1.6.1"
 
 [[projects]]
   branch = "master"
@@ -25,7 +25,7 @@
     ".",
     "auth"
   ]
-  revision = "09b839892604e7aef056ad499d5cd46980bebcf9"
+  revision = "a31b912e79c8cb4875840cbfbe8dc4f96f0507ab"
 
 [[projects]]
   name = "github.com/pivotal-cf/on-demand-services-sdk"
@@ -40,7 +40,7 @@
   name = "gopkg.in/go-playground/validator.v8"
   packages = ["."]
   revision = "5f1438d3fca68893a817e4a66806cea46a9e4ebf"
-  version = "v8.18.2"
+  version = "v9.13.0"
 
 [[projects]]
   branch = "v2"
