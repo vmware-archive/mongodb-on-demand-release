@@ -55,7 +55,7 @@ else
     do
         stat=$(om_api_call "GET" "backupConfigs/${cluster}" | jq -r ".statusName")
         if [ $stat != "STARTED" ]; then
-                om_api_call "PATCH" "backupConfigs/${cluster}" '{"statusName": "STARTED", "storageEngineName": "WIRED_TIGER", "syncSource": "SECONDARY"}'
+                om_api_call "PATCH" "backupConfigs/${cluster}" '{"statusName": "STARTED"}'
         fi
     done
 

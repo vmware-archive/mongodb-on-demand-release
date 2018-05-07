@@ -15,7 +15,6 @@ provides:
 - name: mongodb_config_agent
   type: config_agent
   properties:
-  - mongo_ops.id
   - mongo_ops.url
   - mongo_ops.username
   - mongo_ops.agent_api_key
@@ -24,9 +23,6 @@ provides:
   - mongo_ops.group_id
   - mongo_ops.backup_enabled
   - mongo_ops.plan_id
-  - mongo_ops.ssl_ca_cert
-  - mongo_ops.ssl_pem
-  - mongo_ops.bosh_dns_disable
 
 consumes:
 - name: mongod_node
@@ -61,9 +57,3 @@ properties:
     description: "Replicas number for each shard"
   mongo_ops.backup_enabled:
     description: "Enables backup for all clusters in a deployment."
-  mongo_ops.bosh_dns_disable:
-    description: "Disables BOSH DNS for all clusters in a deployment."
-  mongo_ops.ssl_ca_cert:
-    description: "MongoDB server CA certificate"
-  mongo_ops.ssl_pem:
-    description: "MongoDB SSL certificate (PEM file)"

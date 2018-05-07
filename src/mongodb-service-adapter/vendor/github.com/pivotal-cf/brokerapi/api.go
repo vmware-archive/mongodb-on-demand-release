@@ -17,9 +17,7 @@ const (
 	deprovisionLogKey   = "deprovision"
 	bindLogKey          = "bind"
 	unbindLogKey        = "unbind"
-	updateLogKey        = "update"
 	lastOperationLogKey = "lastOperation"
-	catalogLogKey       = "catalog"
 
 	instanceIDLogKey      = "instance-id"
 	instanceDetailsLogKey = "instance-details"
@@ -43,8 +41,8 @@ const (
 )
 
 var (
-	serviceIdError = errors.New("service_id missing")
-	planIdError    = errors.New("plan_id missing")
+	serviceIdError = errors.New("service-id missing")
+	planIdError    = errors.New("plan-id missing")
 )
 
 type BrokerCredentials struct {
@@ -77,26 +75,8 @@ type serviceBrokerHandler struct {
 }
 
 func (h serviceBrokerHandler) catalog(w http.ResponseWriter, req *http.Request) {
-	logger := h.logger.Session(catalogLogKey, lager.Data{})
-
-	if err := checkBrokerAPIVersionHdr(req); err != nil {
-		h.respond(w, http.StatusPreconditionFailed, ErrorResponse{
-			Description: err.Error(),
-		})
-		logger.Error(apiVersionInvalidKey, err)
-		return
-	}
-
-	services, err := h.serviceBroker.Services(req.Context())
-	if err != nil {
-		h.respond(w, http.StatusInternalServerError, ErrorResponse{
-			Description: err.Error(),
-		})
-		return
-	}
-
 	catalog := CatalogResponse{
-		Services: services,
+		Services: h.serviceBroker.Services(req.Context()),
 	}
 
 	h.respond(w, http.StatusOK, catalog)
@@ -157,31 +137,11 @@ func (h serviceBrokerHandler) update(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	instanceID := vars["instance_id"]
 
-	logger := h.logger.Session(updateLogKey, lager.Data{
-		instanceIDLogKey: instanceID,
-	})
-
-	if err := checkBrokerAPIVersionHdr(req); err != nil {
-		h.respond(w, http.StatusPreconditionFailed, ErrorResponse{
-			Description: err.Error(),
-		})
-		logger.Error(apiVersionInvalidKey, err)
-		return
-	}
-
 	var details UpdateDetails
 	if err := json.NewDecoder(req.Body).Decode(&details); err != nil {
 		h.logger.Error(invalidServiceDetailsErrorKey, err)
 		h.respond(w, http.StatusUnprocessableEntity, ErrorResponse{
 			Description: err.Error(),
-		})
-		return
-	}
-
-	if details.ServiceID == "" {
-		logger.Error(serviceIdMissingKey, serviceIdError)
-		h.respond(w, http.StatusBadRequest, ErrorResponse{
-			Description: serviceIdError.Error(),
 		})
 		return
 	}
@@ -280,35 +240,11 @@ func (h serviceBrokerHandler) bind(w http.ResponseWriter, req *http.Request) {
 		bindingIDLogKey:  bindingID,
 	})
 
-	if err := checkBrokerAPIVersionHdr(req); err != nil {
-		h.respond(w, http.StatusPreconditionFailed, ErrorResponse{
-			Description: err.Error(),
-		})
-		logger.Error(apiVersionInvalidKey, err)
-		return
-	}
-
 	var details BindDetails
 	if err := json.NewDecoder(req.Body).Decode(&details); err != nil {
 		logger.Error(invalidBindDetailsErrorKey, err)
 		h.respond(w, http.StatusUnprocessableEntity, ErrorResponse{
 			Description: err.Error(),
-		})
-		return
-	}
-
-	if details.ServiceID == "" {
-		logger.Error(serviceIdMissingKey, serviceIdError)
-		h.respond(w, http.StatusBadRequest, ErrorResponse{
-			Description: serviceIdError.Error(),
-		})
-		return
-	}
-
-	if details.PlanID == "" {
-		logger.Error(planIdMissingKey, planIdError)
-		h.respond(w, http.StatusBadRequest, ErrorResponse{
-			Description: planIdError.Error(),
 		})
 		return
 	}
@@ -437,14 +373,6 @@ func (h serviceBrokerHandler) lastOperation(w http.ResponseWriter, req *http.Req
 	logger := h.logger.Session(lastOperationLogKey, lager.Data{
 		instanceIDLogKey: instanceID,
 	})
-
-	if err := checkBrokerAPIVersionHdr(req); err != nil {
-		h.respond(w, http.StatusPreconditionFailed, ErrorResponse{
-			Description: err.Error(),
-		})
-		logger.Error(apiVersionInvalidKey, err)
-		return
-	}
 
 	logger.Info("starting-check-for-operation")
 

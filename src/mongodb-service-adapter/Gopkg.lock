@@ -4,7 +4,7 @@
 [[projects]]
   name = "code.cloudfoundry.org/lager"
   packages = ["."]
-  revision = "25ee72f227fe10c5671d8a99d05a2faf388ccfeb"
+  revision = "0bfa98e49e7a976af91e918d47978f07c00b081f"
 
 [[projects]]
   name = "github.com/gorilla/context"
@@ -16,7 +16,7 @@
   name = "github.com/gorilla/mux"
   packages = ["."]
   revision = "7f08801859139f86dfafd1c296e2cba9a80d292e"
-  version = "v1.6.1"
+  version = "v1.6.0"
 
 [[projects]]
   branch = "master"
@@ -25,7 +25,7 @@
     ".",
     "auth"
   ]
-  revision = "a31b912e79c8cb4875840cbfbe8dc4f96f0507ab"
+  revision = "09b839892604e7aef056ad499d5cd46980bebcf9"
 
 [[projects]]
   name = "github.com/pivotal-cf/on-demand-services-sdk"
@@ -33,14 +33,14 @@
     "bosh",
     "serviceadapter"
   ]
-  revision = "b5c60d513859ba004975f1c31c39d4444bf9a236"
-  version = "v0.20.0"
+  revision = "1f0cc517b5754177de68bb507e6e33d3f31b76eb"
+  version = "v0.19.0"
 
 [[projects]]
   name = "gopkg.in/go-playground/validator.v8"
   packages = ["."]
   revision = "5f1438d3fca68893a817e4a66806cea46a9e4ebf"
-  version = "v9.13.0"
+  version = "v8.18.2"
 
 [[projects]]
   branch = "v2"
@@ -63,6 +63,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "79e135ee7c2824a15569f46b8546b4f7d285bc3441c2a7dd48a7771f77bc8980"
+  inputs-digest = "105f50b66840a268836ed281bad72c2b8570a175db60b6db85272b96c331777a"
   solver-name = "gps-cdcl"
   solver-version = 1
