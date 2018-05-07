@@ -93,12 +93,7 @@ func (m ManifestGenerator) GenerateManifest(
 		return bosh.BoshManifest{}, err
 	}
 
-	configAgentJobs, err := gatherJobs(serviceDeployment.Releases, []string{ConfigAgentJobName})
-	if err != nil {
-		return bosh.BoshManifest{}, err
-	}
-
-	cleanupErrandJobs, err := gatherJobs(serviceDeployment.Releases, []string{CleanupErrandJobName})
+	configAgentJobs, err := gatherJobs(serviceDeployment.Releases, []string{ConfigAgentJobName, CleanupErrandJobName})
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
@@ -280,18 +275,6 @@ func (m ManifestGenerator) GenerateManifest(
 						"bosh_dns_disable": boshDNSDisable,
 					},
 				},
-			},
-			{
-				Name:         "cleanup-service",
-				Instances:    1,
-				Jobs:         cleanupErrandJobs,
-				VMType:       mongodInstanceGroup.VMType,
-				VMExtensions: mongodInstanceGroup.VMExtensions,
-				Stemcell:     StemcellAlias,
-				AZs:          mongodInstanceGroup.AZs,
-				Networks:     mongodNetworks,
-				Lifecycle:    LifecycleErrandType,
-				Properties:   map[string]interface{}{},
 			},
 		},
 		Update: updateBlock,

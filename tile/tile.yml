@@ -368,7 +368,7 @@ packages:
           lifecycle_errands:
             pre_delete:
             - name: cleanup_service
-              instances: [cleanup-service/0]
+              instances: [mongodb-config-agent/0]
           metadata:
             display_name: Standalone Small
             bullets: []
@@ -397,7 +397,7 @@ packages:
           lifecycle_errands:
             pre_delete:
             - name: cleanup_service
-              instances: [cleanup-service/0]
+              instances: [mongodb-config-agent/0]
           metadata:
             display_name: Standalone Medium
             bullets: []
@@ -426,7 +426,7 @@ packages:
           lifecycle_errands:
             pre_delete:
             - name: cleanup_service
-              instances: [cleanup-service/0]
+              instances: [mongodb-config-agent/0]
           metadata:
             display_name: Standalone Large
             bullets: []
@@ -455,7 +455,7 @@ packages:
           lifecycle_errands:
             pre_delete:
             - name: cleanup_service
-              instances: [cleanup-service/0]
+              instances: [mongodb-config-agent/0]
           metadata:
             display_name: Replica Set Small
             bullets: []
@@ -484,7 +484,7 @@ packages:
           lifecycle_errands:
             pre_delete:
             - name: cleanup_service
-              instances: [cleanup-service/0]
+              instances: [mongodb-config-agent/0]
           metadata:
             display_name: Replica Set Medium
             bullets: []
@@ -513,7 +513,7 @@ packages:
           lifecycle_errands:
             pre_delete:
             - name: cleanup_service
-              instances: [cleanup-service/0]
+              instances: [mongodb-config-agent/0]
           metadata:
             display_name: Replica Set Large
             bullets: []
@@ -542,7 +542,7 @@ packages:
           lifecycle_errands:
             pre_delete:
             - name: cleanup_service
-              instances: [cleanup-service/0]
+              instances: [mongodb-config-agent/0]
           metadata:
             display_name: Sharded Cluster Small
             bullets: []
@@ -573,7 +573,7 @@ packages:
           lifecycle_errands:
             pre_delete:
             - name: cleanup_service
-              instances: [cleanup-service/0]
+              instances: [mongodb-config-agent/0]
           metadata:
             display_name: Sharded Cluster Medium
             bullets: []
@@ -604,7 +604,7 @@ packages:
           lifecycle_errands:
             pre_delete:
             - name: cleanup_service
-              instances: [cleanup-service/0]
+              instances: [mongodb-config-agent/0]
           metadata:
             display_name: Sharded Cluster Large
             bullets: []
