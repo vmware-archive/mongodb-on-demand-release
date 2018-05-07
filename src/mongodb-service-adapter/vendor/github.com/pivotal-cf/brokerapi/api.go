@@ -40,11 +40,15 @@ const (
 	apiVersionInvalidKey          = "broker-api-version-invalid"
 	serviceIdMissingKey           = "service-id-missing"
 	planIdMissingKey              = "plan-id-missing"
+	invalidServiceID              = "invalid-service-id"
+	invalidPlanID                 = "invalid-plan-id"
 )
 
 var (
-	serviceIdError = errors.New("service_id missing")
-	planIdError    = errors.New("plan_id missing")
+	serviceIdError        = errors.New("service_id missing")
+	planIdError           = errors.New("plan_id missing")
+	invalidServiceIDError = errors.New("service-id not in the catalog")
+	invalidPlanIDError    = errors.New("plan-id not in the catalog")
 )
 
 type BrokerCredentials struct {
@@ -110,6 +114,14 @@ func (h serviceBrokerHandler) provision(w http.ResponseWriter, req *http.Request
 		instanceIDLogKey: instanceID,
 	})
 
+	if err := checkBrokerAPIVersionHdr(req); err != nil {
+		h.respond(w, http.StatusPreconditionFailed, ErrorResponse{
+			Description: err.Error(),
+		})
+		logger.Error(apiVersionInvalidKey, err)
+		return
+	}
+
 	var details ProvisionDetails
 	if err := json.NewDecoder(req.Body).Decode(&details); err != nil {
 		logger.Error(invalidServiceDetailsErrorKey, err)
@@ -119,13 +131,62 @@ func (h serviceBrokerHandler) provision(w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	acceptsIncompleteFlag, _ := strconv.ParseBool(req.URL.Query().Get("accepts_incomplete"))
+	if details.ServiceID == "" {
+		logger.Error(serviceIdMissingKey, serviceIdError)
+		h.respond(w, http.StatusBadRequest, ErrorResponse{
+			Description: serviceIdError.Error(),
+		})
+		return
+	}
+
+	if details.PlanID == "" {
+		logger.Error(planIdMissingKey, planIdError)
+		h.respond(w, http.StatusBadRequest, ErrorResponse{
+			Description: planIdError.Error(),
+		})
+		return
+	}
+
+	valid := false
+	services, _ := h.serviceBroker.Services(req.Context())
+	for _, service := range services {
+		if service.ID == details.ServiceID {
+			valid = true
+			break
+		}
+	}
+	if !valid {
+		logger.Error(invalidServiceID, invalidServiceIDError)
+		h.respond(w, http.StatusBadRequest, ErrorResponse{
+			Description: invalidServiceIDError.Error(),
+		})
+		return
+	}
+
+	valid = false
+	for _, service := range services {
+		for _, plan := range service.Plans {
+			if plan.ID == details.PlanID {
+				valid = true
+				break
+			}
+		}
+	}
+	if !valid {
+		logger.Error(invalidPlanID, invalidPlanIDError)
+		h.respond(w, http.StatusBadRequest, ErrorResponse{
+			Description: invalidPlanIDError.Error(),
+		})
+		return
+	}
+
+	asyncAllowed := req.FormValue("accepts_incomplete") == "true"
 
 	logger = logger.WithData(lager.Data{
 		instanceDetailsLogKey: details,
 	})
 
-	provisionResponse, err := h.serviceBroker.Provision(req.Context(), instanceID, details, acceptsIncompleteFlag)
+	provisionResponse, err := h.serviceBroker.Provision(req.Context(), instanceID, details, asyncAllowed)
 
 	if err != nil {
 		switch err := err.(type) {

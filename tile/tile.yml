@@ -277,7 +277,7 @@ packages:
   path: resources/pcf-mongodb-helpers-0.0.1.tgz
 - name: on-demand-service-broker
   type: bosh-release
-  path: resources/on-demand-service-broker-0.20.0-ubuntu-trusty-3468.25.tgz
+  path: resources/on-demand-service-broker-0.21.1.tgz
 - name: mongodb
   type: bosh-release
   path: resources/mongodb-1.0.4.tgz
@@ -367,7 +367,7 @@ packages:
           description: Standalone Small Instance
           lifecycle_errands:
             pre_delete:
-              name: cleanup_service
+            - name: cleanup_service
               instances: [cleanup-service/0]
           metadata:
             display_name: Standalone Small
@@ -396,7 +396,7 @@ packages:
           description: Standalone Medium Instance
           lifecycle_errands:
             pre_delete:
-              name: cleanup_service
+            - name: cleanup_service
               instances: [cleanup-service/0]
           metadata:
             display_name: Standalone Medium
@@ -425,7 +425,7 @@ packages:
           description: Standalone Large Instance
           lifecycle_errands:
             pre_delete:
-              name: cleanup_service
+            - name: cleanup_service
               instances: [cleanup-service/0]
           metadata:
             display_name: Standalone Large
@@ -454,7 +454,7 @@ packages:
           description: Replica Set Small
           lifecycle_errands:
             pre_delete:
-              name: cleanup_service
+            - name: cleanup_service
               instances: [cleanup-service/0]
           metadata:
             display_name: Replica Set Small
@@ -483,7 +483,7 @@ packages:
           description: Replica Set Medium
           lifecycle_errands:
             pre_delete:
-              name: cleanup_service
+            - name: cleanup_service
               instances: [cleanup-service/0]
           metadata:
             display_name: Replica Set Medium
@@ -512,7 +512,7 @@ packages:
           description: Replica Set Large
           lifecycle_errands:
             pre_delete:
-              name: cleanup_service
+            - name: cleanup_service
               instances: [cleanup-service/0]
           metadata:
             display_name: Replica Set Large
@@ -541,7 +541,7 @@ packages:
           description: Sharded Cluster Small
           lifecycle_errands:
             pre_delete:
-              name: cleanup_service
+            - name: cleanup_service
               instances: [cleanup-service/0]
           metadata:
             display_name: Sharded Cluster Small
@@ -572,7 +572,7 @@ packages:
           description: Sharded Cluster Medium
           lifecycle_errands:
             pre_delete:
-              name: cleanup_service
+            - name: cleanup_service
               instances: [cleanup-service/0]
           metadata:
             display_name: Sharded Cluster Medium
@@ -603,7 +603,7 @@ packages:
           description: Sharded Cluster Large
           lifecycle_errands:
             pre_delete:
-              name: cleanup_service
+            - name: cleanup_service
               instances: [cleanup-service/0]
           metadata:
             display_name: Sharded Cluster Large

@@ -218,8 +218,6 @@ var _ = Describe("Domain", func() {
 					],
 					"properties": {},
 					"lifecycle_errands": {
-						"post_deploy": {},
-						"pre_delete": {}
 					}
 				}`)
 				Expect(toJson(expectedPlan)).To(MatchJSON(planJson))
@@ -502,14 +500,14 @@ var _ = Describe("Domain", func() {
 func planWithMaxInFlight(maxInFlight bosh.MaxInFlightValue) serviceadapter.Plan {
 	return serviceadapter.Plan{
 		LifecycleErrands: serviceadapter.LifecycleErrands{
-			PostDeploy: serviceadapter.Errand{
+			PostDeploy: []serviceadapter.Errand{{
 				Name:      "health-check",
 				Instances: []string{"redis-server/0"},
-			},
-			PreDelete: serviceadapter.Errand{
+			}},
+			PreDelete: []serviceadapter.Errand{{
 				Name:      "cleanup-data",
 				Instances: []string{"redis-server/0"},
-			},
+			}},
 		},
 		InstanceGroups: []serviceadapter.InstanceGroup{{
 			Name:               "example-server",
@@ -547,14 +545,14 @@ func jsonPlanWithMaxInFlight(maxInFlight bosh.MaxInFlightValue) []byte {
 
 	return []byte(fmt.Sprintf(`{
 		"lifecycle_errands": {
-			"post_deploy": {
+			"post_deploy": [{
 				"name": "health-check",
 				"instances": ["redis-server/0"]
-			},
-			"pre_delete": {
+			}],
+			"pre_delete": [{
 				"name": "cleanup-data",
 				"instances": ["redis-server/0"]
-			}
+			}]
 		},
 		"instance_groups": [
 			{
@@ -584,7 +582,7 @@ func jsonPlanWithMaxInFlight(maxInFlight bosh.MaxInFlightValue) []byte {
 			"canary_watch_time": "1000-30000",
 			"update_watch_time": "1000-30000",
 			"serial": false
-		}	
+		}
 	}`, m))
 }
 
@@ -593,13 +591,13 @@ func yamlPlanWithMaxInFlight(maxInFlight bosh.MaxInFlightValue) []byte {
 ---
 lifecycle_errands:
   post_deploy:
-    name: health-check
-    instances:
-    - redis-server/0
+   - name: health-check
+     instances:
+     - redis-server/0
   pre_delete:
-    name: cleanup-data
-    instances:
-    - redis-server/0
+    - name: cleanup-data
+      instances:
+      - redis-server/0
 instance_groups:
 - name: example-server
   vm_type: small

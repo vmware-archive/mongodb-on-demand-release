@@ -2,9 +2,10 @@
 
 
 [[projects]]
+  branch = "master"
   name = "code.cloudfoundry.org/lager"
   packages = ["."]
-  revision = "0bfa98e49e7a976af91e918d47978f07c00b081f"
+  revision = "a77e1033ba8d8e36597be5c0d384ee6054105bc2"
 
 [[projects]]
   name = "github.com/gorilla/context"
@@ -66,13 +67,19 @@
   version = "v1.3.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/pivotal-cf/brokerapi"
   packages = [
     ".",
     "auth"
   ]
-  revision = "61af3c362c579b641bbffd7cb6355e5c4bfa5eda"
+  revision = "b763fb58cdae010fb90a94387db218c95967f0d5"
+  version = "v2.0.0"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
 
 [[projects]]
   branch = "master"
@@ -128,6 +135,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7056f419d32e49d56dd5a97239ca2080a45d15400d5171a28bc5ecbfd9c2eaa8"
+  inputs-digest = "1ff28259e12b01dfeb0a9adf8c7cba7941076e446fc24901eb5e1c933e874ec3"
   solver-name = "gps-cdcl"
   solver-version = 1
