@@ -5,6 +5,14 @@
     "#{instance.name.gsub('_','-')}-#{instance.index}"
   end
 
+  def nodes
+    if p("mongo_ops.bosh_dns_disable")
+      link("mongod_node").instances.collect{ |x| "#{x.address}" }.join(",")
+    else
+      link("mongod_node").instances.map{ |instance| "#{node_name(instance)}-#{p('mongo_ops.id')}.mongodb.internal" }.join(",")
+    end
+  end
+
   config = {
     "id" => p("mongo_ops.id"),
     "url" => p("mongo_ops.url"),
@@ -13,7 +21,7 @@
     "auth_key" => p("mongo_ops.auth_key"),
     "group" => p("mongo_ops.group_id"),
     "plan" => p("mongo_ops.plan_id"),
-    "nodes" => link("mongod_node").instances.map{ |instance| "#{node_name(instance)}-#{p('mongo_ops.id')}.mongodb.internal" }.join(","),
+    "nodes" => nodes,
     "admin_password" => p("mongo_ops.admin_password"),
     "engine_version" => p("mongo_ops.engine_version"),
     "routers" => p("mongo_ops.routers"),

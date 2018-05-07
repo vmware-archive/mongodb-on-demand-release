@@ -71,6 +71,12 @@ forms:
     options:
     - name: public_ip
       label: Allow outbound internet access from service instances (IaaS-dependent)
+  - name: bosh_dns_disable
+    type: boolean
+    configurable: true
+    default: false
+    label: Disable BOSH DNS
+    description: 'Enabling the BOSH DNS plugin is recommended. However, if you experience issues with BOSH DNS, you can disable the plugin and rollback to the configuration with plain IP addresses.'
 - name: plan_standalone
   label: Standalone Service Plan
   description: Standalone service plan configuration
@@ -274,7 +280,7 @@ packages:
   path: resources/on-demand-service-broker-0.20.0-ubuntu-trusty-3468.25.tgz
 - name: mongodb
   type: bosh-release
-  path: resources/mongodb-1.0.3.tgz
+  path: resources/mongodb-1.0.4.tgz
   jobs:
   - name: broker
     label: MongoDB-ODB
@@ -283,8 +289,6 @@ packages:
       release: on-demand-service-broker
     - name: mongodb_service_adapter
       release: mongodb
-    - name: bosh-dns-enable
-      release: pcf-mongodb-helpers
     max_in_flight: 1
     memory: 1024
     ephemeral_disk: 2048
@@ -315,6 +319,7 @@ packages:
             username: (( ..cf.uaa.admin_credentials.identity ))
             password: (( ..cf.uaa.admin_credentials.password ))
       mongo_ops:
+        bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
         ssl_ca_cert: (( .properties.ca_cert.value || "" ))
         ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
         ssl_key: (( .properties.rsa_certificate.private_key_pem || "" ))
@@ -324,7 +329,7 @@ packages:
       service_deployment:
         releases:
         - name: mongodb
-          version: "1.0.3"
+          version: "1.0.4"
           jobs:
           - mongod_node
           - mongodb_config_agent
@@ -385,6 +390,7 @@ packages:
               backup_enabled:  false
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
+              bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
         - name: standalone_medium
           plan_id: f40cf0fa-4eb9-446c-a429-0b1ea2ae6ae7
           description: Standalone Medium Instance
@@ -413,6 +419,7 @@ packages:
               backup_enabled:  false
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
+              bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
         - name: standalone_large
           plan_id: 44cad965-9182-4a89-8246-af719f5f699a
           description: Standalone Large Instance
@@ -441,6 +448,7 @@ packages:
               backup_enabled:  false
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
+              bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
         - name: replica_set_small
           plan_id: 02d95e8f-a0ee-4c25-9407-6ca5d1989741
           description: Replica Set Small
@@ -469,6 +477,7 @@ packages:
               backup_enabled: (( .properties.backup_enabled.value ))
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
+              bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
         - name: replica_set_medium
           plan_id: fee3933e-42cb-4964-b66e-79498f94e968
           description: Replica Set Medium
@@ -497,6 +506,7 @@ packages:
               backup_enabled: (( .properties.backup_enabled.value ))
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
+              bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
         - name: replica_set_large
           plan_id: 317e003c-30a4-4384-b51d-9bf686e395e9
           description: Replica Set Large
@@ -525,6 +535,7 @@ packages:
               backup_enabled: (( .properties.backup_enabled.value ))
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
+              bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
         - name: sharded_cluster_small
           plan_id: f2677585-4020-407c-87c2-b8260e816ef8
           description: Sharded Cluster Small
@@ -555,6 +566,7 @@ packages:
               backup_enabled: (( .properties.backup_enabled.value ))
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
+              bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
         - name: sharded_cluster_medium
           plan_id: 477a196a-9e28-4103-87d3-593767448c9f
           description: Sharded Cluster Medium
@@ -585,6 +597,7 @@ packages:
               backup_enabled: (( .properties.backup_enabled.value ))
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
+              bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
         - name: sharded_cluster_large
           plan_id: 7a5977ed-4a45-4e32-8eb4-e4b371dd3b95
           description: Sharded Cluster Large
@@ -615,6 +628,7 @@ packages:
               backup_enabled: (( .properties.backup_enabled.value ))
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
+              bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
   - name: smoke_tests
     label: 'Smoke Tests'
     lifecycle: errand

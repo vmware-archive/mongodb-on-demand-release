@@ -45,6 +45,7 @@ func (m ManifestGenerator) GenerateManifest(
 
 	username := mongoOps["username"].(string)
 	apiKey := mongoOps["api_key"].(string)
+	boshDNSDisable := mongoOps["bosh_dns_disable"].(bool)
 
 	// trim trailing slash
 	url := mongoOps["url"].(string)
@@ -105,6 +106,12 @@ func (m ManifestGenerator) GenerateManifest(
 	addonsJobs, err := gatherJobs(serviceDeployment.Releases, []string{AliasesJobName, BoshDNSEnableJobName})
 	if err != nil {
 		return bosh.BoshManifest{}, err
+	}
+	if boshDNSDisable {
+		addonsJobs, err = gatherJobs(serviceDeployment.Releases, []string{AliasesJobName})
+		if err != nil {
+			return bosh.BoshManifest{}, err
+		}
 	}
 
 	mongodNetworks := []bosh.Network{}
@@ -252,24 +259,25 @@ func (m ManifestGenerator) GenerateManifest(
 				// See mongodb_config_agent job spec
 				Properties: map[string]interface{}{
 					"mongo_ops": map[string]interface{}{
-						"id":             id,
-						"url":            url,
-						"agent_api_key":  group.AgentAPIKey,
-						"api_key":        apiKey,
-						"auth_key":       authKey,
-						"username":       username,
-						"group_id":       group.ID,
-						"plan_id":        planID,
-						"admin_password": adminPassword,
-						"engine_version": engineVersion,
-						"routers":        routers,
-						"config_servers": configServers,
-						"replicas":       replicas,
-						"shards":         shards,
-						"backup_enabled": backupEnabled,
-						"ssl_enabled":    tlsEnabled,
-						"ssl_ca_cert":    caCert,
-						"ssl_pem":        sslPem,
+						"id":               id,
+						"url":              url,
+						"agent_api_key":    group.AgentAPIKey,
+						"api_key":          apiKey,
+						"auth_key":         authKey,
+						"username":         username,
+						"group_id":         group.ID,
+						"plan_id":          planID,
+						"admin_password":   adminPassword,
+						"engine_version":   engineVersion,
+						"routers":          routers,
+						"config_servers":   configServers,
+						"replicas":         replicas,
+						"shards":           shards,
+						"backup_enabled":   backupEnabled,
+						"ssl_enabled":      tlsEnabled,
+						"ssl_ca_cert":      caCert,
+						"ssl_pem":          sslPem,
+						"bosh_dns_disable": boshDNSDisable,
 					},
 				},
 			},
