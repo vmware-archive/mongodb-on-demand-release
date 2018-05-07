@@ -97,7 +97,7 @@ func (oc *OMClient) CreateGroup(id string, request GroupCreateRequest) (Group, e
 	var group Group
 
 	if request.Name == "" {
-		request.Name = fmt.Sprintf("PCF_%s", id)
+		request.Name = fmt.Sprintf("pcf_%s", id)
 	}
 	req, err := json.Marshal(request)
 	if err != nil {

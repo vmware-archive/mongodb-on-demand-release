@@ -2,7 +2,6 @@ package brokerapi_test
 
 import (
 	"encoding/json"
-	"reflect"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -134,46 +133,6 @@ var _ = Describe("Catalog", func() {
 
 				Expect(json.Marshal(metadata)).To(MatchJSON(jsonString))
 			})
-
-			It("encodes the AdditionalMetadata fields in the metadata fields", func() {
-				metadata := brokerapi.ServicePlanMetadata{
-					Bullets:     []string{"hello", "its me"},
-					DisplayName: "name",
-					AdditionalMetadata: map[string]interface{}{
-						"foo": "bar",
-						"baz": 1,
-					},
-				}
-				jsonString := `{
-					"bullets":["hello", "its me"],
-					"displayName":"name",
-					"foo": "bar",
-					"baz": 1
-				}`
-
-				Expect(json.Marshal(metadata)).To(MatchJSON(jsonString))
-			})
-		})
-
-		Describe("JSON decoding", func() {
-			It("sets the AdditionalMetadata from unrecognized fields", func() {
-				metadata := brokerapi.ServicePlanMetadata{}
-				jsonString := `{"foo":["test"],"bar":"Some display name"}`
-
-				err := json.Unmarshal([]byte(jsonString), &metadata)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(metadata.AdditionalMetadata["foo"]).To(Equal([]interface{}{"test"}))
-				Expect(metadata.AdditionalMetadata["bar"]).To(Equal("Some display name"))
-			})
-
-			It("does not include convention fields into additional metadata", func() {
-				metadata := brokerapi.ServicePlanMetadata{}
-				jsonString := `{"bullets":["test"],"displayName":"Some display name", "costs": [{"amount": {"usd": 649.0},"unit": "MONTHLY"}]}`
-
-				err := json.Unmarshal([]byte(jsonString), &metadata)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(metadata.AdditionalMetadata).To(BeNil())
-			})
 		})
 	})
 
@@ -202,63 +161,6 @@ var _ = Describe("Catalog", func() {
 
 				Expect(json.Marshal(metadata)).To(MatchJSON(jsonString))
 			})
-
-			It("encodes the AdditionalMetadata fields in the metadata fields", func() {
-				metadata := brokerapi.ServiceMetadata{
-					DisplayName: "name",
-					AdditionalMetadata: map[string]interface{}{
-						"foo": "bar",
-						"baz": 1,
-					},
-				}
-				jsonString := `{
-					"displayName":"name",
-					"foo": "bar",
-					"baz": 1
-				}`
-
-				Expect(json.Marshal(metadata)).To(MatchJSON(jsonString))
-			})
 		})
-
-		Describe("JSON decoding", func() {
-			It("sets the AdditionalMetadata from unrecognized fields", func() {
-				metadata := brokerapi.ServiceMetadata{}
-				jsonString := `{"foo":["test"],"bar":"Some display name"}`
-
-				err := json.Unmarshal([]byte(jsonString), &metadata)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(metadata.AdditionalMetadata["foo"]).To(Equal([]interface{}{"test"}))
-				Expect(metadata.AdditionalMetadata["bar"]).To(Equal("Some display name"))
-			})
-
-			It("does not include convention fields into additional metadata", func() {
-				metadata := brokerapi.ServiceMetadata{}
-				jsonString := `{
-					"displayName":"Cassandra",
-					"longDescription":"A long description of Cassandra",
-					"documentationUrl":"doc",
-					"supportUrl":"support",
-					"imageUrl":"image",
-					"providerDisplayName":"display",
-					"shareable":true
-				}`
-				err := json.Unmarshal([]byte(jsonString), &metadata)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(metadata.AdditionalMetadata).To(BeNil())
-			})
-		})
-	})
-
-	It("Reflects JSON names from struct", func() {
-		type Example1 struct {
-			Foo int    `json:"foo"`
-			Bar string `yaml:"hello" json:"bar,omitempty"`
-			Qux float64
-		}
-
-		s := Example1{}
-		Expect(brokerapi.GetJsonNames(reflect.ValueOf(&s).Elem())).To(
-			ConsistOf([]string{"foo", "bar", "Qux"}))
 	})
 })

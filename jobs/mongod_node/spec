@@ -2,12 +2,10 @@
 name: mongod_node
 
 templates:
-  bin/mongod_agent_ctl.erb: bin/mongod_agent_ctl
-  bin/pre-start.erb: bin/pre-start
-  config/cacert.pem.erb: config/cacert.pem
   config/local.conf.erb: config/local.conf
   config/mongo_om.key.erb: config/mongo_om.key
-  config/server.pem.erb: config/server.pem
+  bin/pre-start.erb: bin/pre-start
+  bin/mongod_agent_ctl.erb: bin/mongod_agent_ctl
 
 packages:
   - mongod-node
