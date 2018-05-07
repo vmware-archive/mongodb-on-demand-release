@@ -1,0 +1,15 @@
+---
+name: mongodb-dns-aliases
+
+templates:
+  aliases.json.erb: dns/aliases.json
+
+packages: []
+
+properties: {}
+
+consumes:
+- name: mongodb_config_agent
+  type: config_agent
+- name: mongod_node
+  type: node

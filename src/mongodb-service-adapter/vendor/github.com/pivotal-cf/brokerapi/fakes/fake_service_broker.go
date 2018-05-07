@@ -2,6 +2,7 @@ package fakes
 
 import (
 	"context"
+	"errors"
 
 	"github.com/pivotal-cf/brokerapi"
 )
@@ -58,11 +59,15 @@ type FakeAsyncOnlyServiceBroker struct {
 	FakeServiceBroker
 }
 
-func (fakeBroker *FakeServiceBroker) Services(context context.Context) []brokerapi.Service {
+func (fakeBroker *FakeServiceBroker) Services(ctx context.Context) ([]brokerapi.Service, error) {
 	fakeBroker.BrokerCalled = true
 
-	if val, ok := context.Value("test_context").(bool); ok {
+	if val, ok := ctx.Value("test_context").(bool); ok {
 		fakeBroker.ReceivedContext = val
+	}
+
+	if val, ok := ctx.Value("fails").(bool); ok && val {
+		return []brokerapi.Service{}, errors.New("something went wrong!")
 	}
 
 	return []brokerapi.Service{
@@ -84,7 +89,7 @@ func (fakeBroker *FakeServiceBroker) Services(context context.Context) []brokera
 					Schemas: &brokerapi.ServiceSchemas{
 						Instance: brokerapi.ServiceInstanceSchema{
 							Create: brokerapi.Schema{
-								Schema: map[string]interface{}{
+								Parameters: map[string]interface{}{
 									"$schema": "http://json-schema.org/draft-04/schema#",
 									"type":    "object",
 									"properties": map[string]interface{}{
@@ -96,7 +101,7 @@ func (fakeBroker *FakeServiceBroker) Services(context context.Context) []brokera
 								},
 							},
 							Update: brokerapi.Schema{
-								Schema: map[string]interface{}{
+								Parameters: map[string]interface{}{
 									"$schema": "http://json-schema.org/draft-04/schema#",
 									"type":    "object",
 									"properties": map[string]interface{}{
@@ -110,7 +115,7 @@ func (fakeBroker *FakeServiceBroker) Services(context context.Context) []brokera
 						},
 						Binding: brokerapi.ServiceBindingSchema{
 							Create: brokerapi.Schema{
-								Schema: map[string]interface{}{
+								Parameters: map[string]interface{}{
 									"$schema": "http://json-schema.org/draft-04/schema#",
 									"type":    "object",
 									"properties": map[string]interface{}{
@@ -136,7 +141,7 @@ func (fakeBroker *FakeServiceBroker) Services(context context.Context) []brokera
 				"cassandra",
 			},
 		},
-	}
+	}, nil
 }
 
 func (fakeBroker *FakeServiceBroker) Provision(context context.Context, instanceID string, details brokerapi.ProvisionDetails, asyncAllowed bool) (brokerapi.ProvisionedServiceSpec, error) {
