@@ -277,7 +277,7 @@ packages:
   path: resources/pcf-mongodb-helpers-0.0.1.tgz
 - name: on-demand-service-broker
   type: bosh-release
-  path: resources/on-demand-service-broker-0.21.1.tgz
+  path: resources/on-demand-service-broker-0.21.2.tgz
 - name: mongodb
   type: bosh-release
   path: resources/mongodb-1.0.4.tgz

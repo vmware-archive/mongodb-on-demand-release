@@ -34,8 +34,8 @@
     "bosh",
     "serviceadapter"
   ]
-  revision = "ccb18d33b429ef5c3cd202d869f59e3961a35003"
-  version = "v0.21.1"
+  revision = "8e483f3c40b6afa9be12c75991ff0bafc560c550"
+  version = "v0.21.2"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -70,6 +70,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bd854b441126eebe5365be3749bec6197f71ba3d7371c72cf11f26a984b9ef60"
+  inputs-digest = "c1adefb7078f4ed49d21976956000cc14475c1985f5ec47403818881af9b4f23"
   solver-name = "gps-cdcl"
   solver-version = 1
