@@ -1,10 +1,39 @@
 ---
+groups:
+  - name: mongodb-on-demand
+    jobs:
+      - build-tile
+      - deploy-tile
+      - smoke-tests
+      - shipit
+  - name: versioning
+    jobs:
+      - patch
+      - major
+      - minor
+
 resources:
-- name: git
+- name: mongodb-on-demand-release
   type: git
   source:
-    branch: ((git-branch))
-    uri: ((git-uri))
+    branch: master
+    uri: git@github.com:Altoros/mongodb-on-demand-release.git
+    private_key: ((git-private-key))
+
+- name: on-demand-service-broker
+  type: pivnet
+  source:
+    api_token: ((pivnet-token))
+    product_slug: on-demand-services-sdk
+    product_version: 0.21.2
+
+- name: stemcell
+  type: pivnet
+  source:
+    api_token: ((pivnet-token))
+    product_slug: stemcells
+    product_version: '3468.*'
+
 - name: version
   type: semver
   source:
@@ -14,154 +43,185 @@ resources:
     access_key_id: ((aws-access-key))
     secret_access_key: ((aws-secret-access-key))
     initial_version: ((initial-version))
-- name: stemcell
+
+- name: pcf-mongodb-helpers
   type: s3
   source:
     bucket: ((aws-bucket))
-    regexp: ((stemcell-regexp))
+    regexp: pcf-mongodb-helpers-(.*).tgz
     access_key_id: ((aws-access-key))
     secret_access_key: ((aws-secret-access-key))
-- name: odb
+
+- name: artifacts
   type: s3
   source:
     bucket: ((aws-bucket))
-    regexp: ((odb-regexp))
+    regexp: mongodb-on-demand-(.*).pivotal
     access_key_id: ((aws-access-key))
     secret_access_key: ((aws-secret-access-key))
-- name: tile
+
+- name: release
   type: s3
   source:
-    bucket: ((aws-bucket))
-    regexp: ((tile-regexp))
+    bucket: ((release-bucket))
+    regexp: mongodb-on-demand-(.*).pivotal
     access_key_id: ((aws-access-key))
     secret_access_key: ((aws-secret-access-key))
-- name: slack-alert
-  type: slack-notification
+
+- name: alert
+  type: slack
   source:
     url: ((slack-url))
 
 resource_types:
-- name: slack-notification
+- name: pivnet
+  type: docker-image
+  source:
+    repository: pivotalcf/pivnet-resource
+    tag: latest-final
+- name: slack
   type: docker-image
   source:
     repository: cfcommunity/slack-notification-resource
 
 jobs:
-- name: run-tests
-  serial: true
-  plan:
-  - get: git
-    trigger: true
-  - task: run-tests
-    config:
-      platform: linux
-      image_resource: &golang-image
-        type: docker-image
-        source:
-          repository: andreikrasnitski/golang-cf-cli
-      inputs:
-      - name: git
-      run:
-        path: ./git/ci/run-tests
-        args: []
-    on_failure: &slack-alert
-      put: slack-alert
-      params:
-        channel:  ((slack-channel))
-        username: ((slack-username))
-        icon_url: ((slack-icon))
-        text:     ((slack-failed-text))
 - name: build-tile
   serial: true
+  build_logs_to_retain: 50
   plan:
-  - get: git
-    trigger: true
-    passed: [run-tests]
-  - get: odb
-    trigger: false
-    params: {filename: on-demand-service-broker-0.16.0.tgz}
-  - get: version
-    trigger: false
+  - aggregate:
+    - get: mongodb-on-demand-release
+      trigger: true
+    - get: on-demand-service-broker
+    - get: pcf-mongodb-helpers
+      params:
+        filename: pcf-mongodb-helpers-(.*).tgz
+    - get: version
+      params:
+        pre: rc
   - task: build-tile
-    config:
-      platform: linux
-      image_resource: &tile-pipeline-image
-        type: docker-image
-        source:
-          repository: andreikrasnitski/tile-pipeline
-      inputs:
-      - name: git
-      - name: odb
-      - name: version
-      outputs:
-      - name: tile
-      run:
-        path: ./git/ci/build-tile
-        args: []
-    on_failure: *slack-alert
-  - put: tile
+    file: mongodb-on-demand-release/ci/tasks/build-tile/task.yml
+    on_failure: &alert
+      put: alert
+      params:
+        channel: ((slack-channel))
+        icon_url: ((slack-icon))
+        text: ((slack-failed-text))
+        username: ((slack-username))
+  - put: artifacts
     params:
-      file: tile/mongodb-on-demand-*.pivotal
-      acl: public-read
+      file: artifacts/mongodb-on-demand-*.pivotal
+  - put: version
+    params:
+      pre: rc
+
 - name: deploy-tile
   serial: true
+  build_logs_to_retain: 50
   plan:
-  - get: git
-    trigger: true
-    passed: [build-tile]
-  - get: tile
-    trigger: false
-    params: {filename: mongodb-on-demand-*.pivotal}
-  - get: stemcell
-    trigger: false
-    params: {filename: bosh-stemcell-*.tgz}
-  - get: version
-    trigger: false
-  - task: deploy-tile
-    config:
-      platform: linux
-      image_resource: *tile-pipeline-image
-      inputs:
-      - name: git
-      - name: stemcell
-      - name: tile
-      - name: version
-      run:
-        path: ./git/ci/deploy-tile
-        args: []
+  - aggregate:
+    - get: mongodb-on-demand-release
+      trigger: true
+      passed: [ build-tile ]
+    - get: artifacts
       params:
-        PCF_URL: ((pcf-url))
-        PCF_USERNAME: ((pcf-username))
-        PCF_PASSWORD: ((pcf-password))
-        URL: ((mongo-url))
-        USERNAME: ((mongo-username))
-        API_KEY: ((mongo-apikey))
-        VM_TYPE: ((mongo-vm))
-        DISK_TYPE: ((mongo-disk))
-        AZ: ((mongo-az))
-    on_failure: *slack-alert
-  - put: version
-    params: {bump: patch}
+        file: artifacts/mongodb-on-demand-*.pivotal
+    - get: version
+    - get: stemcell
+      params:
+        globs: ["*aws*"]
+  - task: deploy-tile
+    file: mongodb-on-demand-release/ci/tasks/deploy-tile/task.yml
+    params:
+      PCF_URL: ((pcf-url))
+      PCF_USERNAME: ((pcf-username))
+      PCF_PASSWORD: ((pcf-password))
+      MONGO_OPS_URL: ((mongo-url))
+      MONGO_OPS_USERNAME: ((mongo-username))
+      MONGO_OPS_API_KEY: ((mongo-apikey))
+      AZ: ((mongo-az))
+      SINGELTON_AZ: ((mongo-az))
+      OTHER_AZ: ((mongo-az))
+      SERVICE_NETWORK: ((pcf-service-network))
+      PCF_NETWORK: ((pcf-network))
+    on_failure: *alert
+
 - name: smoke-tests
   serial: true
+  build_logs_to_retain: 50
   plan:
-  - get: git
-    trigger: true
-    passed: [deploy-tile]
+  - aggregate:
+    - get: mongodb-on-demand-release
+      trigger: true
+      passed: [ deploy-tile ]
   - task: smoke-tests
-    config:
-      platform: linux
-      image_resource: *golang-image
-      inputs:
-      - name: git
-      run:
-        path: ./git/ci/smoke-tests
-        args: []
+    file: mongodb-on-demand-release/ci/tasks/smoke-tests/task.yml
+    params:
+      PCF_URL: ((pcf-url))
+      PCF_USERNAME: ((pcf-username))
+      PCF_PASSWORD: ((pcf-password))
+    on_failure: *alert
+
+- name: shipit
+  serial: true
+  build_logs_to_retain: 50
+  plan:
+  - aggregate:
+    - get: mongodb-on-demand-release
+      passed: [ smoke-tests ]
+    - get: on-demand-service-broker
+    - get: pcf-mongodb-helpers
       params:
-        CF_APPS_DOMAIN: ((cf-apps-domain))
-        CF_SYSTEM_DOMAIN: ((cf-system-domain))
-        CF_API: ((cf-api))
-        CF_USER: ((cf-user))
-        CF_PASSWORD: ((cf-password))
-        SERVICE_NAME: ((service-name))
-    on_failure: *slack-alert
+        filename: pcf-mongodb-helpers-(.*).tgz
+    - get: version
+      params:
+        bump: final
+  - task: shipit
+    file: mongodb-on-demand-release/ci/tasks/shipit/task.yml
+    on_failure: *alert
+    on_success:
+      put: alert
+      params:
+        channel: ((slack-channel))
+        icon_url: ((slack-icon))
+        text_file: release/notification
+        username: ((slack-username))
+  - put: release
+    params:
+      file: release/mongodb-on-demand-*.pivotal
+
+- name: minor
+  plan:
+  - do:
+    - get: version
+      trigger: false
+      params:
+        bump: minor
+    - put: version
+      params:
+        file: version/number
+    on_failure: *alert
+
+- name: patch
+  plan:
+  - do:
+    - get: version
+      trigger: false
+      params:
+        bump: patch
+    - put: version
+      params:
+        file: version/number
+    on_failure: *alert
+
+- name: major
+  plan:
+  - do:
+    - get: version
+      trigger: false
+      params:
+        bump: major
+    - put: version
+      params:
+        file: version/number
+    on_failure: *alert

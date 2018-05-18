@@ -1,0 +1,16 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: andreikrasnitski/ci
+
+inputs:
+- name: mongodb-on-demand-release
+- name: stemcell
+- name: version
+- name: artifacts
+
+run:
+  path: mongodb-on-demand-release/ci/tasks/deploy-tile/run.sh
