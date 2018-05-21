@@ -1,7 +1,10 @@
 package service_test
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"strings"
 	"time"
 
@@ -13,7 +16,12 @@ import (
 	"github.com/pivotal-cf-experimental/cf-test-helpers/services"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
+
+type CFTestContext struct {
+	Org, Space string
+}
 
 var _ = Describe("MongoDB Service", func() {
 	var (
@@ -30,11 +38,15 @@ var _ = Describe("MongoDB Service", func() {
 		serviceInstanceName string
 		appName             string
 		planName            string
+		securityGroupName   string
+		serviceKeyName      string
+
+		cfTestContext CFTestContext
 
 		context services.Context
 	)
 
-	BeforeSuite(func() {
+	SynchronizedBeforeSuite(func() []byte {
 		context = services.NewContext(cfTestConfig, "mongodb-test")
 
 		createQuotaArgs := []string{
@@ -60,48 +72,24 @@ var _ = Describe("MongoDB Service", func() {
 				testCF.CreateQuota("mongodb-smoke-test-quota", createQuotaArgs...),
 			),
 			reporter.NewStep(
-				fmt.Sprintf("Create '%s' org", cfTestConfig.OrgName),
-				testCF.CreateOrg(cfTestConfig.OrgName, "mongodb-smoke-test-quota"),
+				fmt.Sprintf("Create '%s' org", regularContext.Org),
+				testCF.CreateOrg(regularContext.Org, "mongodb-smoke-test-quota"),
 			),
 			reporter.NewStep(
-				fmt.Sprintf("Enable service access for '%s' org", cfTestConfig.OrgName),
-				testCF.EnableServiceAccess(cfTestConfig.OrgName, mongodbConfig.ServiceName),
+				fmt.Sprintf("Enable service access for '%s' org", regularContext.Org),
+				testCF.EnableServiceAccess(regularContext.Org, mongodbConfig.ServiceName),
 			),
 			reporter.NewStep(
-				fmt.Sprintf("Target '%s' org", cfTestConfig.OrgName),
-				testCF.TargetOrg(cfTestConfig.OrgName),
+				fmt.Sprintf("Target '%s' org", regularContext.Org),
+				testCF.TargetOrg(regularContext.Org),
 			),
 			reporter.NewStep(
-				fmt.Sprintf("Create '%s' space", cfTestConfig.SpaceName),
-				testCF.CreateSpace(cfTestConfig.SpaceName),
+				fmt.Sprintf("Create '%s' space", regularContext.Space),
+				testCF.CreateSpace(regularContext.Space),
 			),
 			reporter.NewStep(
-				fmt.Sprintf("Create user '%s'", regularContext.Username),
-				testCF.CreateUser(regularContext.Username, regularContext.Password),
-			),
-			reporter.NewStep(
-				fmt.Sprintf(
-					"Assign user '%s' to 'SpaceManager' role for '%s'",
-					regularContext.Username,
-					cfTestConfig.SpaceName,
-				),
-				testCF.SetSpaceRole(regularContext.Username, regularContext.Org, cfTestConfig.SpaceName, "SpaceManager"),
-			),
-			reporter.NewStep(
-				fmt.Sprintf(
-					"Assign user '%s' to 'SpaceDeveloper' role for '%s'",
-					regularContext.Username,
-					cfTestConfig.SpaceName,
-				),
-				testCF.SetSpaceRole(regularContext.Username, regularContext.Org, cfTestConfig.SpaceName, "SpaceDeveloper"),
-			),
-			reporter.NewStep(
-				fmt.Sprintf(
-					"Assign user '%s' to 'SpaceAuditor' role for '%s'",
-					regularContext.Username,
-					cfTestConfig.SpaceName,
-				),
-				testCF.SetSpaceRole(regularContext.Username, regularContext.Org, cfTestConfig.SpaceName, "SpaceAuditor"),
+				fmt.Sprintf("Target '%s' org and '%s' space", regularContext.Org, regularContext.Space),
+				testCF.TargetOrgAndSpace(regularContext.Org, regularContext.Space),
 			),
 			reporter.NewStep(
 				"Log out",
@@ -114,28 +102,51 @@ var _ = Describe("MongoDB Service", func() {
 		for _, task := range beforeSuiteSteps {
 			task.Perform()
 		}
+
+		cfTestContext = CFTestContext{
+			Org:   regularContext.Org,
+			Space: regularContext.Space,
+		}
+
+		rawTestContext, err := json.Marshal(cfTestContext)
+		Expect(err).NotTo(HaveOccurred())
+
+		return rawTestContext
+	}, func(data []byte) {
+		err := json.Unmarshal(data, &cfTestContext)
+		Expect(err).NotTo(HaveOccurred())
+
+		// Set $CF_HOME so that cf cli state is not shared between nodes
+		cfHomeDir, err := ioutil.TempDir("", "cf-redis-smoke-tests")
+		Expect(err).NotTo(HaveOccurred())
+		os.Setenv("CF_HOME", cfHomeDir)
 	})
 
 	BeforeEach(func() {
-		regularContext := context.RegularUserContext()
 		appName = randomName()
 		serviceInstanceName = randomName()
+		securityGroupName = randomName()
+		serviceKeyName = randomName()
 
 		pushArgs := []string{
 			"-m", "256M",
 			"-p", appPath,
 			"-s", "cflinuxfs2",
-			"-no-start",
+			"--no-start",
 		}
 
 		specSteps := []*reporter.Step{
 			reporter.NewStep(
-				fmt.Sprintf("Log in as %s", regularContext.Username),
-				testCF.Auth(regularContext.Username, regularContext.Password),
+				"Connect to CloudFoundry",
+				testCF.API(cfTestConfig.ApiEndpoint, cfTestConfig.SkipSSLValidation),
 			),
 			reporter.NewStep(
-				fmt.Sprintf("Target '%s' org and '%s' space", cfTestConfig.OrgName, cfTestConfig.SpaceName),
-				testCF.TargetOrgAndSpace(cfTestConfig.OrgName, cfTestConfig.SpaceName),
+				"Log in as admin",
+				testCF.Auth(cfTestConfig.AdminUser, cfTestConfig.AdminPassword),
+			),
+			reporter.NewStep(
+				fmt.Sprintf("Target '%s' org and '%s' space", cfTestContext.Org, cfTestContext.Space),
+				testCF.TargetOrgAndSpace(cfTestContext.Org, cfTestContext.Space),
 			),
 			reporter.NewStep(
 				"Push the MongoDB sample app to Cloud Foundry",
@@ -158,6 +169,10 @@ var _ = Describe("MongoDB Service", func() {
 				testCF.UnbindService(appName, serviceInstanceName),
 			),
 			reporter.NewStep(
+				fmt.Sprintf("Delete the service key %s for the %q plan instance", serviceKeyName, planName),
+				testCF.DeleteServiceKey(serviceInstanceName, serviceKeyName),
+			),
+			reporter.NewStep(
 				fmt.Sprintf("Delete the %q plan instance", planName),
 				testCF.DeleteService(serviceInstanceName),
 			),
@@ -170,20 +185,8 @@ var _ = Describe("MongoDB Service", func() {
 				testCF.Delete(appName),
 			),
 			reporter.NewStep(
-				"Log out",
-				testCF.Logout(),
-			),
-			reporter.NewStep(
-				"Log in as admin",
-				testCF.Auth(cfTestConfig.AdminUser, cfTestConfig.AdminPassword),
-			),
-			reporter.NewStep(
-				"Delete security group 'mongodb-smoke-tests-sg'",
+				fmt.Sprintf("Delete security group '%s'", securityGroupName),
 				testCF.DeleteSecurityGroup("mongodb-smoke-tests-sg"),
-			),
-			reporter.NewStep(
-				"Log out",
-				testCF.Logout(),
 			),
 		}
 
@@ -194,33 +197,15 @@ var _ = Describe("MongoDB Service", func() {
 		}
 	})
 
-	AfterSuite(func() {
-		regularContext := context.RegularUserContext()
-
+	SynchronizedAfterSuite(func() {}, func() {
 		afterSuiteSteps := []*reporter.Step{
-			reporter.NewStep(
-				"Connect to CloudFoundry",
-				testCF.API(cfTestConfig.ApiEndpoint, cfTestConfig.SkipSSLValidation),
-			),
-			reporter.NewStep(
-				"Log in as admin",
-				testCF.Auth(cfTestConfig.AdminUser, cfTestConfig.AdminPassword),
-			),
-			reporter.NewStep(
-				fmt.Sprintf("Target '%s' org and '%s' space", cfTestConfig.OrgName, cfTestConfig.SpaceName),
-				testCF.TargetOrgAndSpace(cfTestConfig.OrgName, cfTestConfig.SpaceName),
-			),
 			reporter.NewStep(
 				"Ensure no service-instances left",
 				testCF.EnsureAllServiceInstancesGone(),
 			),
 			reporter.NewStep(
-				fmt.Sprintf("Delete user '%s'", regularContext.Username),
-				testCF.DeleteUser(regularContext.Username),
-			),
-			reporter.NewStep(
-				fmt.Sprintf("Delete org '%s'", cfTestConfig.OrgName),
-				testCF.DeleteOrg(cfTestConfig.OrgName),
+				fmt.Sprintf("Delete org '%s'", cfTestContext.Org),
+				testCF.DeleteOrg(cfTestContext.Org),
 			),
 			reporter.NewStep(
 				"Log out",
@@ -230,19 +215,16 @@ var _ = Describe("MongoDB Service", func() {
 
 		smokeTestReporter.RegisterAfterSuiteSteps(afterSuiteSteps)
 
-		for _, task := range afterSuiteSteps {
-			task.Perform()
-		}
+		afterSuiteSteps[0].Perform()
 	})
 
 	AssertLifeCycleBehavior := func(planName string) {
 		It(strings.ToUpper(planName)+": create, bind to, write to, read from, unbind, and destroy a service instance", func() {
-			regularContext := context.RegularUserContext()
-
 			var skip bool
 
 			uri := fmt.Sprintf("https://%s.%s", appName, cfTestConfig.AppsDomain)
 			app := mongodb.NewApp(uri, testCF.ShortTimeout, retryInterval)
+			testValue := randomName()
 
 			serviceCreateStep := reporter.NewStep(
 				fmt.Sprintf("Create a '%s' plan instance of MongoDB", planName),
@@ -257,24 +239,12 @@ var _ = Describe("MongoDB Service", func() {
 					testCF.BindService(appName, serviceInstanceName),
 				),
 				reporter.NewStep(
-					"Log in as admin",
-					testCF.Auth(cfTestConfig.AdminUser, cfTestConfig.AdminPassword),
+					fmt.Sprintf("Create service key for the '%s' plan instance '%s' of MongoDB", planName, serviceInstanceName),
+					testCF.CreateServiceKey(serviceInstanceName, serviceKeyName),
 				),
 				reporter.NewStep(
-					fmt.Sprintf("Target '%s' org and '%s' space", cfTestConfig.OrgName, cfTestConfig.SpaceName),
-					testCF.TargetOrgAndSpace(cfTestConfig.OrgName, cfTestConfig.SpaceName),
-				),
-				reporter.NewStep(
-					"Create and bind security group for running smoke tests",
-					testCF.CreateAndBindSecurityGroup("mongodb-smoke-tests-sg", appName, cfTestConfig.OrgName, cfTestConfig.SpaceName),
-				),
-				reporter.NewStep(
-					fmt.Sprintf("Log in as %s", regularContext.Username),
-					testCF.Auth(regularContext.Username, regularContext.Password),
-				),
-				reporter.NewStep(
-					fmt.Sprintf("Target '%s' org and '%s' space", cfTestConfig.OrgName, cfTestConfig.SpaceName),
-					testCF.TargetOrgAndSpace(cfTestConfig.OrgName, cfTestConfig.SpaceName),
+					fmt.Sprintf("Create and bind security group '%s' for running smoke tests", securityGroupName),
+					testCF.CreateAndBindSecurityGroup(securityGroupName, cfTestContext.Org, cfTestContext.Space),
 				),
 				reporter.NewStep(
 					"Start the app",
@@ -286,11 +256,11 @@ var _ = Describe("MongoDB Service", func() {
 				),
 				reporter.NewStep(
 					"Write to MongoDB",
-					app.Write("mykey", "myvalue"),
+					app.Write("testkey", testValue),
 				),
 				reporter.NewStep(
 					"Read from MongoDB",
-					app.ReadAssert("mykey", "myvalue"),
+					app.ReadAssert("testkey", testValue),
 				),
 			}
 

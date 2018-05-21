@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/config"
 	"github.com/onsi/ginkgo/types"
 )
@@ -62,10 +63,16 @@ func (report *SmokeTestReport) SpecSuiteWillBegin(
 	config config.GinkgoConfigType,
 	summary *types.SuiteSummary,
 ) {
+	if ginkgo.GinkgoParallelNode() != 1 {
+		return
+	}
 	report.printMessageTitle("Beginning test suite setup")
 }
 
 func (report *SmokeTestReport) BeforeSuiteDidRun(summary *types.SetupSummary) {
+	if ginkgo.GinkgoParallelNode() != 1 {
+		return
+	}
 	if summary.State == types.SpecStateFailed ||
 		summary.State == types.SpecStatePanicked ||
 		summary.State == types.SpecStateTimedOut {
@@ -113,6 +120,9 @@ func (report *SmokeTestReport) SpecDidComplete(summary *types.SpecSummary) {
 }
 
 func (report *SmokeTestReport) AfterSuiteDidRun(summary *types.SetupSummary) {
+	if ginkgo.GinkgoParallelNode() != 1 {
+		return
+	}
 	report.printMessageTitle("Finished suite teardown")
 
 	fmt.Println("Smoke Test Suite Teardown Results:")
@@ -124,6 +134,9 @@ func (report *SmokeTestReport) AfterSuiteDidRun(summary *types.SetupSummary) {
 }
 
 func (report *SmokeTestReport) SpecSuiteDidEnd(summary *types.SuiteSummary) {
+	if ginkgo.GinkgoParallelNode() != 1 {
+		return
+	}
 	matchJSON, err := regexp.Compile(`{"FailReason":\s"(.*)"}`)
 	if err != nil {
 		fmt.Printf("\nSkipping \"Summarising failure reasons\": %s\n", err.Error())
@@ -141,7 +154,7 @@ func (report *SmokeTestReport) SpecSuiteDidEnd(summary *types.SuiteSummary) {
 				fmt.Printf("> %s\n", failMessage[1])
 			}
 		}
-		fmt.Printf("\nFor help with troubleshooting, visit: https://docs.pivotal.io/partners/mongodb/index.html\n\n")
+		fmt.Printf("\nFor help with troubleshooting, visit: https://docs.pivotal.io/redis/smoke-tests.html\n\n")
 	}
 }
 

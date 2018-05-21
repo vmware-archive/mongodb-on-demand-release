@@ -1,7 +1,7 @@
 {
   "service_name": "mongodb-odb",
   "plan_names": [
-    "standalone"
+    "standalone_small"
   ],
   "retry": {
     "max_attempts": 10,
@@ -13,14 +13,6 @@
   "api": "api.bosh-lite.com",
   "admin_user": "admin",
   "admin_password": "admin",
-  "space_name": "mongodb-on-demand-test-space",
-  "org_name": "mongodb-on-demand-test-org",
   "skip_ssl_validation": true,
-  "create_permissive_security_group": false,
-  "security_groups": [{
-      "protocol": "tcp",
-      "destination": "10.0.0.0-10.255.255.255",
-      "ports": "28000"
-    }
-  ]
+  "create_permissive_security_group": false
 }
