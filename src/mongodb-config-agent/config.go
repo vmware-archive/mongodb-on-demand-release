@@ -22,6 +22,7 @@ type Config struct {
 	Routers       int    `json:"routers"`
 	ConfigServers int    `json:"config_servers"`
 	Replicas      int    `json:"replicas"`
+	RequireSSL    bool   `json:"require_ssl"`
 }
 
 func LoadConfig(configFile string) (config *Config, err error) {

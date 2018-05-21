@@ -33,6 +33,7 @@ func main() {
 		AdminPassword: config.AdminPassword,
 		Nodes:         nodes,
 		Version:       config.EngineVersion,
+		RequireSSL:    config.RequireSSL,
 	}
 
 	if config.PlanID == adapter.PlanShardedCluster {
@@ -50,6 +51,18 @@ func main() {
 	}
 	logger.Println(doc)
 
+	monitoringAgentDoc, err := omClient.LoadDoc(adapter.MonitoringAgentConfiguration, ctx)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	logger.Println(monitoringAgentDoc)
+
+	backupAgentDoc, err := omClient.LoadDoc(adapter.MonitoringAgentConfiguration, ctx)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	logger.Println(backupAgentDoc)
+
 	for {
 		logger.Printf("Checking group %s", config.GroupID)
 
@@ -63,6 +76,16 @@ func main() {
 			logger.Printf("Host count for %s is 0, configuring...", config.GroupID)
 
 			err = omClient.ConfigureGroup(doc, config.GroupID)
+			if err != nil {
+				logger.Fatal(err)
+			}
+
+			err = omClient.ConfigureMonitoringAgent(monitoringAgentDoc, config.GroupID)
+			if err != nil {
+				logger.Fatal(err)
+			}
+
+			err = omClient.ConfigureBackupAgent(backupAgentDoc, config.GroupID)
 			if err != nil {
 				logger.Fatal(err)
 			}

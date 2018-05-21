@@ -58,6 +58,7 @@ type DocContext struct {
 	Nodes                []string
 	Cluster              *Cluster
 	Password             string
+	RequireSSL           bool
 }
 
 type Cluster struct {
@@ -176,6 +177,27 @@ func (oc *OMClient) ConfigureGroup(configurationDoc string, groupID string) erro
 	return nil
 }
 
+func (oc *OMClient) ConfigureMonitoringAgent(configurationDoc string, groupID string) error {
+	u := fmt.Sprintf("/api/public/v1.0/groups/%s/automationConfig/monitoringAgentConfig", groupID)
+	b, err := oc.doRequest("PUT", u, strings.NewReader(configurationDoc))
+	if err != nil {
+		return err
+	}
+	log.Println(string(b))
+
+	return nil
+}
+
+func (oc *OMClient) ConfigureBackupAgent(configurationDoc string, groupID string) error {
+	u := fmt.Sprintf("/api/public/v1.0/groups/%s/automationConfig/backupAgentConfig", groupID)
+	b, err := oc.doRequest("PUT", u, strings.NewReader(configurationDoc))
+	if err != nil {
+		return err
+	}
+	log.Println(string(b))
+
+	return nil
+}
 func (oc *OMClient) GetAvailableVersions(groupID string) (Automation, error) {
 	var versions Automation
 

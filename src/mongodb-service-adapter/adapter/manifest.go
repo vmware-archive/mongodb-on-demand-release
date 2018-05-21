@@ -190,10 +190,12 @@ func (m ManifestGenerator) GenerateManifest(
 			backupEnabled = mongoOps["backup_enabled"].(bool)
 		}
 	}
-	tlsEnabled := false
-	e := getArbitraryParam("ssl_enabled", "ssl_enabled", arbitraryParams, previousMongoProperties)
-	if e != nil {
-		tlsEnabled = e.(bool)
+	requireSSL := false
+	if !boshDNSDisable {
+		e := getArbitraryParam("ssl_enabled", "ssl_enabled", arbitraryParams, previousMongoProperties)
+		if e != nil {
+			requireSSL = e.(bool)
+		}
 	}
 
 	caCert := ""
@@ -269,7 +271,7 @@ func (m ManifestGenerator) GenerateManifest(
 						"replicas":         replicas,
 						"shards":           shards,
 						"backup_enabled":   backupEnabled,
-						"ssl_enabled":      tlsEnabled,
+						"require_ssl":      requireSSL,
 						"ssl_ca_cert":      caCert,
 						"ssl_pem":          sslPem,
 						"bosh_dns_disable": boshDNSDisable,
@@ -284,7 +286,7 @@ func (m ManifestGenerator) GenerateManifest(
 				"api_key":        group.AgentAPIKey,
 				"group_id":       group.ID,
 				"admin_password": adminPassword,
-				"ssl_enabled":    tlsEnabled,
+				"require_ssl":    requireSSL,
 
 				// options needed for binding
 				"plan_id":        planID,

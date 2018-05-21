@@ -6,9 +6,11 @@ import (
 )
 
 const (
-	PlanStandalone     = "standalone"
-	PlanReplicaSet     = "replica_set"
-	PlanShardedCluster = "sharded_cluster"
+	PlanStandalone               = "standalone"
+	PlanReplicaSet               = "replica_set"
+	PlanShardedCluster           = "sharded_cluster"
+	MonitoringAgentConfiguration = "monitoring_agent_config"
+	BackupAgentConfiguration     = "backup_agent_config"
 )
 
 var plans = map[string]*template.Template{}
@@ -34,6 +36,13 @@ var plansRaw = map[string]string{
     "options": {
         "downloadBase": "/var/lib/mongodb-mms-automation"
     },
+    {{ if .RequireSSL }}
+    "ssl" : {
+				"autoPEMKeyFilePath": "/var/vcap/jobs/mongod_node/config/server.pem",
+        "CAFilePath": "/var/vcap/jobs/mongod_node/config/cacert.pem",
+        "clientCertificateMode": "REQUIRE"
+    },
+    {{end}}
     "mongoDbVersions": [
         {"name": "{{.Version}}"}
     ],
@@ -56,6 +65,12 @@ var plansRaw = map[string]string{
     "processes": [{
         "args2_6": {
             "net": {
+                {{ if .RequireSSL }}
+                "ssl": {
+                    "mode": "requireSSL",
+                    "PEMKeyFile": "/var/vcap/jobs/mongod_node/config/server.pem"
+                },
+                {{ end }}
                 "port": 28000
             },
             "storage": {
@@ -168,6 +183,13 @@ var plansRaw = map[string]string{
     "options": {
         "downloadBase": "/var/lib/mongodb-mms-automation"
     },
+    {{ if .RequireSSL }}
+    "ssl" : {
+				"autoPEMKeyFilePath": "/var/vcap/jobs/mongod_node/config/server.pem",
+        "CAFilePath": "/var/vcap/jobs/mongod_node/config/cacert.pem",
+        "clientCertificateMode": "REQUIRE"
+    },
+    {{end}}
     "mongoDbVersions": [
         {"name": "{{.Version}}"}
     ],
@@ -191,6 +213,12 @@ var plansRaw = map[string]string{
       {{range $i, $node := .Cluster.Routers}}{
           "args2_6": {
               "net": {
+                  {{ if $.RequireSSL }}
+                  "ssl": {
+                      "mode": "requireSSL",
+                      "PEMKeyFile": "/var/vcap/jobs/mongod_node/config/server.pem"
+                  },
+                  {{ end }}
                   "port": 28000
               },
               "systemLog": {
@@ -216,6 +244,12 @@ var plansRaw = map[string]string{
       {{range $i, $node := .Cluster.ConfigServers}}{
           "args2_6": {
               "net": {
+                  {{ if $.RequireSSL }}
+                  "ssl": {
+                      "mode": "requireSSL",
+                      "PEMKeyFile": "/var/vcap/jobs/mongod_node/config/server.pem"
+                  },
+                  {{ end }}
                   "port": 28000
               },
               "replication": {
@@ -250,6 +284,12 @@ var plansRaw = map[string]string{
           {{range $i, $node := $shard}},{
               "args2_6": {
                   "net": {
+                      {{ if $.RequireSSL }}
+                      "ssl": {
+                          "mode": "requireSSL",
+                          "PEMKeyFile": "/var/vcap/jobs/mongod_node/config/server.pem"
+                      },
+                      {{ end }}
                       "port": 28000
                   },
                   "replication": {
@@ -408,6 +448,13 @@ var plansRaw = map[string]string{
     "options": {
         "downloadBase": "/var/lib/mongodb-mms-automation"
     },
+    {{ if .RequireSSL }}
+    "ssl" : {
+				"autoPEMKeyFilePath": "/var/vcap/jobs/mongod_node/config/server.pem",
+        "CAFilePath": "/var/vcap/jobs/mongod_node/config/cacert.pem",
+        "clientCertificateMode": "REQUIRE"
+    },
+    {{end}}
     "mongoDbVersions": [
         {"name": "{{.Version}}"}
     ],
@@ -431,6 +478,12 @@ var plansRaw = map[string]string{
       {{if $i}},{{end}}{
         "args2_6": {
             "net": {
+                {{ if $.RequireSSL }}
+                "ssl": {
+                    "mode": "requireSSL",
+                    "PEMKeyFile": "/var/vcap/jobs/mongod_node/config/server.pem"
+                },
+                {{ end }}
                 "port": 28000
             },
             "replication": {
@@ -551,6 +604,28 @@ var plansRaw = map[string]string{
             }
         ],
         "autoAuthMechanism": "SCRAM-SHA-1"
+    }
+}`,
+
+	MonitoringAgentConfiguration: `{
+    {{ if .RequireSSL }}
+		"sslPEMKeyFile": "/var/vcap/jobs/mongod_node/config/server.pem",
+		{{ end }}
+    "logPath": "/var/vcap/sys/log/mongod_node/monitoring-agent.log",
+    "logRotate": {
+        "sizeThresholdMB": 1000,
+        "timeThresholdHrs": 24
+    }
+}`,
+
+	BackupAgentConfiguration: `{
+    {{ if .RequireSSL }}
+		"sslPEMKeyFile": "/var/vcap/jobs/mongod_node/config/server.pem",
+		{{ end }}
+    "logPath": "/var/vcap/sys/log/mongod_node/backup-agent.log",
+    "logRotate": {
+        "sizeThresholdMB": 1000,
+        "timeThresholdHrs": 24
     }
 }`,
 }

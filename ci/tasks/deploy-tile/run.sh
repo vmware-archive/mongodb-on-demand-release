@@ -67,6 +67,15 @@ cat > missing-properties.json << EOF
   },
   ".properties.az_multi_select": {
     "value": ["${AZ}"]
+  },
+  ".properties.ca_cert": {
+    "value": "${MONGO_OPS_USERNAME}"
+  },
+  ".properties.rsa_certificate": {
+    "value": {
+      "cert_pem":"${MONGO_OPS_RSA_CERT}",
+      "private_key_pem": "${MONGO_OPS_RSA_KEY}"
+    }
   }
 }
 EOF

@@ -26,7 +26,7 @@ libsnmp/perl-base_5.18.2-2ubuntu1.3_amd64.deb:
   size: 1149076
   object_id: bc8667ca-c74e-4cdf-7846-87b01e030d36
   sha: 7356c1dd7da3c31c683c4d1ac7e9558e6f1b6e67
-mongodb/mongodb-linux-x86_64-3.6.0.tgz:
-  size: 86660499
-  object_id: 14afcb04-bf44-49ff-72d0-6fbd32d388f9
-  sha: 628ed70f49325ff017d179b67581b1eabc5eb446
+mongodb/mongodb-linux-x86_64-ubuntu1404-3.6.4.tgz:
+  size: 99386872
+  object_id: 8e4dc3c9-a56f-4651-47e3-6370b6b75219
+  sha: 1cd5f23096680b3922eb49ad89bb22210ae02afc

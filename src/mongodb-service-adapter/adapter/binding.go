@@ -65,7 +65,7 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 		servers = cluster.Routers
 	}
 
-	ssl := properties["ssl_enabled"].(bool)
+	ssl := properties["require_ssl"].(bool)
 	sslOption := ""
 	if ssl {
 		sslOption = "&ssl=true"
@@ -128,7 +128,7 @@ func (Binder) DeleteBinding(bindingID string, deploymentTopology bosh.BoshVMs, m
 	username := mkUsername(bindingID)
 	properties := manifest.Properties["mongo_ops"].(map[interface{}]interface{})
 	adminPassword := properties["admin_password"].(string)
-	ssl := properties["ssl_enabled"].(bool)
+	ssl := properties["require_ssl"].(bool)
 
 	servers := make([]string, len(deploymentTopology["mongod_node"]))
 	for i, node := range deploymentTopology["mongod_node"] {
