@@ -40,5 +40,6 @@ fi
 SHA256=$(sha256sum release/"$TILE_FILE" | cut -d ' ' -f 1)
 cat > "$base"/release/notification <<EOF
 <!here> New build v${VERSION} released!
+You can download build at https://s3.amazonaws.com/${RELEASE_BUCKET_NAME}/${TILE_FILE}
 Build SHA256: ${SHA256}
 EOF

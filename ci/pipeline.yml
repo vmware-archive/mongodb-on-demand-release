@@ -181,6 +181,8 @@ jobs:
         bump: final
   - task: shipit
     file: mongodb-on-demand-release/ci/tasks/shipit/task.yml
+    params:
+      RELEASE_BUCKET_NAME: ((release-bucket))
     on_failure: *alert
     on_success:
       put: alert
@@ -192,6 +194,7 @@ jobs:
   - put: release
     params:
       file: release/mongodb-on-demand-*.pivotal
+      acl: public-read
 
 - name: minor
   plan:
