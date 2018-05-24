@@ -69,7 +69,7 @@ cat > missing-properties.json << EOF
     "value": ["${AZ}"]
   },
   ".properties.ca_cert": {
-    "value": "${MONGO_OPS_USERNAME}"
+    "value": "${MONGO_CA_CERT}"
   },
   ".properties.rsa_certificate": {
     "value": {
