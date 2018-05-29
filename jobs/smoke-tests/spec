@@ -6,9 +6,9 @@ templates:
   errand.sh.erb: bin/run
 
 packages:
-- cf-cli-6-linux
-- golang
-- mongodb-smoke-tests
+  - cf-cli-6-linux
+  - golang-1.9-linux
+  - mongodb-smoke-tests
 
 properties:
   cf.api_url:
