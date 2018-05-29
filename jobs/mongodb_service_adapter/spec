@@ -11,8 +11,6 @@ templates:
   server.crt.erb: config/server.crt
 
 properties:
-  aliases:
-    description: List of generated aliases
   mongo_ops.ssl_ca_cert:
     description: "MongoDB server CA certificate"
   mongo_ops.ssl_pem:
