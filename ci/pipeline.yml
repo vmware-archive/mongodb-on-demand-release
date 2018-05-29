@@ -4,6 +4,7 @@ groups:
     jobs:
       - build-tile
       - deploy-tile
+      - delete-tile
       - smoke-tests
       - shipit
   - name: versioning
@@ -195,6 +196,20 @@ jobs:
     params:
       file: release/mongodb-on-demand-*.pivotal
       acl: public-read
+
+- name: delete-tile
+  serial: true
+  build_logs_to_retain: 50
+  plan:
+  - aggregate:
+    - get: mongodb-on-demand-release
+  - task: delete-tile
+    file: mongodb-on-demand-release/ci/tasks/delete-tile/task.yml
+    params:
+      PCF_URL: ((pcf-url))
+      PCF_USERNAME: ((pcf-username))
+      PCF_PASSWORD: ((pcf-password))
+    on_failure: *alert
 
 - name: minor
   plan:
