@@ -195,6 +195,8 @@ func (m ManifestGenerator) GenerateManifest(
 		e := getArbitraryParam("ssl_enabled", "ssl_enabled", arbitraryParams, previousMongoProperties)
 		if e != nil {
 			requireSSL = e.(bool)
+		} else {
+			requireSSL = mongoOps["ssl_enabled"].(bool)
 		}
 	}
 

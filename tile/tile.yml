@@ -43,6 +43,11 @@ forms:
     configurable: true
     label: Backup enabled by default
     description: Enables or disables backup by default for Replica Set and Sharded Cluster service plans. Can be overwritten by "enable_backup" parameter at service creation time.
+  - name: ssl_enabled
+    type: boolean
+    configurable: true
+    label: SSL enabled by default
+    description: Enables or disables SSL by default for all service plans. Can be overwritten by "ssl_enabled" parameter at service creation time.
   - name: tags
     type: collection
     optional: true
@@ -388,6 +393,7 @@ packages:
               api_key: (( .properties.api_key.value ))
               tags:  (( .properties.tags.value || [] ))
               backup_enabled:  false
+              ssl_enabled: (( .properties.ssl_enabled.value ))
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
@@ -417,6 +423,7 @@ packages:
               api_key: (( .properties.api_key.value ))
               tags:  (( .properties.tags.value || [] ))
               backup_enabled:  false
+              ssl_enabled: (( .properties.ssl_enabled.value ))
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
@@ -446,6 +453,7 @@ packages:
               api_key: (( .properties.api_key.value ))
               tags:  (( .properties.tags.value || [] ))
               backup_enabled:  false
+              ssl_enabled: (( .properties.ssl_enabled.value ))
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
@@ -475,6 +483,7 @@ packages:
               api_key: (( .properties.api_key.value ))
               tags:  (( .properties.tags.value || [] ))
               backup_enabled: (( .properties.backup_enabled.value ))
+              ssl_enabled: (( .properties.ssl_enabled.value ))
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
@@ -504,6 +513,7 @@ packages:
               api_key: (( .properties.api_key.value ))
               tags:  (( .properties.tags.value || [] ))
               backup_enabled: (( .properties.backup_enabled.value ))
+              ssl_enabled: (( .properties.ssl_enabled.value ))
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
@@ -533,6 +543,7 @@ packages:
               api_key: (( .properties.api_key.value ))
               tags:  (( .properties.tags.value || [] ))
               backup_enabled: (( .properties.backup_enabled.value ))
+              ssl_enabled: (( .properties.ssl_enabled.value ))
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
@@ -564,6 +575,7 @@ packages:
               api_key: (( .properties.api_key.value ))
               tags:  (( .properties.tags.value || [] ))
               backup_enabled: (( .properties.backup_enabled.value ))
+              ssl_enabled: (( .properties.ssl_enabled.value ))
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
@@ -595,6 +607,7 @@ packages:
               api_key: (( .properties.api_key.value ))
               tags:  (( .properties.tags.value || [] ))
               backup_enabled: (( .properties.backup_enabled.value ))
+              ssl_enabled: (( .properties.ssl_enabled.value ))
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
@@ -626,6 +639,7 @@ packages:
               api_key: (( .properties.api_key.value ))
               tags:  (( .properties.tags.value || [] ))
               backup_enabled: (( .properties.backup_enabled.value ))
+              ssl_enabled: (( .properties.ssl_enabled.value ))
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
