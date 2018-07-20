@@ -2,7 +2,7 @@
 name: mongodb-config-agent
 
 dependencies:
-  - golang-1.9-linux
+  - golang-1.10-linux
 
 files:
   - mongodb-config-agent/**/*
