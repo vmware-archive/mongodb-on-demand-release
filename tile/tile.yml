@@ -686,36 +686,6 @@ packages:
     single_az_only: true
     instances: 1
     properties: {}
-  - name: smoke_tests
-    label: 'Smoke Tests'
-    lifecycle: errand
-    post_deploy: true
-    run_post_deploy_errand_default: false
-    templates:
-    - name: smoke-tests
-      release: mongodb
-    max_in_flight: 1
-    memory: 1024
-    ephemeral_disk: 2048
-    persistent_disk: 0
-    cpu: 1
-    static_ip: 0
-    dynamic_ip: 1
-    single_az_only: true
-    instances: 1
-    properties:
-      cf:
-        api_url: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
-        apps_domain: (( ..cf.cloud_controller.apps_domain.value ))
-        system_domain: (( ..cf.cloud_controller.system_domain.value ))
-        admin_username: (( ..cf.uaa.admin_credentials.identity ))
-        admin_password: (( ..cf.uaa.admin_credentials.password ))
-        skip_ssl_validation: (( ..cf.ha_proxy.skip_cert_verify.value ))
-      mongodb:
-        service_plans:
-        - "standalone_small"
-        - "replica_set_small"
-        - "sharded_cluster_small"
   - name: delete_subdeployments_on_demand_service_broker
     label: 'Delete all instances deployed by the On Demand Service Broker'
     lifecycle: errand
