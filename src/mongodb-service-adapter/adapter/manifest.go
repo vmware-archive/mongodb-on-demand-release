@@ -122,7 +122,10 @@ func (m ManifestGenerator) GenerateManifest(
 	if version == nil {
 		engineVersion = oc.GetLatestVersion(group.ID)
 	} else {
-		engineVersion = version.(string)
+		engineVersion, err = oc.ValidateVersion(group.ID, version.(string))
+		if err != nil {
+			return bosh.BoshManifest{}, err
+		}
 	}
 
 	// sharded_cluster parameters

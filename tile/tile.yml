@@ -286,7 +286,7 @@ packages:
   path: resources/on-demand-service-broker-0.21.2.tgz
 - name: mongodb
   type: bosh-release
-  path: resources/mongodb-1.0.4.tgz
+  path: resources/mongodb-1.0.6.tgz
   jobs:
   - name: broker
     label: MongoDB-ODB
@@ -335,7 +335,7 @@ packages:
       service_deployment:
         releases:
         - name: mongodb
-          version: "1.0.4"
+          version: "1.0.6"
           jobs:
           - mongod_node
           - mongodb_config_agent

@@ -44,6 +44,18 @@
   version = "v0.8.0"
 
 [[projects]]
+  name = "github.com/tidwall/gjson"
+  packages = ["."]
+  revision = "f123b340873a0084cb27267eddd8ff615115fbff"
+  version = "v1.1.2"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/tidwall/match"
+  packages = ["."]
+  revision = "1731857f09b1f38450e2c12409748407822dc6be"
+
+[[projects]]
   name = "gopkg.in/go-playground/validator.v8"
   packages = ["."]
   revision = "5f1438d3fca68893a817e4a66806cea46a9e4ebf"
@@ -70,6 +82,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c1adefb7078f4ed49d21976956000cc14475c1985f5ec47403818881af9b4f23"
+  inputs-digest = "bb1815728e68e65746fb8a2afeaba5c004578926ba849ac95ed84339ad22ff2a"
   solver-name = "gps-cdcl"
   solver-version = 1

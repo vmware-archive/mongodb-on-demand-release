@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/cf-platform-eng/mongodb-on-demand-release/src/mongodb-service-adapter/digest"
+	"github.com/tidwall/gjson"
 )
 
 type OMClient struct {
@@ -221,6 +222,21 @@ func (oc *OMClient) GetLatestVersion(groupID string) string {
 	b := cfg.MongoDbVersions[len(cfg.MongoDbVersions)-1].Name
 
 	return b
+}
+
+func (oc *OMClient) ValidateVersion(groupID string, version string) (string, error) {
+	b, err := oc.doRequest("GET", fmt.Sprintf("/api/public/v1.0/groups/%s/automationConfig", groupID), nil)
+	if err != nil {
+		return "", err
+	}
+
+	v := gjson.GetBytes(b, fmt.Sprintf(`mongoDbVersions.#[name="%s"].name`, version))
+	log.Printf("Using %q version of MongoDB", v.String())
+	if v.String() == "" {
+		log.Fatalf("failed to find expected version, got %s", version)
+	}
+
+	return v.String(), nil
 }
 
 func (oc *OMClient) doRequest(method string, path string, body io.Reader) ([]byte, error) {
