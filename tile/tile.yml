@@ -274,7 +274,8 @@ forms:
     description: If you wish MongoDB to use SSL, provide an SSL certificate-authority certificate in PEM format here.
 
 requires_product_versions:
-  cf: ">= 1.10"
+- name: cf
+  version: ">= 1.10"
 
 packages:
 - name: pcf-mongodb-helpers
