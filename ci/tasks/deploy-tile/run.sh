@@ -33,54 +33,15 @@ ${om} upload-stemcell --stemcell "stemcell/$STEMCELL_FILE"
 ${om} available-products
 ${om} stage-product --product-name "$PRODUCT" --product-version "$VERSION"
 
-cat > network-config.json << EOF
-{
-  "singleton_availability_zone": {
-    "name": "$SINGELTON_AZ"
-  },
-  "other_availability_zones": [
-    {
-      "name": "$OTHER_AZ"
-    }
-  ],
-  "network": {
-    "name": "$PCF_NETWORK"
-  },
-  "service_network": {
-    "name": "${SERVICE_NETWORK}"
-  }
-}
-EOF
+echo "$PRODUCT_PROPERTIES" > properties.yml
+echo "$PRODUCT_NETWORK_AZS" > network-azs.yml
 
-cat > missing-properties.json << EOF
-{
-  ".properties.url": {
-    "value": "${MONGO_OPS_URL}"
-  },
-  ".properties.username": {
-    "value": "${MONGO_OPS_USERNAME}"
-  },
-  ".properties.api_key": {
-    "value": {
-      "secret": "${MONGO_OPS_API_KEY}"
-    }
-  },
-  ".properties.az_multi_select": {
-    "value": ["${AZ}"]
-  },
-  ".properties.ca_cert": {
-    "value": "${MONGO_CA_CERT}"
-  },
-  ".properties.rsa_certificate": {
-    "value": {
-      "cert_pem":"${MONGO_OPS_RSA_CERT}",
-      "private_key_pem": "${MONGO_OPS_RSA_KEY}"
-    }
-  }
-}
-EOF
+properties_config=$(ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))' < properties.yml)
+properties_config=$(echo "$properties_config" | jq 'delpaths([path(.[][] | select(. == null))]) | delpaths([path(.[][] | select(. == ""))]) | delpaths([path(.[] | select(. == {}))])')
 
-${om} configure-product --product-name "$PRODUCT" --product-network "$(cat network-config.json| jq -cr .)" --product-properties "$(cat missing-properties.json| jq -cr .)"
+network_config=$(ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))' < network-azs.yml)
+
+${om} configure-product --product-name "$PRODUCT" --product-network "$network_config" --product-properties "$properties_config"
 
 STAGED=$(${om} curl --path /api/v0/staged/products)
 RESULT=$(echo "$STAGED" | jq --arg product_name "$PRODUCT" 'map(select(.type == $product_name)) | .[].guid')

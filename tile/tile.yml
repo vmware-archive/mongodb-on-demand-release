@@ -256,6 +256,53 @@ forms:
     resource_definitions:
       - name: persistent_disk
         default: 200_000
+- name: mongodb_syslog_form
+  label: Syslog
+  description: Forwards syslog messages to a syslog server
+  properties:
+  - name: syslog_address
+    type: string
+    configurable: true
+    optional: true
+    label: Address
+    description: The address or host for the syslog server
+  - name: syslog_port
+    type: port
+    configurable: true
+    optional: true
+    label: Port
+    description: The port on which the syslog server listens
+  - name: syslog_transport_protocol
+    type: dropdown_select
+    configurable: true
+    label: Transport Protocol
+    description: The transport protocol used to send syslog messages to the server
+    default: tcp
+    options:
+    - name: tcp
+      label: TCP
+    - name: udp
+      label: UDP
+    - name: relp
+      label: RELP
+  - name: syslog_tls_enabled
+    type: boolean
+    default: false
+    configurable: true
+    label: Enable TLS
+    description: Send logs encrypted to syslog server via TLS
+  - name: syslog_permitted_peer
+    type: string
+    configurable: true
+    optional: true
+    label: Permitted Peer
+    description: 'Either the accepted fingerprint (SHA1) or name of remote peer, e.g. *.example.com'
+  - name: syslog_ca_cert
+    type: ca_certificate
+    configurable: true
+    optional: true
+    label: SSL Certificate
+    description: This certificate will ensure that logs get securely transported to the syslog destination
 - name: mongodb_security_form
   label: Security
   description: Configure MongoDB to support TLS/SSL
@@ -284,6 +331,9 @@ packages:
 - name: on-demand-service-broker
   type: bosh-release
   path: resources/on-demand-service-broker-0.21.2.tgz
+- name: syslog
+  type: bosh-release
+  path: resources/syslog-migration-11.1.1.tgz
 - name: mongodb
   type: bosh-release
   path: resources/mongodb-1.0.6.tgz
@@ -345,6 +395,10 @@ packages:
           version: "0.0.1"
           jobs:
           - bosh-dns-enable
+        - name: syslog-migration
+          version: "11.1.1"
+          jobs:
+          - syslog_forwarder
         stemcell:
           os: ubuntu-trusty
           version: "(( $self.stemcell_version ))"
@@ -398,6 +452,13 @@ packages:
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
+            syslog:
+              address: (( .properties.syslog_address.value || "" ))
+              port: (( .properties.syslog_port.value ))
+              transport: (( .properties.syslog_transport_protocol.value ))
+              tls_enabled: (( .properties.syslog_tls_enabled.value ))
+              permitted_peer: (( .properties.syslog_permitted_peer.value ))
+              ca_cert: (( .properties.syslog_ca_cert.value ))
         - name: standalone_medium
           plan_id: f40cf0fa-4eb9-446c-a429-0b1ea2ae6ae7
           description: Standalone Medium Instance
@@ -428,6 +489,13 @@ packages:
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
+            syslog:
+              address: (( .properties.syslog_address.value || "" ))
+              port: (( .properties.syslog_port.value ))
+              transport: (( .properties.syslog_transport_protocol.value ))
+              tls_enabled: (( .properties.syslog_tls_enabled.value ))
+              permitted_peer: (( .properties.syslog_permitted_peer.value ))
+              ca_cert: (( .properties.syslog_ca_cert.value ))
         - name: standalone_large
           plan_id: 44cad965-9182-4a89-8246-af719f5f699a
           description: Standalone Large Instance
@@ -458,6 +526,13 @@ packages:
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
+            syslog:
+              address: (( .properties.syslog_address.value || "" ))
+              port: (( .properties.syslog_port.value ))
+              transport: (( .properties.syslog_transport_protocol.value ))
+              tls_enabled: (( .properties.syslog_tls_enabled.value ))
+              permitted_peer: (( .properties.syslog_permitted_peer.value ))
+              ca_cert: (( .properties.syslog_ca_cert.value ))
         - name: replica_set_small
           plan_id: 02d95e8f-a0ee-4c25-9407-6ca5d1989741
           description: Replica Set Small
@@ -488,6 +563,13 @@ packages:
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
+            syslog:
+              address: (( .properties.syslog_address.value || "" ))
+              port: (( .properties.syslog_port.value ))
+              transport: (( .properties.syslog_transport_protocol.value ))
+              tls_enabled: (( .properties.syslog_tls_enabled.value ))
+              permitted_peer: (( .properties.syslog_permitted_peer.value ))
+              ca_cert: (( .properties.syslog_ca_cert.value ))
         - name: replica_set_medium
           plan_id: fee3933e-42cb-4964-b66e-79498f94e968
           description: Replica Set Medium
@@ -518,6 +600,13 @@ packages:
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
+            syslog:
+              address: (( .properties.syslog_address.value || "" ))
+              port: (( .properties.syslog_port.value ))
+              transport: (( .properties.syslog_transport_protocol.value ))
+              tls_enabled: (( .properties.syslog_tls_enabled.value ))
+              permitted_peer: (( .properties.syslog_permitted_peer.value ))
+              ca_cert: (( .properties.syslog_ca_cert.value ))
         - name: replica_set_large
           plan_id: 317e003c-30a4-4384-b51d-9bf686e395e9
           description: Replica Set Large
@@ -548,6 +637,13 @@ packages:
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
+            syslog:
+              address: (( .properties.syslog_address.value || "" ))
+              port: (( .properties.syslog_port.value ))
+              transport: (( .properties.syslog_transport_protocol.value ))
+              tls_enabled: (( .properties.syslog_tls_enabled.value ))
+              permitted_peer: (( .properties.syslog_permitted_peer.value ))
+              ca_cert: (( .properties.syslog_ca_cert.value ))
         - name: sharded_cluster_small
           plan_id: f2677585-4020-407c-87c2-b8260e816ef8
           description: Sharded Cluster Small
@@ -580,6 +676,13 @@ packages:
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
+            syslog:
+              address: (( .properties.syslog_address.value || "" ))
+              port: (( .properties.syslog_port.value ))
+              transport: (( .properties.syslog_transport_protocol.value ))
+              tls_enabled: (( .properties.syslog_tls_enabled.value ))
+              permitted_peer: (( .properties.syslog_permitted_peer.value ))
+              ca_cert: (( .properties.syslog_ca_cert.value ))
         - name: sharded_cluster_medium
           plan_id: 477a196a-9e28-4103-87d3-593767448c9f
           description: Sharded Cluster Medium
@@ -612,6 +715,13 @@ packages:
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
+            syslog:
+              address: (( .properties.syslog_address.value || "" ))
+              port: (( .properties.syslog_port.value ))
+              transport: (( .properties.syslog_transport_protocol.value ))
+              tls_enabled: (( .properties.syslog_tls_enabled.value ))
+              permitted_peer: (( .properties.syslog_permitted_peer.value ))
+              ca_cert: (( .properties.syslog_ca_cert.value ))
         - name: sharded_cluster_large
           plan_id: 7a5977ed-4a45-4e32-8eb4-e4b371dd3b95
           description: Sharded Cluster Large
@@ -644,6 +754,13 @@ packages:
               ssl_ca_cert: (( .properties.ca_cert.value || "" ))
               ssl_pem: (( .properties.rsa_certificate.cert_and_private_key_pems || "" ))
               bosh_dns_disable: (( .properties.bosh_dns_disable.value ))
+            syslog:
+              address: (( .properties.syslog_address.value || "" ))
+              port: (( .properties.syslog_port.value ))
+              transport: (( .properties.syslog_transport_protocol.value ))
+              tls_enabled: (( .properties.syslog_tls_enabled.value ))
+              permitted_peer: (( .properties.syslog_permitted_peer.value ))
+              ca_cert: (( .properties.syslog_ca_cert.value ))
   - name: register_on_demand_service_broker
     label: 'On Demand Service Broker Registrar'
     lifecycle: errand

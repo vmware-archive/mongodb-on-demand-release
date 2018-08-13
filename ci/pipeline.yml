@@ -53,6 +53,14 @@ resources:
     access_key_id: ((aws-access-key))
     secret_access_key: ((aws-secret-access-key))
 
+- name: syslog-migration-release
+  type: s3
+  source:
+    bucket: ((aws-bucket))
+    regexp: syslog-migration-(.*).tgz
+    access_key_id: ((aws-access-key))
+    secret_access_key: ((aws-secret-access-key))
+
 - name: artifacts
   type: s3
   source:
@@ -94,6 +102,9 @@ jobs:
     - get: mongodb-on-demand-release
       trigger: true
     - get: on-demand-service-broker
+    - get: syslog-migration-release
+      params:
+        filename: syslog-migration-(.*).tgz
     - get: pcf-mongodb-helpers
       params:
         filename: pcf-mongodb-helpers-(.*).tgz
@@ -137,17 +148,8 @@ jobs:
       PCF_URL: ((pcf-url))
       PCF_USERNAME: ((pcf-username))
       PCF_PASSWORD: ((pcf-password))
-      MONGO_OPS_URL: ((mongo-url))
-      MONGO_OPS_USERNAME: ((mongo-username))
-      MONGO_OPS_API_KEY: ((mongo-apikey))
-      MONGO_CA_CERT: ((mongo-ca-cert))
-      MONGO_OPS_RSA_CERT: ((mongo-rsa-cert))
-      MONGO_OPS_RSA_KEY: ((mongo-rsa-key))
-      AZ: ((mongo-az))
-      SINGELTON_AZ: ((mongo-az))
-      OTHER_AZ: ((mongo-az))
-      SERVICE_NETWORK: ((pcf-service-network))
-      PCF_NETWORK: ((pcf-network))
+      PRODUCT_PROPERTIES: ((product_properties))
+      PRODUCT_NETWORK_AZS: ((product_network_azs))
     on_failure: *alert
 
 - name: smoke-tests

@@ -14,6 +14,7 @@ const (
 	MongodInstanceGroupName = "mongod_node"
 	MongodJobName           = "mongod_node"
 	AliasesJobName          = "mongodb-dns-aliases"
+	SyslogJobName           = "syslog_forwarder"
 	BoshDNSEnableJobName    = "bosh-dns-enable"
 	ConfigAgentJobName      = "mongodb_config_agent"
 	CleanupErrandJobName    = "cleanup_service"
@@ -42,6 +43,7 @@ func (m ManifestGenerator) GenerateManifest(
 	arbitraryParams := requestParams.ArbitraryParams()
 
 	mongoOps := plan.Properties["mongo_ops"].(map[string]interface{})
+	syslogProps := plan.Properties["syslog"].(map[string]interface{})
 
 	username := mongoOps["username"].(string)
 	apiKey := mongoOps["api_key"].(string)
@@ -92,10 +94,22 @@ func (m ManifestGenerator) GenerateManifest(
 	if err != nil {
 		return bosh.BoshManifest{}, err
 	}
+	if syslogProps["address"].(string) != "" {
+		mongodJobs, err = gatherJobs(serviceDeployment.Releases, []string{MongodJobName, SyslogJobName})
+		if err != nil {
+			return bosh.BoshManifest{}, err
+		}
+	}
 
 	configAgentJobs, err := gatherJobs(serviceDeployment.Releases, []string{ConfigAgentJobName, CleanupErrandJobName})
 	if err != nil {
 		return bosh.BoshManifest{}, err
+	}
+	if syslogProps["address"].(string) != "" {
+		configAgentJobs, err = gatherJobs(serviceDeployment.Releases, []string{ConfigAgentJobName, CleanupErrandJobName, SyslogJobName})
+		if err != nil {
+			return bosh.BoshManifest{}, err
+		}
 	}
 
 	addonsJobs, err := gatherJobs(serviceDeployment.Releases, []string{AliasesJobName, BoshDNSEnableJobName})
@@ -298,6 +312,14 @@ func (m ManifestGenerator) GenerateManifest(
 				"routers":        routers,
 				"config_servers": configServers,
 				"replicas":       replicas,
+			},
+			"syslog": map[string]interface{}{
+				"address":        syslogProps["address"],
+				"port":           syslogProps["port"],
+				"transport":      syslogProps["transport"],
+				"tls_enabled":    syslogProps["tls_enabled"],
+				"permitted_peer": syslogProps["permitted_peer"],
+				"ca_cert":        syslogProps["ca_cert"],
 			},
 		},
 	}
