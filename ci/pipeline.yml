@@ -176,6 +176,9 @@ jobs:
     - get: mongodb-on-demand-release
       passed: [ smoke-tests ]
     - get: on-demand-service-broker
+    - get: syslog-migration-release
+      params:
+        filename: syslog-migration-(.*).tgz
     - get: pcf-mongodb-helpers
       params:
         filename: pcf-mongodb-helpers-(.*).tgz

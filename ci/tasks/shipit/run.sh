@@ -11,6 +11,7 @@ if [ -z "${VERSION:-}" ]; then
 fi
 
 cp "$base"/on-demand-service-broker/on-demand-service-broker-*.tgz "$base"/mongodb-on-demand-release/tile/resources
+cp "$base"/syslog-migration-release/syslog-migration-*.tgz "$base"/mongodb-on-demand-release/tile/resources
 cp "$base"/pcf-mongodb-helpers/pcf-mongodb-helpers-*.tgz "$base"/mongodb-on-demand-release/tile/resources
 
 (
@@ -24,8 +25,8 @@ bosh -n create-release --sha2 --tarball="$tarball_path" --version="${VERSION}"
 (
 cd mongodb-on-demand-release/tile
 
-yq w -i tile.yml packages.[2].path "$(ls resources/mongodb-*.tgz)"
-yq w -i tile.yml packages.[2].jobs[0].properties.service_deployment.releases[0].version "${VERSION}"
+yq w -i tile.yml packages.[3].path "$(ls resources/mongodb-*.tgz)"
+yq w -i tile.yml packages.[3].jobs[0].properties.service_deployment.releases[0].version "${VERSION}"
 tile build "${VERSION}"
 )
 
