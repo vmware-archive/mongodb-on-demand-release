@@ -260,7 +260,10 @@ func (m ManifestGenerator) GenerateManifest(
 				PersistentDiskType: mongodInstanceGroup.PersistentDiskType,
 				AZs:                mongodInstanceGroup.AZs,
 				Networks:           mongodNetworks,
-				Properties:         map[string]interface{}{},
+				Env: map[string]interface{}{
+					"persistent_disk_fs": "xfs",
+				},
+				Properties: map[string]interface{}{},
 			},
 			{
 				Name:         "mongodb-config-agent",
