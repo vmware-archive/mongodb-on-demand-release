@@ -47,6 +47,8 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 
 	b.logf("properties: %v", properties)
 
+	b.logf("Deployment topology: %v", deploymentTopology)
+
 	servers := make([]string, len(deploymentTopology["mongod_node"]))
 	for i, node := range deploymentTopology["mongod_node"] {
 		servers[i] = fmt.Sprintf("%s:28000", node)
