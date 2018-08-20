@@ -302,6 +302,9 @@ func (m ManifestGenerator) GenerateManifest(
 			},
 		},
 		Update: updateBlock,
+		Features: bosh.BoshFeatures{
+			UseDNSAddresses: boolPointer(true),
+		},
 		Properties: map[string]interface{}{
 			"mongo_ops": map[string]interface{}{
 				"url":            url,
@@ -465,4 +468,8 @@ found:
 		return int(p)
 	}
 	return prop
+}
+
+func boolPointer(b bool) *bool {
+	return &b
 }
