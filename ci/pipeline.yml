@@ -21,13 +21,6 @@ resources:
     uri: git@github.com:Altoros/mongodb-on-demand-release.git
     private_key: ((git-private-key))
 
-- name: on-demand-service-broker
-  type: pivnet
-  source:
-    api_token: ((pivnet-token))
-    product_slug: on-demand-services-sdk
-    product_version: 0.21.2
-
 - name: stemcell
   type: pivnet
   source:
@@ -44,6 +37,14 @@ resources:
     access_key_id: ((aws-access-key))
     secret_access_key: ((aws-secret-access-key))
     initial_version: ((initial-version))
+
+- name: on-demand-service-broker-release
+  type: s3
+  source:
+    bucket: ((aws-bucket))
+    regexp: on-demand-service-broker-(.*).tgz
+    access_key_id: ((aws-access-key))
+    secret_access_key: ((aws-secret-access-key))
 
 - name: pcf-mongodb-helpers
   type: s3
@@ -101,7 +102,9 @@ jobs:
   - aggregate:
     - get: mongodb-on-demand-release
       trigger: true
-    - get: on-demand-service-broker
+    - get: on-demand-service-broker-release
+      params:
+        filename: on-demand-service-broker-(.*).tgz
     - get: syslog-migration-release
       params:
         filename: syslog-migration-(.*).tgz
@@ -175,7 +178,9 @@ jobs:
   - aggregate:
     - get: mongodb-on-demand-release
       passed: [ smoke-tests ]
-    - get: on-demand-service-broker
+    - get: on-demand-service-broker-release
+      params:
+        filename: on-demand-service-broker-(.*).tgz
     - get: syslog-migration-release
       params:
         filename: syslog-migration-(.*).tgz

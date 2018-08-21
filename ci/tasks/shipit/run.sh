@@ -10,7 +10,7 @@ if [ -z "${VERSION:-}" ]; then
   exit 1
 fi
 
-cp "$base"/on-demand-service-broker/on-demand-service-broker-*.tgz "$base"/mongodb-on-demand-release/tile/resources
+cp "$base"/on-demand-service-broker-release/on-demand-service-broker-*.tgz "$base"/mongodb-on-demand-release/tile/resources
 cp "$base"/syslog-migration-release/syslog-migration-*.tgz "$base"/mongodb-on-demand-release/tile/resources
 cp "$base"/pcf-mongodb-helpers/pcf-mongodb-helpers-*.tgz "$base"/mongodb-on-demand-release/tile/resources
 
