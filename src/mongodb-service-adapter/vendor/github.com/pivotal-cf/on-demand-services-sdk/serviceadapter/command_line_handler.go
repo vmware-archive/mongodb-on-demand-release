@@ -16,20 +16,14 @@
 package serviceadapter
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
+	"sort"
 
 	"strings"
 
 	"path/filepath"
-
-	"flag"
-
-	"github.com/pivotal-cf/on-demand-services-sdk/bosh"
-	"github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
 )
 
 // CommandLineHandler contains all of the implementers required for the service adapter interface
@@ -67,7 +61,7 @@ func HandleCommandLineInvocation(args []string, manifestGenerator ManifestGenera
 // line arguments. The first argument at the command line should be one of:
 // generate-manifest, create-binding, delete-binding, dashboard-url.
 func HandleCLI(args []string, handler CommandLineHandler) {
-	err := handler.Handle(args, os.Stdout, os.Stderr)
+	err := handler.Handle(args, os.Stdout, os.Stderr, os.Stdin)
 	switch e := err.(type) {
 	case nil:
 	case CLIHandlerError:
@@ -78,8 +72,15 @@ func HandleCLI(args []string, handler CommandLineHandler) {
 }
 
 // Handle executes required action and returns an error. Writes responses to the writer provided
-func (h CommandLineHandler) Handle(args []string, outputWriter, errorWriter io.Writer) error {
-	supportedCommands := h.generateSupportedCommandsMessage()
+func (h CommandLineHandler) Handle(args []string, outputWriter, errorWriter io.Writer, inputParamsReader io.Reader) error {
+	actions := map[string]Action{
+		"generate-manifest":     NewGenerateManifestAction(h.ManifestGenerator),
+		"create-binding":        NewCreateBindingAction(h.Binder),
+		"delete-binding":        NewDeleteBindingAction(h.Binder),
+		"dashboard-url":         NewDashboardUrlAction(h.DashboardURLGenerator),
+		"generate-plan-schemas": NewGeneratePlanSchemasAction(h.SchemaGenerator, errorWriter),
+	}
+	supportedCommands := h.generateSupportedCommandsMessage(actions)
 
 	if len(args) < 2 {
 		return CLIHandlerError{
@@ -88,95 +89,31 @@ func (h CommandLineHandler) Handle(args []string, outputWriter, errorWriter io.W
 		}
 	}
 
-	fmt.Fprintf(errorWriter, "[odb-sdk] handling %s\n", args[1])
+	action, arguments := args[1], args[2:]
+	fmt.Fprintf(errorWriter, "[odb-sdk] handling %s\n", action)
 
-	switch args[1] {
-	case "generate-manifest":
-		if h.ManifestGenerator == nil {
-			return CLIHandlerError{NotImplementedExitCode, "manifest generator not implemented"}
-		}
+	var inputParams InputParams
 
-		if len(args) < 7 {
-			return missingArgsError(args, "<service-deployment-JSON> <plan-JSON> <request-params-JSON> <previous-manifest-YAML> <previous-plan-JSON>")
-		}
-
-		serviceDeploymentJSON := args[2]
-		planJSON := args[3]
-		argsJSON := args[4]
-		previousManifestYAML := args[5]
-		previousPlanJSON := args[6]
-		return h.generateManifest(serviceDeploymentJSON, planJSON, argsJSON, previousManifestYAML, previousPlanJSON, outputWriter)
-
-	case "create-binding":
-		if h.Binder == nil {
-			return CLIHandlerError{NotImplementedExitCode, "binder not implemented"}
-		}
-		if len(args) < 6 {
-			return missingArgsError(args, "<binding-ID> <bosh-VMs-JSON> <manifest-YAML> <request-params-JSON>")
-		}
-
-		bindingID := args[2]
-		boshVMsJSON := args[3]
-		manifestYAML := args[4]
-		reqParams := args[5]
-		return h.createBinding(bindingID, boshVMsJSON, manifestYAML, reqParams, outputWriter)
-	case "delete-binding":
-		if h.Binder == nil {
-			return CLIHandlerError{NotImplementedExitCode, "binder not implemented"}
-		}
-		if len(args) < 6 {
-			return missingArgsError(args, "<binding-ID> <bosh-VMs-JSON> <manifest-YAML> <request-params-JSON>")
-		}
-
-		bindingID := args[2]
-		boshVMsJSON := args[3]
-		manifestYAML := args[4]
-		unbindingRequestParams := args[5]
-		return h.deleteBinding(bindingID, boshVMsJSON, manifestYAML, unbindingRequestParams, outputWriter)
-	case "dashboard-url":
-		if h.DashboardURLGenerator == nil {
-			return CLIHandlerError{NotImplementedExitCode, "dashboard-url not implemented"}
-		}
-		if len(args) < 5 {
-			return missingArgsError(args, "<instance-ID> <plan-JSON> <manifest-YAML>")
-		}
-
-		instanceID := args[2]
-		planJSON := args[3]
-		manifestYAML := args[4]
-		return h.dashboardUrl(instanceID, planJSON, manifestYAML, outputWriter)
-	case "generate-plan-schemas":
-		if h.SchemaGenerator == nil {
-			return CLIHandlerError{NotImplementedExitCode, "plan schema generator not implemented"}
-		}
-
-		planJson, err := parseGeneratePlanSchemaArguments(args, errorWriter)
-		if err != nil {
-			return err
-		}
-		return h.generatePlanSchema(planJson, outputWriter)
-
-	default:
+	var err error
+	ac, ok := actions[action]
+	if !ok {
 		failWithCode(ErrorExitCode, fmt.Sprintf("unknown subcommand: %s. The following commands are supported: %s", args[1], supportedCommands))
-	}
-	return nil
-}
-
-func parseGeneratePlanSchemaArguments(args []string, errorWriter io.Writer) (string, error) {
-	fs := flag.NewFlagSet("", flag.ContinueOnError)
-	flagPlanJSON := fs.String("plan-json", "", "Plan JSON")
-	fs.SetOutput(errorWriter)
-
-	err := fs.Parse(args[2:])
-	if err != nil {
-		return "", incorrectArgsError(args[1])
+		return nil
 	}
 
-	if *flagPlanJSON == "" {
-		return "", incorrectArgsError(args[1])
+	if !ac.IsImplemented() {
+		return CLIHandlerError{NotImplementedExitCode, fmt.Sprintf("%s not implemented", action)}
 	}
 
-	return *flagPlanJSON, nil
+	if inputParams, err = ac.ParseArgs(inputParamsReader, arguments); err != nil {
+		switch e := err.(type) {
+		case MissingArgsError:
+			return missingArgsError(args, e.Error())
+		default:
+			return e
+		}
+	}
+	return ac.Execute(inputParams, outputWriter)
 }
 
 func failWithMissingArgsError(args []string, argumentNames string) {
@@ -212,191 +149,16 @@ func missingArgsError(args []string, argumentNames string) error {
 	}
 }
 
-func (h CommandLineHandler) generateSupportedCommandsMessage() string {
-	var commands []string
-	if h.ManifestGenerator != nil {
-		commands = append(commands, "generate-manifest")
+func (h CommandLineHandler) generateSupportedCommandsMessage(actions map[string]Action) string {
+	commands := []string{}
+	for key, action := range actions {
+		if action.IsImplemented() {
+			commands = append(commands, key)
+		}
 	}
 
-	if h.Binder != nil {
-		commands = append(commands, "create-binding, delete-binding")
-	}
-
-	if h.DashboardURLGenerator != nil {
-		commands = append(commands, "dashboard-url")
-	}
-
-	if h.SchemaGenerator != nil {
-		commands = append(commands, "generate-plan-schemas")
-	}
-
+	sort.Strings(commands)
 	return strings.Join(commands, ", ")
-}
-
-func (h CommandLineHandler) generateManifest(serviceDeploymentJSON, planJSON, argsJSON, previousManifestYAML, previousPlanJSON string, outputWriter io.Writer) error {
-	var serviceDeployment ServiceDeployment
-
-	if err := json.Unmarshal([]byte(serviceDeploymentJSON), &serviceDeployment); err != nil {
-		return errors.Wrap(err, "unmarshalling service deployment")
-	}
-	if err := serviceDeployment.Validate(); err != nil {
-		return errors.Wrap(err, "validating service deployment")
-	}
-
-	var plan Plan
-	if err := json.Unmarshal([]byte(planJSON), &plan); err != nil {
-		return errors.Wrap(err, "unmarshalling service plan")
-	}
-	if err := plan.Validate(); err != nil {
-		return errors.Wrap(err, "validating service plan")
-	}
-
-	var requestParams map[string]interface{}
-	if err := json.Unmarshal([]byte(argsJSON), &requestParams); err != nil {
-		return errors.Wrap(err, "unmarshalling requestParams")
-	}
-
-	var previousManifest *bosh.BoshManifest
-	if err := yaml.Unmarshal([]byte(previousManifestYAML), &previousManifest); err != nil {
-		return errors.Wrap(err, "unmarshalling previous manifest")
-	}
-
-	var previousPlan *Plan
-	if err := json.Unmarshal([]byte(previousPlanJSON), &previousPlan); err != nil {
-		return errors.Wrap(err, "unmarshalling previous service plan")
-	}
-	if previousPlan != nil {
-		if err := previousPlan.Validate(); err != nil {
-			return errors.Wrap(err, "validating previous service plan")
-		}
-	}
-
-	manifest, err := h.ManifestGenerator.GenerateManifest(serviceDeployment, plan, requestParams, previousManifest, previousPlan)
-	if err != nil {
-		fmt.Fprintf(outputWriter, err.Error())
-		return CLIHandlerError{ErrorExitCode, err.Error()}
-	}
-
-	manifestBytes, err := yaml.Marshal(manifest)
-	if err != nil {
-		return errors.Wrap(err, "error marshalling bosh manifest")
-	}
-
-	fmt.Fprint(outputWriter, string(manifestBytes))
-	return nil
-}
-
-func (h CommandLineHandler) createBinding(bindingID, boshVMsJSON, manifestYAML, requestParams string, outputWriter io.Writer) error {
-	var boshVMs map[string][]string
-	if err := json.Unmarshal([]byte(boshVMsJSON), &boshVMs); err != nil {
-		return errors.Wrap(err, "unmarshalling BOSH VMs")
-	}
-
-	var manifest bosh.BoshManifest
-	if err := yaml.Unmarshal([]byte(manifestYAML), &manifest); err != nil {
-		return errors.Wrap(err, "unmarshalling manifest YAML")
-	}
-
-	var reqParams map[string]interface{}
-	if err := json.Unmarshal([]byte(requestParams), &reqParams); err != nil {
-		return errors.Wrap(err, "unmarshalling request binding parameters")
-	}
-
-	binding, err := h.Binder.CreateBinding(bindingID, boshVMs, manifest, reqParams)
-	if err != nil {
-		fmt.Fprintf(outputWriter, err.Error())
-		switch err := err.(type) {
-		case BindingAlreadyExistsError:
-			return CLIHandlerError{BindingAlreadyExistsErrorExitCode, err.Error()}
-		case AppGuidNotProvidedError:
-			return CLIHandlerError{AppGuidNotProvidedErrorExitCode, err.Error()}
-		default:
-			return CLIHandlerError{ErrorExitCode, err.Error()}
-		}
-	}
-
-	if err := json.NewEncoder(outputWriter).Encode(binding); err != nil {
-		return errors.Wrap(err, "marshalling binding")
-	}
-
-	return nil
-}
-
-func (h CommandLineHandler) deleteBinding(bindingID, boshVMsJSON, manifestYAML string, requestParams string, outputWriter io.Writer) error {
-	var boshVMs bosh.BoshVMs
-	if err := json.Unmarshal([]byte(boshVMsJSON), &boshVMs); err != nil {
-		return errors.Wrap(err, "unmarshalling BOSH VMs")
-	}
-
-	var manifest bosh.BoshManifest
-	if err := yaml.Unmarshal([]byte(manifestYAML), &manifest); err != nil {
-		return errors.Wrap(err, "unmarshalling manifest YAML")
-	}
-
-	var reqParams RequestParameters
-	if err := json.Unmarshal([]byte(requestParams), &reqParams); err != nil {
-		return errors.Wrap(err, "unmarshalling request binding parameters")
-	}
-
-	err := h.Binder.DeleteBinding(bindingID, boshVMs, manifest, reqParams)
-	if err != nil {
-		fmt.Fprintf(outputWriter, err.Error())
-		switch err.(type) {
-		case BindingNotFoundError:
-			return CLIHandlerError{BindingNotFoundErrorExitCode, err.Error()}
-		default:
-			return CLIHandlerError{ErrorExitCode, err.Error()}
-		}
-	}
-	return nil
-}
-
-func (h CommandLineHandler) dashboardUrl(instanceID, planJSON, manifestYAML string, outputWriter io.Writer) error {
-	var plan Plan
-	if err := json.Unmarshal([]byte(planJSON), &plan); err != nil {
-		return errors.Wrap(err, "unmarshalling service plan")
-	}
-	if err := plan.Validate(); err != nil {
-		return errors.Wrap(err, "validating service plan")
-	}
-
-	var manifest bosh.BoshManifest
-	if err := yaml.Unmarshal([]byte(manifestYAML), &manifest); err != nil {
-		return errors.Wrap(err, "unmarshalling manifest")
-	}
-
-	dashboardUrl, err := h.DashboardURLGenerator.DashboardUrl(instanceID, plan, manifest)
-	if err != nil {
-		fmt.Fprintf(outputWriter, err.Error())
-		return CLIHandlerError{ErrorExitCode, err.Error()}
-	}
-
-	if err := json.NewEncoder(outputWriter).Encode(dashboardUrl); err != nil {
-		return errors.Wrap(err, "marshalling dashboardUrl")
-	}
-
-	return nil
-}
-
-func (h CommandLineHandler) generatePlanSchema(planJSON string, outputWriter io.Writer) error {
-	var plan Plan
-	if err := json.Unmarshal([]byte(planJSON), &plan); err != nil {
-		return errors.Wrap(err, "error unmarshalling plan JSON")
-	}
-	if err := plan.Validate(); err != nil {
-		return errors.Wrap(err, "error validating plan JSON")
-	}
-	schema, err := h.SchemaGenerator.GeneratePlanSchema(plan)
-	if err != nil {
-		fmt.Fprintf(outputWriter, err.Error())
-		return CLIHandlerError{ErrorExitCode, err.Error()}
-	}
-	err = json.NewEncoder(outputWriter).Encode(schema)
-	if err != nil {
-		return errors.Wrap(err, "error marshalling plan schema")
-	}
-
-	return nil
 }
 
 func (h CommandLineHandler) must(err error, msg string) {

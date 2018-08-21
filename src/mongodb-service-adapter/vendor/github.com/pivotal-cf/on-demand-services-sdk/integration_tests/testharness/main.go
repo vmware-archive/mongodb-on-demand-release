@@ -45,13 +45,13 @@ func main() {
 
 type manifestGenerator struct{}
 
-func (m *manifestGenerator) GenerateManifest(serviceDeployment serviceadapter.ServiceDeployment, plan serviceadapter.Plan, requestParams serviceadapter.RequestParameters, previousManifest *bosh.BoshManifest, previousPlan *serviceadapter.Plan) (bosh.BoshManifest, error) {
+func (m *manifestGenerator) GenerateManifest(serviceDeployment serviceadapter.ServiceDeployment, plan serviceadapter.Plan, requestParams serviceadapter.RequestParameters, previousManifest *bosh.BoshManifest, previousPlan *serviceadapter.Plan) (serviceadapter.GenerateManifestOutput, error) {
 	if os.Getenv(testvariables.OperationFailsKey) == OperationShouldFail {
 		fmt.Fprintf(os.Stderr, "not valid")
-		return bosh.BoshManifest{}, errors.New("some message to the user")
+		return serviceadapter.GenerateManifestOutput{}, errors.New("some message to the user")
 	}
 
-	return bosh.BoshManifest{Name: "deployment-name",
+	manifest := bosh.BoshManifest{Name: "deployment-name",
 		Releases: []bosh.Release{
 			{
 				Name:    "a-release",
@@ -73,12 +73,15 @@ func (m *manifestGenerator) GenerateManifest(serviceDeployment serviceadapter.Se
 				},
 			},
 		},
+	}
+	return serviceadapter.GenerateManifestOutput{
+		Manifest: manifest,
 	}, nil
 }
 
 type binder struct{}
 
-func (b *binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest, requestParams serviceadapter.RequestParameters) (serviceadapter.Binding, error) {
+func (b *binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest, requestParams serviceadapter.RequestParameters, secrets serviceadapter.ManifestSecrets, dnsAddresses serviceadapter.DNSAddresses) (serviceadapter.Binding, error) {
 	errs := func(err error) (serviceadapter.Binding, error) {
 		return serviceadapter.Binding{}, err
 	}

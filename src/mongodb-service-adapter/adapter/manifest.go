@@ -36,7 +36,7 @@ func (m ManifestGenerator) GenerateManifest(
 	plan serviceadapter.Plan,
 	requestParams serviceadapter.RequestParameters,
 	previousManifest *bosh.BoshManifest,
-	previousPlan *serviceadapter.Plan) (bosh.BoshManifest, error) {
+	previousPlan *serviceadapter.Plan) (serviceadapter.GenerateManifestOutput, error) {
 
 	m.logf("request params: %#v", requestParams)
 
@@ -63,17 +63,17 @@ func (m ManifestGenerator) GenerateManifest(
 
 	adminPassword, err := passwordForMongoServer(previousMongoProperties)
 	if err != nil {
-		return bosh.BoshManifest{}, err
+		return serviceadapter.GenerateManifestOutput{}, err
 	}
 
 	id, err := idForMongoServer(previousMongoProperties)
 	if err != nil {
-		return bosh.BoshManifest{}, err
+		return serviceadapter.GenerateManifestOutput{}, err
 	}
 
 	group, err := groupForMongoServer(id, oc, plan.Properties, previousMongoProperties, arbitraryParams)
 	if err != nil {
-		return bosh.BoshManifest{}, fmt.Errorf("could not create new group (%s)", err.Error())
+		return serviceadapter.GenerateManifestOutput{}, fmt.Errorf("could not create new group (%s)", err.Error())
 	}
 	m.logf("created group %s", group.ID)
 
@@ -87,39 +87,39 @@ func (m ManifestGenerator) GenerateManifest(
 
 	mongodInstanceGroup := findInstanceGroup(plan, MongodInstanceGroupName)
 	if mongodInstanceGroup == nil {
-		return bosh.BoshManifest{}, fmt.Errorf("no definition found for instance group '%s'", MongodInstanceGroupName)
+		return serviceadapter.GenerateManifestOutput{}, fmt.Errorf("no definition found for instance group '%s'", MongodInstanceGroupName)
 	}
 
 	mongodJobs, err := gatherJobs(serviceDeployment.Releases, []string{MongodJobName})
 	if err != nil {
-		return bosh.BoshManifest{}, err
+		return serviceadapter.GenerateManifestOutput{}, err
 	}
 	if syslogProps["address"].(string) != "" {
 		mongodJobs, err = gatherJobs(serviceDeployment.Releases, []string{MongodJobName, SyslogJobName})
 		if err != nil {
-			return bosh.BoshManifest{}, err
+			return serviceadapter.GenerateManifestOutput{}, err
 		}
 	}
 
 	configAgentJobs, err := gatherJobs(serviceDeployment.Releases, []string{ConfigAgentJobName, CleanupErrandJobName})
 	if err != nil {
-		return bosh.BoshManifest{}, err
+		return serviceadapter.GenerateManifestOutput{}, err
 	}
 	if syslogProps["address"].(string) != "" {
 		configAgentJobs, err = gatherJobs(serviceDeployment.Releases, []string{ConfigAgentJobName, CleanupErrandJobName, SyslogJobName})
 		if err != nil {
-			return bosh.BoshManifest{}, err
+			return serviceadapter.GenerateManifestOutput{}, err
 		}
 	}
 
 	addonsJobs, err := gatherJobs(serviceDeployment.Releases, []string{AliasesJobName, BoshDNSEnableJobName})
 	if err != nil {
-		return bosh.BoshManifest{}, err
+		return serviceadapter.GenerateManifestOutput{}, err
 	}
 	if boshDNSDisable {
 		addonsJobs, err = gatherJobs(serviceDeployment.Releases, []string{AliasesJobName})
 		if err != nil {
-			return bosh.BoshManifest{}, err
+			return serviceadapter.GenerateManifestOutput{}, err
 		}
 	}
 
@@ -128,7 +128,7 @@ func (m ManifestGenerator) GenerateManifest(
 		mongodNetworks = append(mongodNetworks, bosh.Network{Name: network})
 	}
 	if len(mongodNetworks) == 0 {
-		return bosh.BoshManifest{}, fmt.Errorf("no networks definition found for instance group '%s'", MongodInstanceGroupName)
+		return serviceadapter.GenerateManifestOutput{}, fmt.Errorf("no networks definition found for instance group '%s'", MongodInstanceGroupName)
 	}
 
 	var engineVersion string
@@ -138,7 +138,7 @@ func (m ManifestGenerator) GenerateManifest(
 	} else {
 		engineVersion, err = oc.ValidateVersion(group.ID, version.(string))
 		if err != nil {
-			return bosh.BoshManifest{}, err
+			return serviceadapter.GenerateManifestOutput{}, err
 		}
 	}
 
@@ -192,11 +192,11 @@ func (m ManifestGenerator) GenerateManifest(
 
 		instances = routers + configServers + shards*replicas
 	default:
-		return bosh.BoshManifest{}, fmt.Errorf("unknown plan: %s", planID)
+		return serviceadapter.GenerateManifestOutput{}, fmt.Errorf("unknown plan: %s", planID)
 	}
 	authKey, err := authKeyForMongoServer(previousMongoProperties)
 	if err != nil {
-		return bosh.BoshManifest{}, err
+		return serviceadapter.GenerateManifestOutput{}, err
 	}
 	backupEnabled := false
 	if planID != PlanStandalone {
@@ -331,7 +331,10 @@ func (m ManifestGenerator) GenerateManifest(
 	}
 
 	m.logf("generated manifest: %#v", manifest)
-	return manifest, nil
+	return serviceadapter.GenerateManifestOutput{
+		Manifest:          manifest,
+		ODBManagedSecrets: serviceadapter.ODBManagedSecrets{},
+	}, nil
 }
 
 func findInstanceGroup(plan serviceadapter.Plan, jobName string) *serviceadapter.InstanceGroup {

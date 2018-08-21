@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 
 	"github.com/pivotal-cf/brokerapi"
 	"github.com/pivotal-cf/on-demand-services-sdk/bosh"
@@ -30,12 +31,12 @@ import (
 
 //go:generate counterfeiter -o fakes/manifest_generator.go . ManifestGenerator
 type ManifestGenerator interface {
-	GenerateManifest(serviceDeployment ServiceDeployment, plan Plan, requestParams RequestParameters, previousManifest *bosh.BoshManifest, previousPlan *Plan) (bosh.BoshManifest, error)
+	GenerateManifest(serviceDeployment ServiceDeployment, plan Plan, requestParams RequestParameters, previousManifest *bosh.BoshManifest, previousPlan *Plan) (GenerateManifestOutput, error)
 }
 
 //go:generate counterfeiter -o fakes/binder.go . Binder
 type Binder interface {
-	CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest, requestParams RequestParameters) (Binding, error)
+	CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest, requestParams RequestParameters, secrets ManifestSecrets, dnsAddresses DNSAddresses) (Binding, error)
 	DeleteBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest, requestParams RequestParameters) error
 }
 
@@ -71,12 +72,69 @@ type DashboardUrl struct {
 	DashboardUrl string `json:"dashboard_url"`
 }
 
+type GenerateManifestParams struct {
+	ServiceDeployment string `json:"service_deployment"`
+	Plan              string `json:"plan"`
+	PreviousPlan      string `json:"previous_plan"`
+	PreviousManifest  string `json:"previous_manifest"`
+	RequestParameters string `json:"request_parameters"`
+}
+
+type DashboardUrlParams struct {
+	InstanceId string `json:"instance_id"`
+	Plan       string `json:"plan"`
+	Manifest   string `json:"manifest"`
+}
+
+type CreateBindingParams struct {
+	BindingId         string `json:"binding_id"`
+	BoshVms           string `json:"bosh_vms"`
+	Manifest          string `json:"manifest"`
+	RequestParameters string `json:"request_parameters"`
+	Secrets           string `json:"secrets"`
+	DNSAddresses      string `json:"dns_addresses"`
+}
+
+type DeleteBindingParams struct {
+	BindingId         string `json:"binding_id"`
+	BoshVms           string `json:"bosh_vms"`
+	Manifest          string `json:"manifest"`
+	RequestParameters string `json:"request_parameters"`
+}
+
+type GeneratePlanSchemasParams struct {
+	Plan string `json:"plan"`
+}
+
+type InputParams struct {
+	GenerateManifest    GenerateManifestParams    `json:"generate_manifest,omitempty"`
+	DashboardUrl        DashboardUrlParams        `json:"dashboard_url,omitempty"`
+	CreateBinding       CreateBindingParams       `json:"create_binding,omitempty"`
+	DeleteBinding       DeleteBindingParams       `json:"delete_binding,omitempty"`
+	GeneratePlanSchemas GeneratePlanSchemasParams `json:"generate_plan_schemas,omitempty"`
+	TextOutput          bool                      `json:"-"`
+}
+
+type ODBManagedSecrets map[string]interface{}
+
+type GenerateManifestOutput struct {
+	Manifest          bosh.BoshManifest `json:"manifest"`
+	ODBManagedSecrets ODBManagedSecrets `json:"secrets"`
+}
+
+type MarshalledGenerateManifest struct {
+	Manifest          string            `json:"manifest"`
+	ODBManagedSecrets ODBManagedSecrets `json:"secrets"`
+}
+
 const (
 	ErrorExitCode                     = 1
 	NotImplementedExitCode            = 10
 	BindingNotFoundErrorExitCode      = 41
 	AppGuidNotProvidedErrorExitCode   = 42
 	BindingAlreadyExistsErrorExitCode = 49
+
+	ODBSecretPrefix = "odb_secret"
 )
 
 type BindingAlreadyExistsError struct {
@@ -89,6 +147,12 @@ type AppGuidNotProvidedError struct {
 
 type BindingNotFoundError struct {
 	error
+}
+
+type Action interface {
+	IsImplemented() bool
+	ParseArgs(io.Reader, []string) (InputParams, error)
+	Execute(InputParams, io.Writer) error
 }
 
 func NewBindingAlreadyExistsError(err error) BindingAlreadyExistsError {
@@ -255,7 +319,7 @@ type Update struct {
 	Canaries        int                   `json:"canaries" yaml:"canaries"`
 	CanaryWatchTime string                `json:"canary_watch_time" yaml:"canary_watch_time"`
 	UpdateWatchTime string                `json:"update_watch_time" yaml:"update_watch_time"`
-	MaxInFlight     bosh.MaxInFlightValue `json:"max_in_flight, " yaml:"max_in_flight"`
+	MaxInFlight     bosh.MaxInFlightValue `json:"max_in_flight," yaml:"max_in_flight"`
 	Serial          *bool                 `json:"serial,omitempty" yaml:"serial,omitempty"`
 }
 
@@ -314,4 +378,12 @@ type Binding struct {
 	Credentials     map[string]interface{} `json:"credentials"`
 	SyslogDrainURL  string                 `json:"syslog_drain_url,omitempty"`
 	RouteServiceURL string                 `json:"route_service_url,omitempty"`
+}
+
+type MissingArgsError struct {
+	error
+}
+
+func NewMissingArgsError(e string) MissingArgsError {
+	return MissingArgsError{errors.New(e)}
 }

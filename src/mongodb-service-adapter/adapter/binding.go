@@ -33,7 +33,7 @@ const (
 	serverCertPath = "/var/vcap/jobs/mongodb_service_adapter/config/server.crt"
 )
 
-func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest, requestParams serviceadapter.RequestParameters) (serviceadapter.Binding, error) {
+func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs, manifest bosh.BoshManifest, requestParams serviceadapter.RequestParameters, secrets serviceadapter.ManifestSecrets, dnsAddresses serviceadapter.DNSAddresses) (serviceadapter.Binding, error) {
 
 	// create an admin level user
 	username := mkUsername(bindingID)
@@ -115,11 +115,12 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 
 	return serviceadapter.Binding{
 		Credentials: map[string]interface{}{
-			"username": username,
-			"password": password,
-			"database": defaultDB,
-			"servers":  servers,
-			"uri":      url,
+			"username":      username,
+			"password":      password,
+			"database":      defaultDB,
+			"servers":       servers,
+			"uri":           url,
+			"dns_addresses": dnsAddresses,
 		},
 	}, nil
 }
