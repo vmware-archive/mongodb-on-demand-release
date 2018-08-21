@@ -363,10 +363,9 @@ packages:
         url: https://(( $director.hostname )):25555
         root_ca_cert: (( $director.ca_public_key ))
         authentication:
-          uaa:
-            url: https://(( $director.hostname )):8443
-            client_id: (( $self.uaa_client_name ))
-            client_secret: (( $self.uaa_client_secret ))
+          basic:
+            username: (( $director.username ))
+            password: (( $director.password ))
       cf:
         url: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
         authentication:
