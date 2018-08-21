@@ -26,7 +26,7 @@ resources:
   source:
     api_token: ((pivnet-token))
     product_slug: stemcells
-    product_version: '3468.*'
+    product_version: '3586.*'
 
 - name: version
   type: semver
