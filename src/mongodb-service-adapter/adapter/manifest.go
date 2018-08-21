@@ -91,11 +91,13 @@ func (m ManifestGenerator) GenerateManifest(
 	}
 
 	mongodJobs, err := gatherJobs(serviceDeployment.Releases, []string{MongodJobName})
+	mongodJobs[0].AddSharedProvidesLink(MongodJobName)
 	if err != nil {
 		return serviceadapter.GenerateManifestOutput{}, err
 	}
 	if syslogProps["address"].(string) != "" {
 		mongodJobs, err = gatherJobs(serviceDeployment.Releases, []string{MongodJobName, SyslogJobName})
+		mongodJobs[0].AddSharedProvidesLink(MongodJobName)
 		if err != nil {
 			return serviceadapter.GenerateManifestOutput{}, err
 		}
