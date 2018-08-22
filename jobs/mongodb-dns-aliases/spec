@@ -6,10 +6,19 @@ templates:
 
 packages: []
 
-properties: {}
-
-consumes:
-- name: mongodb_config_agent
-  type: config_agent
-- name: mongod_node
-  type: node
+properties:
+  aliases:
+    description: List of generated aliases
+    example:
+    - domain: credhub.cf.internal
+      targets:
+      - query: "*"
+        instance_group: diego_cell1
+        deployment: cf_123
+        network: default_123
+        domain: bosh
+      - query: "*"
+        instance_group: diego_cell2
+        deployment: cf_123
+        network: default
+        domain: bosh

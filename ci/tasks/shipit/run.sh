@@ -27,6 +27,7 @@ cd mongodb-on-demand-release/tile
 
 yq w -i tile.yml packages.[3].path "$(ls resources/mongodb-*.tgz)"
 yq w -i tile.yml packages.[3].jobs[0].properties.service_deployment.releases[0].version "${VERSION}"
+yq w -i tile.yml runtime_configs[0].runtime_config.releases[0].version "${VERSION}"
 tile build "${VERSION}"
 )
 

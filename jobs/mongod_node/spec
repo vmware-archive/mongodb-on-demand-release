@@ -8,6 +8,7 @@ templates:
   config/local.conf.erb: config/local.conf
   config/mongo_om.key.erb: config/mongo_om.key
   config/server.pem.erb: config/server.pem
+  dns/aliases.json.erb: dns/aliases.json
 
 packages:
   - mongod-node

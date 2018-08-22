@@ -12,13 +12,13 @@ export JOB_DIR=/var/vcap/jobs/mongodb_config_agent
 
 <%
 def node_name(instance)
-  "#{instance.name.gsub('_','-')}-#{instance.index}"
+  "#{instance.id}"
 end
 
 aliases = []
 
 link('mongod_node').instances.each do |instance|
-  mongod_alias = "#{node_name(instance)}-#{p('mongo_ops.id')}.mongodb.internal"
+  mongod_alias = "#{node_name(instance)}.mongodb.internal"
   aliases.push(mongod_alias)
 end
 %>

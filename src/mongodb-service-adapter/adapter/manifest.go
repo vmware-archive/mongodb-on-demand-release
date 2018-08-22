@@ -114,15 +114,12 @@ func (m ManifestGenerator) GenerateManifest(
 		}
 	}
 
-	addonsJobs, err := gatherJobs(serviceDeployment.Releases, []string{AliasesJobName, BoshDNSEnableJobName})
+	addonsJobs, err := gatherJobs(serviceDeployment.Releases, []string{BoshDNSEnableJobName})
 	if err != nil {
 		return serviceadapter.GenerateManifestOutput{}, err
 	}
 	if boshDNSDisable {
-		addonsJobs, err = gatherJobs(serviceDeployment.Releases, []string{AliasesJobName})
-		if err != nil {
-			return serviceadapter.GenerateManifestOutput{}, err
-		}
+		addonsJobs = []bosh.Job{}
 	}
 
 	mongodNetworks := []bosh.Network{}

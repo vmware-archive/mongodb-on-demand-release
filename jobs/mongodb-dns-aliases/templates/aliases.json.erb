@@ -1,17 +1,26 @@
 <%=
-def node_name(instance)
-  "#{instance.name.gsub('_','-')}-#{instance.index}"
+
+require 'json'
+
+def canonicalize(str)
+  str.downcase.gsub(/_/, "-").gsub(/[^a-z0-9\-\*]/, "")
 end
 
-conn = link('mongodb_config_agent')
-
-config_agent_node_dns = conn.address
-aliases = { "mongodb-config-agent-0-#{conn.p('mongo_ops.id')}.mongodb.internal" => [ config_agent_node_dns ] }
-
-link('mongod_node').instances.each do |instance|
-  mongod_alias = "#{node_name(instance)}-#{conn.p('mongo_ops.id')}.mongodb.internal"
-  aliases.merge!({ mongod_alias => [instance.address] })
+aliases = p("aliases").map do |a|
+  [
+    a.fetch("domain"),
+    a.fetch("targets").map do |t|
+      [
+        t.fetch("query"),
+        canonicalize(t.fetch("instance_group")),
+        canonicalize(t.fetch("network")),
+        canonicalize(t.fetch("deployment")),
+        t.fetch("domain", spec.dns_domain_name),
+      ].join(".")
+    end,
+  ]
 end
 
-JSON.pretty_generate(aliases)
+JSON.pretty_generate(Hash[aliases])
+
 %>

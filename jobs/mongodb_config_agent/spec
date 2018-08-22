@@ -12,6 +12,7 @@ templates:
   config/cacert.pem.erb: config/cacert.pem
   config/mongodb_config_agent.json.erb: config/mongodb_config_agent.json
   config/server.pem.erb: config/server.pem
+  dns/aliases.json.erb: dns/aliases.json
 
 provides:
 - name: mongodb_config_agent
@@ -32,6 +33,8 @@ provides:
   - mongo_ops.username
 
 consumes:
+- name: mongodb_config_agent
+  type: config_agent
 - name: mongod_node
   type: node
 
