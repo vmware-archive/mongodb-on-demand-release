@@ -102,9 +102,6 @@ var plansRaw = map[string]string{
         "autoUser": "mms-automation",
         "autoPwd": "{{.Password}}",
         "deploymentAuthMechanisms": [
-            {{ if .RequireSSL }}
-            "MONGODB-X509",
-            {{end}}
             "SCRAM-SHA-1"
         ],
         "key": "{{.Key}}",
@@ -370,9 +367,6 @@ var plansRaw = map[string]string{
         "autoUser": "mms-automation",
         "autoPwd": "{{.Password}}",
         "deploymentAuthMechanisms": [
-            {{ if .RequireSSL }}
-            "MONGODB-X509",
-            {{end}}
             "SCRAM-SHA-1"
         ],
         "key": "{{.Key}}",
@@ -536,9 +530,6 @@ var plansRaw = map[string]string{
         "autoUser": "mms-automation",
         "autoPwd": "{{.Password}}",
         "deploymentAuthMechanisms": [
-            {{ if .RequireSSL }}
-            "MONGODB-X509",
-            {{end}}
             "SCRAM-SHA-1"
         ],
         "key": "{{.Key}}",
