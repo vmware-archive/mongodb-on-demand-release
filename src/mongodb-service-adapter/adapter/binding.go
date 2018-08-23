@@ -44,10 +44,13 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 
 	properties := manifest.Properties["mongo_ops"].(map[interface{}]interface{})
 	adminPassword := properties["admin_password"].(string)
+	URL := properties["url"].(string)
+	adminUsername := properties["username"].(string)
+	adminAPIKey := properties["admin_api_key"].(string)
+	ssl := properties["require_ssl"].(bool)
+	groupID := properties["group_id"].(string)
 
 	b.logf("properties: %v", properties)
-
-	b.logf("Deployment topology: %v", deploymentTopology)
 
 	servers := make([]string, len(deploymentTopology["mongod_node"]))
 	for i, node := range deploymentTopology["mongod_node"] {
@@ -67,7 +70,14 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 		servers = cluster.Routers
 	}
 
-	ssl := properties["require_ssl"].(bool)
+	if ssl {
+		omClient := OMClient{Url: URL, Username: adminUsername, ApiKey: adminAPIKey}
+		servers, err = omClient.GetGroupHostnames(groupID, plan)
+		if err != nil {
+			return serviceadapter.Binding{}, err
+		}
+	}
+
 	sslOption := ""
 	if ssl {
 		sslOption = "&ssl=true"
@@ -115,12 +125,11 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 
 	return serviceadapter.Binding{
 		Credentials: map[string]interface{}{
-			"username":      username,
-			"password":      password,
-			"database":      defaultDB,
-			"servers":       servers,
-			"uri":           url,
-			"dns_addresses": dnsAddresses,
+			"username": username,
+			"password": password,
+			"database": defaultDB,
+			"servers":  servers,
+			"uri":      url,
 		},
 	}, nil
 }

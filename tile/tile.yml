@@ -472,10 +472,6 @@ packages:
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
             vm_extensions: (( .properties.vm_extensions.value ))
-          binding_with_dns:
-          - name: mongod
-            link_provider: mongod_node
-            instance_group: mongod_node
           properties:
             id: standalone
             mongo_ops:
@@ -513,10 +509,6 @@ packages:
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
             vm_extensions: (( .properties.vm_extensions.value ))
-          binding_with_dns:
-          - name: mongod
-            link_provider: mongod_node
-            instance_group: mongod_node
           properties:
             id: standalone
             mongo_ops:
@@ -554,10 +546,6 @@ packages:
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
             vm_extensions: (( .properties.vm_extensions.value ))
-          binding_with_dns:
-          - name: mongod
-            link_provider: mongod_node
-            instance_group: mongod_node
           properties:
             id: standalone
             mongo_ops:
@@ -595,10 +583,6 @@ packages:
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
             vm_extensions: (( .properties.vm_extensions.value ))
-          binding_with_dns:
-          - name: mongod
-            link_provider: mongod_node
-            instance_group: mongod_node
           properties:
             id: replica_set
             mongo_ops:
@@ -636,10 +620,6 @@ packages:
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
             vm_extensions: (( .properties.vm_extensions.value ))
-          binding_with_dns:
-          - name: mongod
-            link_provider: mongod_node
-            instance_group: mongod_node
           properties:
             id: replica_set
             mongo_ops:
@@ -677,10 +657,6 @@ packages:
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
             vm_extensions: (( .properties.vm_extensions.value ))
-          binding_with_dns:
-          - name: mongod
-            link_provider: mongod_node
-            instance_group: mongod_node
           properties:
             id: replica_set
             mongo_ops:
@@ -720,10 +696,6 @@ packages:
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
             vm_extensions: (( .properties.vm_extensions.value ))
-          binding_with_dns:
-          - name: mongod
-            link_provider: mongod_node
-            instance_group: mongod_node
           properties:
             id: sharded_cluster
             mongo_ops:
@@ -763,10 +735,6 @@ packages:
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
             vm_extensions: (( .properties.vm_extensions.value ))
-          binding_with_dns:
-          - name: mongod
-            link_provider: mongod_node
-            instance_group: mongod_node
           properties:
             id: sharded_cluster
             mongo_ops:
@@ -806,10 +774,6 @@ packages:
             networks: [(( $self.service_network ))]
             azs: (( .properties.az_multi_select.value ))
             vm_extensions: (( .properties.vm_extensions.value ))
-          binding_with_dns:
-          - name: mongod
-            link_provider: mongod_node
-            instance_group: mongod_node
           properties:
             id: sharded_cluster
             mongo_ops:

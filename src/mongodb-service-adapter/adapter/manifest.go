@@ -308,7 +308,9 @@ func (m ManifestGenerator) GenerateManifest(
 			"mongo_ops": map[string]interface{}{
 				"url":            url,
 				"api_key":        group.AgentAPIKey,
+				"admin_api_key":  apiKey,
 				"group_id":       group.ID,
+				"username":       username,
 				"admin_password": adminPassword,
 				"require_ssl":    requireSSL,
 

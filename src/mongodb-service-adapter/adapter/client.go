@@ -167,6 +167,25 @@ func (oc *OMClient) GetGroupHosts(groupID string) (GroupHosts, error) {
 	return groupHosts, nil
 }
 
+func (oc *OMClient) GetGroupHostnames(groupID string, planID string) ([]string, error) {
+	b, err := oc.doRequest("GET", fmt.Sprintf("/api/public/v1.0/groups/%s/hosts", groupID), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	groupHostnames := gjson.GetBytes(b, fmt.Sprintf(`results.#.hostname`))
+	if planID == "sharded_cluster" {
+		groupHostnames = gjson.GetBytes(b, fmt.Sprintf(`results.#[typeName="SHARD_MONGOS"]#.hostname`))
+	}
+
+	servers := make([]string, len(groupHostnames.Array()))
+	for i, node := range groupHostnames.Array() {
+		servers[i] = fmt.Sprintf("%s:28000", node)
+	}
+
+	return servers, nil
+}
+
 func (oc *OMClient) ConfigureGroup(configurationDoc string, groupID string) error {
 	u := fmt.Sprintf("/api/public/v1.0/groups/%s/automationConfig", groupID)
 	b, err := oc.doRequest("PUT", u, strings.NewReader(configurationDoc))
