@@ -336,6 +336,8 @@ runtime_configs:
         jobs:
         - name: rep
           release: diego
+        - name: rep_windows
+          release: diego
         - name: mongodb_service_adapter
           release: mongodb
       jobs:
