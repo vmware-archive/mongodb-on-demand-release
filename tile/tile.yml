@@ -364,10 +364,10 @@ packages:
   path: resources/pcf-mongodb-helpers-0.0.1.tgz
 - name: on-demand-service-broker
   type: bosh-release
-  path: resources/on-demand-service-broker-0.22.0.tgz
+  path: resources/on-demand-service-broker-0.22.0-ubuntu-trusty-3586.36.tgz
 - name: syslog
   type: bosh-release
-  path: resources/syslog-migration-11.1.1.tgz
+  path: resources/syslog-migration-11.1.1-ubuntu-trusty-3586.36.tgz
 - name: mongodb
   type: bosh-release
   path: resources/mongodb-1.0.6.tgz
