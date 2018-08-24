@@ -141,10 +141,20 @@ func (Binder) DeleteBinding(bindingID string, deploymentTopology bosh.BoshVMs, m
 	properties := manifest.Properties["mongo_ops"].(map[interface{}]interface{})
 	adminPassword := properties["admin_password"].(string)
 	ssl := properties["require_ssl"].(bool)
+	URL := properties["url"].(string)
+	adminUsername := properties["username"].(string)
+	adminAPIKey := properties["admin_api_key"].(string)
+	groupID := properties["group_id"].(string)
+	plan := properties["plan_id"].(string)
 
 	servers := make([]string, len(deploymentTopology["mongod_node"]))
 	for i, node := range deploymentTopology["mongod_node"] {
 		servers[i] = fmt.Sprintf("%s:28000", node)
+	}
+
+	if ssl {
+		omClient := OMClient{Url: URL, Username: adminUsername, ApiKey: adminAPIKey}
+		servers, _ = omClient.GetGroupHostnames(groupID, plan)
 	}
 
 	session, err := GetWithCredentials(servers, adminPassword, ssl)
