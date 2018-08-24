@@ -11,7 +11,7 @@ import (
 
 	"github.com/pivotal-cf/on-demand-services-sdk/bosh"
 	"github.com/pivotal-cf/on-demand-services-sdk/serviceadapter"
-	"gopkg.in/mgo.v2"
+	mgo "gopkg.in/mgo.v2"
 )
 
 type Binder struct {
@@ -129,6 +129,7 @@ func (b Binder) CreateBinding(bindingID string, deploymentTopology bosh.BoshVMs,
 			"password": password,
 			"database": defaultDB,
 			"servers":  servers,
+			"ssl":      ssl,
 			"uri":      url,
 		},
 	}, nil
