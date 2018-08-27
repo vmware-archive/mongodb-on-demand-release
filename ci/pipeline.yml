@@ -66,7 +66,7 @@ resources:
   type: s3
   source:
     bucket: ((aws-bucket))
-    regexp: bpm-release-(.*).tgz
+    regexp: bpm-release-(.*)-ubuntu-trusty-(.*).tgz
     access_key_id: ((aws-access-key))
     secret_access_key: ((aws-secret-access-key))
 
