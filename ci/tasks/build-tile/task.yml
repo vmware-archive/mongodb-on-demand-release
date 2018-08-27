@@ -8,6 +8,7 @@ image_resource:
 
 inputs:
 - name: mongodb-on-demand-release
+- name: bpm-release
 - name: on-demand-service-broker-release
 - name: syslog-migration-release
 - name: pcf-mongodb-helpers

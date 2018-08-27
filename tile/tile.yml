@@ -359,6 +359,9 @@ runtime_configs:
               query: _
 
 packages:
+- name: bpm
+  type: bosh-release
+  path: resources/bpm-release-0.12.2.tgz
 - name: pcf-mongodb-helpers
   type: bosh-release
   path: resources/pcf-mongodb-helpers-0.0.1.tgz
@@ -433,6 +436,10 @@ packages:
           version: "11.1.1"
           jobs:
           - syslog_forwarder
+        - name: bpm
+          version: "0.12.2"
+          jobs:
+          - bpm
         stemcell:
           os: ubuntu-trusty
           version: "(( $self.stemcell_version ))"

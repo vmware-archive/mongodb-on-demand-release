@@ -62,6 +62,14 @@ resources:
     access_key_id: ((aws-access-key))
     secret_access_key: ((aws-secret-access-key))
 
+- name: bpm-release
+  type: s3
+  source:
+    bucket: ((aws-bucket))
+    regexp: bpm-release-(.*).tgz
+    access_key_id: ((aws-access-key))
+    secret_access_key: ((aws-secret-access-key))
+
 - name: artifacts
   type: s3
   source:
@@ -111,6 +119,9 @@ jobs:
     - get: pcf-mongodb-helpers
       params:
         filename: pcf-mongodb-helpers-(.*).tgz
+    - get: bpm-release
+      params:
+        filename: bpm-release-(.*).tgz
     - get: version
       params:
         pre: rc
@@ -187,6 +198,9 @@ jobs:
     - get: pcf-mongodb-helpers
       params:
         filename: pcf-mongodb-helpers-(.*).tgz
+    - get: bpm-release
+      params:
+        filename: bpm-release-(.*).tgz
     - get: version
       params:
         bump: final

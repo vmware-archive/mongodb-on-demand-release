@@ -9,6 +9,7 @@ packages:
 templates:
   bin/mongodb_config_agent_ctl.erb: bin/mongodb_config_agent_ctl
   bin/post-start.erb: bin/post-start
+  config/bpm.yml.erb: config/bpm.yml
   config/cacert.pem.erb: config/cacert.pem
   config/mongodb_config_agent.json.erb: config/mongodb_config_agent.json
   config/server.pem.erb: config/server.pem
@@ -39,6 +40,14 @@ consumes:
   type: node
 
 properties:
+  bpm.enabled:
+    description: "Experimental: use the BOSH Process Manager to manage the BBS process"
+    default: false
+
+  limits.open_files:
+    description: "Maximum number of files (including sockets) the mongodb_config_agent process may have open"
+    default: 100000
+
   mongo_ops.id:
     description: "Service id"
   mongo_ops.url:

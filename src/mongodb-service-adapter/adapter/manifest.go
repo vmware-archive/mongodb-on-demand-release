@@ -15,6 +15,7 @@ const (
 	MongodJobName           = "mongod_node"
 	AliasesJobName          = "mongodb-dns-aliases"
 	SyslogJobName           = "syslog_forwarder"
+	BPMJobName              = "bpm"
 	BoshDNSEnableJobName    = "bosh-dns-enable"
 	ConfigAgentJobName      = "mongodb_config_agent"
 	CleanupErrandJobName    = "cleanup_service"
@@ -103,12 +104,12 @@ func (m ManifestGenerator) GenerateManifest(
 		}
 	}
 
-	configAgentJobs, err := gatherJobs(serviceDeployment.Releases, []string{ConfigAgentJobName, CleanupErrandJobName})
+	configAgentJobs, err := gatherJobs(serviceDeployment.Releases, []string{ConfigAgentJobName, CleanupErrandJobName, BPMJobName})
 	if err != nil {
 		return serviceadapter.GenerateManifestOutput{}, err
 	}
 	if syslogProps["address"].(string) != "" {
-		configAgentJobs, err = gatherJobs(serviceDeployment.Releases, []string{ConfigAgentJobName, CleanupErrandJobName, SyslogJobName})
+		configAgentJobs, err = gatherJobs(serviceDeployment.Releases, []string{ConfigAgentJobName, CleanupErrandJobName, SyslogJobName, BPMJobName})
 		if err != nil {
 			return serviceadapter.GenerateManifestOutput{}, err
 		}
@@ -276,6 +277,9 @@ func (m ManifestGenerator) GenerateManifest(
 
 				// See mongodb_config_agent job spec
 				Properties: map[string]interface{}{
+					"bpm": map[string]interface{}{
+						"enabled": boolPointer(true),
+					},
 					"mongo_ops": map[string]interface{}{
 						"id":               id,
 						"url":              url,
