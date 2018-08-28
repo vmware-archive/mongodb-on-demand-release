@@ -240,9 +240,18 @@ func (oc *OMClient) GetLatestVersion(groupID string) string {
 		panic(err)
 	}
 
-	b := cfg.MongoDbVersions[len(cfg.MongoDbVersions)-1].Name
+	versions := make([]string, len(cfg.MongoDbVersions))
+	n := 0
+	for _, i := range cfg.MongoDbVersions {
+		if !strings.HasSuffix(i.Name, "ent") {
+			versions[n] = i.Name
+			n++
+		}
+	}
+	versions = versions[:n]
+	latestVersion := versions[len(versions)-1]
 
-	return b
+	return latestVersion
 }
 
 func (oc *OMClient) ValidateVersion(groupID string, version string) (string, error) {
