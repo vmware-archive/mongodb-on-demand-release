@@ -91,13 +91,13 @@ func (m ManifestGenerator) GenerateManifest(
 		return serviceadapter.GenerateManifestOutput{}, fmt.Errorf("no definition found for instance group '%s'", MongodInstanceGroupName)
 	}
 
-	mongodJobs, err := gatherJobs(serviceDeployment.Releases, []string{MongodJobName})
+	mongodJobs, err := gatherJobs(serviceDeployment.Releases, []string{MongodJobName, BPMJobName})
 	mongodJobs[0].AddSharedProvidesLink(MongodJobName)
 	if err != nil {
 		return serviceadapter.GenerateManifestOutput{}, err
 	}
 	if syslogProps["address"].(string) != "" {
-		mongodJobs, err = gatherJobs(serviceDeployment.Releases, []string{MongodJobName, SyslogJobName})
+		mongodJobs, err = gatherJobs(serviceDeployment.Releases, []string{MongodJobName, SyslogJobName, BPMJobName})
 		mongodJobs[0].AddSharedProvidesLink(MongodJobName)
 		if err != nil {
 			return serviceadapter.GenerateManifestOutput{}, err
@@ -263,7 +263,11 @@ func (m ManifestGenerator) GenerateManifest(
 				Env: map[string]interface{}{
 					"persistent_disk_fs": "xfs",
 				},
-				Properties: map[string]interface{}{},
+				Properties: map[string]interface{}{
+					"bpm": map[string]interface{}{
+						"enabled": boolPointer(true),
+					},
+				},
 			},
 			{
 				Name:         "mongodb-config-agent",

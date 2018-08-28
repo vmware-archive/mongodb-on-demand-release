@@ -105,7 +105,7 @@ var plansRaw = map[string]string{
             "MONGODB-CR"
         ],
         "key": "{{.Key}}",
-        "keyfile": "/var/vcap/jobs/mongod_node/config/mongo_om.key",
+        "keyfile": "/var/vcap/store/mongod_node/mongo_om.key",
         "disabled": false,
         "usersDeleted": [],
         "usersWanted": [
@@ -370,7 +370,7 @@ var plansRaw = map[string]string{
             "MONGODB-CR"
         ],
         "key": "{{.Key}}",
-        "keyfile": "/var/vcap/jobs/mongod_node/config/mongo_om.key",
+        "keyfile": "/var/vcap/store/mongod_node/mongo_om.key",
         "disabled": false,
         "usersDeleted": [],
         "usersWanted": [
@@ -533,7 +533,7 @@ var plansRaw = map[string]string{
             "MONGODB-CR"
         ],
         "key": "{{.Key}}",
-        "keyfile": "/var/vcap/jobs/mongod_node/config/mongo_om.key",
+        "keyfile": "/var/vcap/store/mongod_node/mongo_om.key",
         "disabled": false,
         "usersDeleted": [],
         "usersWanted": [

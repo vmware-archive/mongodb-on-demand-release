@@ -9,6 +9,7 @@ packages:
 templates:
   bin/mongodb_config_agent_ctl.erb: bin/mongodb_config_agent_ctl
   bin/post-start.erb: bin/post-start
+  bin/pre-start.erb: bin/pre-start
   config/bpm.yml.erb: config/bpm.yml
   config/cacert.pem.erb: config/cacert.pem
   config/mongodb_config_agent.json.erb: config/mongodb_config_agent.json
@@ -41,7 +42,7 @@ consumes:
 
 properties:
   bpm.enabled:
-    description: "Experimental: use the BOSH Process Manager to manage the BBS process"
+    description: "Experimental: use the BOSH Process Manager to manage the mongodb_config_agent process"
     default: false
 
   limits.open_files:

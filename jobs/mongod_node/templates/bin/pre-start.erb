@@ -3,6 +3,11 @@
 
 set -e
 
+<% if p("bpm.enabled") %>
+sysctl -e -w net.ipv4.tcp_fin_timeout=10
+sysctl -e -w net.ipv4.tcp_tw_reuse=1
+<% end %>
+
 # Set readahead setting
 mount_point=$(df | grep -w /var/vcap/store | awk {'print $1'})
 blockdev --setra 0 $mount_point
@@ -71,7 +76,23 @@ dpkg -i /var/vcap/packages/mongod-node/libperl5*.deb
 dpkg -i /var/vcap/packages/mongod-node/libsnmp-base_5*.deb
 dpkg -i /var/vcap/packages/mongod-node/libsnmp30*.deb
 
-chmod 600 /var/vcap/jobs/mongod_node/config/mongo_om.key
+RUN_DIR=/var/vcap/sys/run/mongod_node
+LOG_DIR=/var/vcap/sys/log/mongod_node
+TMP_DIR=/var/vcap/sys/tmp/mongod_node
+STORE_DIR=/var/vcap/store/mongod_node
+AGENT_LOG_DIR=/var/log/mongodb-mms-automation
+DOWNLOAD_DIR=/var/lib/mongodb-mms-automation
+for dir in $AGENT_LOG_DIR $DOWNLOAD_DIR $RUN_DIR $LOG_DIR $TMP_DIR $STORE_DIR
+do
+  mkdir -p ${dir}
+  chown -R vcap:vcap ${dir}
+  chmod 775 ${dir}
+done
+
+keyfile=/var/vcap/store/mongod_node/mongo_om.key
+cp /var/vcap/jobs/mongod_node/config/mongo_om.key ${STORE_DIR}/
+chown vcap:vcap ${keyfile}
+chmod 600 ${keyfile}
 
 # verions 0.8.4 of the tile leaves mongod and mongos running after stop, so we tries to stop the process here
 source /var/vcap/packages/mongod-node/utils.sh

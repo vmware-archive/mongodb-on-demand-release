@@ -2,8 +2,10 @@
 name: mongod_node
 
 templates:
+  bin/drain.erb: bin/drain
   bin/mongod_agent_ctl.erb: bin/mongod_agent_ctl
   bin/pre-start.erb: bin/pre-start
+  config/bpm.yml.erb: config/bpm.yml
   config/cacert.pem.erb: config/cacert.pem
   config/local.conf.erb: config/local.conf
   config/mongo_om.key.erb: config/mongo_om.key
@@ -23,4 +25,7 @@ consumes:
 - name: mongod_node
   type: node
 
-properties: {}
+properties:
+  bpm.enabled:
+    description: "Experimental: use the BOSH Process Manager to manage the mongod_node process"
+    default: false
