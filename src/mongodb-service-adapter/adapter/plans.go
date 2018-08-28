@@ -102,7 +102,7 @@ var plansRaw = map[string]string{
         "autoUser": "mms-automation",
         "autoPwd": "{{.Password}}",
         "deploymentAuthMechanisms": [
-            "SCRAM-SHA-1"
+            "MONGODB-CR"
         ],
         "key": "{{.Key}}",
         "keyfile": "/var/vcap/jobs/mongod_node/config/mongo_om.key",
@@ -175,7 +175,7 @@ var plansRaw = map[string]string{
                "initPwd": "{{.AdminPassword}}"
             }
         ],
-        "autoAuthMechanism": "SCRAM-SHA-1"
+        "autoAuthMechanism": "MONGODB-CR"
     }
 }`,
 
@@ -367,7 +367,7 @@ var plansRaw = map[string]string{
         "autoUser": "mms-automation",
         "autoPwd": "{{.Password}}",
         "deploymentAuthMechanisms": [
-            "SCRAM-SHA-1"
+            "MONGODB-CR"
         ],
         "key": "{{.Key}}",
         "keyfile": "/var/vcap/jobs/mongod_node/config/mongo_om.key",
@@ -440,7 +440,7 @@ var plansRaw = map[string]string{
                "initPwd": "{{.AdminPassword}}"
             }
         ],
-        "autoAuthMechanism": "SCRAM-SHA-1"
+        "autoAuthMechanism": "MONGODB-CR"
     }
 }`,
 
@@ -530,7 +530,7 @@ var plansRaw = map[string]string{
         "autoUser": "mms-automation",
         "autoPwd": "{{.Password}}",
         "deploymentAuthMechanisms": [
-            "SCRAM-SHA-1"
+            "MONGODB-CR"
         ],
         "key": "{{.Key}}",
         "keyfile": "/var/vcap/jobs/mongod_node/config/mongo_om.key",
@@ -603,7 +603,7 @@ var plansRaw = map[string]string{
                "initPwd": "{{.AdminPassword}}"
             }
         ],
-        "autoAuthMechanism": "SCRAM-SHA-1"
+        "autoAuthMechanism": "MONGODB-CR"
     }
 }`,
 
