@@ -82,7 +82,8 @@ TMP_DIR=/var/vcap/sys/tmp/mongod_node
 STORE_DIR=/var/vcap/store/mongod_node
 AGENT_LOG_DIR=/var/log/mongodb-mms-automation
 DOWNLOAD_DIR=/var/lib/mongodb-mms-automation
-for dir in $AGENT_LOG_DIR $DOWNLOAD_DIR $RUN_DIR $LOG_DIR $TMP_DIR $STORE_DIR
+MONGODB_DATA_DIR=/var/vcap/store/mongodb-data
+for dir in $AGENT_LOG_DIR $DOWNLOAD_DIR $RUN_DIR $LOG_DIR $TMP_DIR $STORE_DIR $MONGODB_DATA_DIR
 do
   mkdir -p ${dir}
   chown -R vcap:vcap ${dir}
