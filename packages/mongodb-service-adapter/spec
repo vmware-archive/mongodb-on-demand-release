@@ -2,7 +2,7 @@
 name: mongodb-service-adapter
 
 dependencies:
-  - golang-1.10-linux
+  - golang-1.11-linux
 
 files:
   - mongodb-service-adapter/**/*
