@@ -428,6 +428,7 @@ packages:
           - mongodb_config_agent
           - mongodb-dns-aliases
           - cleanup_service
+          - configure_backups
         - name: pcf-mongodb-helpers
           version: "0.0.1"
           jobs:
@@ -467,6 +468,9 @@ packages:
           plan_id: 2c4a6fc4-f666-4446-8406-2ef5bbbbe9e4
           description: Standalone Small Instance
           lifecycle_errands:
+            post_deploy:
+            - name: configure_backups
+              instances: [mongodb-config-agent/0]
             pre_delete:
             - name: cleanup_service
               instances: [mongodb-config-agent/0]
@@ -504,6 +508,9 @@ packages:
           plan_id: f40cf0fa-4eb9-446c-a429-0b1ea2ae6ae7
           description: Standalone Medium Instance
           lifecycle_errands:
+            post_deploy:
+            - name: configure_backups
+              instances: [mongodb-config-agent/0]
             pre_delete:
             - name: cleanup_service
               instances: [mongodb-config-agent/0]
@@ -541,6 +548,9 @@ packages:
           plan_id: 44cad965-9182-4a89-8246-af719f5f699a
           description: Standalone Large Instance
           lifecycle_errands:
+            post_deploy:
+            - name: configure_backups
+              instances: [mongodb-config-agent/0]
             pre_delete:
             - name: cleanup_service
               instances: [mongodb-config-agent/0]
@@ -578,6 +588,9 @@ packages:
           plan_id: 02d95e8f-a0ee-4c25-9407-6ca5d1989741
           description: Replica Set Small
           lifecycle_errands:
+            post_deploy:
+            - name: configure_backups
+              instances: [mongodb-config-agent/0]
             pre_delete:
             - name: cleanup_service
               instances: [mongodb-config-agent/0]
@@ -615,6 +628,9 @@ packages:
           plan_id: fee3933e-42cb-4964-b66e-79498f94e968
           description: Replica Set Medium
           lifecycle_errands:
+            post_deploy:
+            - name: configure_backups
+              instances: [mongodb-config-agent/0]
             pre_delete:
             - name: cleanup_service
               instances: [mongodb-config-agent/0]
@@ -652,6 +668,9 @@ packages:
           plan_id: 317e003c-30a4-4384-b51d-9bf686e395e9
           description: Replica Set Large
           lifecycle_errands:
+            post_deploy:
+            - name: configure_backups
+              instances: [mongodb-config-agent/0]
             pre_delete:
             - name: cleanup_service
               instances: [mongodb-config-agent/0]
@@ -689,6 +708,9 @@ packages:
           plan_id: f2677585-4020-407c-87c2-b8260e816ef8
           description: Sharded Cluster Small
           lifecycle_errands:
+            post_deploy:
+            - name: configure_backups
+              instances: [mongodb-config-agent/0]
             pre_delete:
             - name: cleanup_service
               instances: [mongodb-config-agent/0]
@@ -728,6 +750,9 @@ packages:
           plan_id: 477a196a-9e28-4103-87d3-593767448c9f
           description: Sharded Cluster Medium
           lifecycle_errands:
+            post_deploy:
+            - name: configure_backups
+              instances: [mongodb-config-agent/0]
             pre_delete:
             - name: cleanup_service
               instances: [mongodb-config-agent/0]
@@ -767,6 +792,9 @@ packages:
           plan_id: 7a5977ed-4a45-4e32-8eb4-e4b371dd3b95
           description: Sharded Cluster Large
           lifecycle_errands:
+            post_deploy:
+            - name: configure_backups
+              instances: [mongodb-config-agent/0]
             pre_delete:
             - name: cleanup_service
               instances: [mongodb-config-agent/0]

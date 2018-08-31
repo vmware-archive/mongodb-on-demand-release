@@ -10,16 +10,17 @@ import (
 )
 
 const (
-	StemcellAlias           = "mongodb-stemcell"
-	MongodInstanceGroupName = "mongod_node"
-	MongodJobName           = "mongod_node"
-	AliasesJobName          = "mongodb-dns-aliases"
-	SyslogJobName           = "syslog_forwarder"
-	BPMJobName              = "bpm"
-	BoshDNSEnableJobName    = "bosh-dns-enable"
-	ConfigAgentJobName      = "mongodb_config_agent"
-	CleanupErrandJobName    = "cleanup_service"
-	LifecycleErrandType     = "errand"
+	StemcellAlias                 = "mongodb-stemcell"
+	MongodInstanceGroupName       = "mongod_node"
+	MongodJobName                 = "mongod_node"
+	AliasesJobName                = "mongodb-dns-aliases"
+	SyslogJobName                 = "syslog_forwarder"
+	BPMJobName                    = "bpm"
+	BoshDNSEnableJobName          = "bosh-dns-enable"
+	ConfigAgentJobName            = "mongodb_config_agent"
+	CleanupErrandJobName          = "cleanup_service"
+	ConfigureBackupsErrandJobName = "configure_backups"
+	LifecycleErrandType           = "errand"
 )
 
 type ManifestGenerator struct {
@@ -104,12 +105,12 @@ func (m ManifestGenerator) GenerateManifest(
 		}
 	}
 
-	configAgentJobs, err := gatherJobs(serviceDeployment.Releases, []string{ConfigAgentJobName, CleanupErrandJobName, BPMJobName})
+	configAgentJobs, err := gatherJobs(serviceDeployment.Releases, []string{ConfigAgentJobName, CleanupErrandJobName, BPMJobName, ConfigureBackupsErrandJobName})
 	if err != nil {
 		return serviceadapter.GenerateManifestOutput{}, err
 	}
 	if syslogProps["address"].(string) != "" {
-		configAgentJobs, err = gatherJobs(serviceDeployment.Releases, []string{ConfigAgentJobName, CleanupErrandJobName, SyslogJobName, BPMJobName})
+		configAgentJobs, err = gatherJobs(serviceDeployment.Releases, []string{ConfigAgentJobName, CleanupErrandJobName, SyslogJobName, BPMJobName, ConfigureBackupsErrandJobName})
 		if err != nil {
 			return serviceadapter.GenerateManifestOutput{}, err
 		}
