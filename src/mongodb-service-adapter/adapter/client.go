@@ -68,6 +68,8 @@ type Cluster struct {
 	Shards        [][]string
 }
 
+const versionsManifest = "/var/vcap/packages/versions/versions.json"
+
 func (oc *OMClient) LoadDoc(p string, ctx *DocContext) (string, error) {
 	t, ok := plans[p]
 	if !ok {
@@ -234,10 +236,14 @@ func (oc *OMClient) GetAvailableVersions(groupID string) (Automation, error) {
 	return versions, nil
 }
 
-func (oc *OMClient) GetLatestVersion(groupID string) string {
+func (oc *OMClient) GetLatestVersion(groupID string) (string, error) {
 	cfg, err := oc.GetAvailableVersions(groupID)
 	if err != nil {
-		panic(err)
+		return "", fmt.Errorf("unable to find the latest MongoDB version from the MongoDB Ops Manager API. Please contact your system administrator to ensure versions are available in the Version Manager for group '%q' in MongoDB Ops Manager. If your MongoDB Ops Manager is running in Local Mode, then after validating versions are available, please indicate a specific MongoDB version using 'version’ paramater when calling 'create-service'", groupID)
+	}
+
+	if len(cfg.MongoDbVersions) == 0 {
+		return "", fmt.Errorf("unable to find the latest MongoDB version from the MongoDB Ops Manager API. Please contact your system administrator to ensure versions are available in the Version Manager for group '%q' in MongoDB Ops Manager. If your MongoDB Ops Manager is running in Local Mode, then after validating versions are available, please indicate a specific MongoDB version using 'version’ paramater when calling 'create-service'", groupID)
 	}
 
 	versions := make([]string, len(cfg.MongoDbVersions))
@@ -251,7 +257,7 @@ func (oc *OMClient) GetLatestVersion(groupID string) string {
 	versions = versions[:n]
 	latestVersion := versions[len(versions)-1]
 
-	return latestVersion
+	return latestVersion, nil
 }
 
 func (oc *OMClient) ValidateVersion(groupID string, version string) (string, error) {
@@ -267,6 +273,21 @@ func (oc *OMClient) ValidateVersion(groupID string, version string) (string, err
 	}
 
 	return v.String(), nil
+}
+
+func (oc *OMClient) ValidateVersionManifest(version string) (string, error) {
+	b, err := ioutil.ReadFile(versionsManifest)
+	if err != nil {
+		return "", err
+	}
+
+	v := gjson.GetBytes(b, fmt.Sprintf(`versions.#[name="%s"].name`, version))
+	log.Printf("Using %q version of MongoDB", v.String())
+	if v.String() == "" {
+		log.Printf("failed to find expected version, got %s, continue with provided versions", version)
+	}
+
+	return version, nil
 }
 
 func (oc *OMClient) doRequest(method string, path string, body io.Reader) ([]byte, error) {

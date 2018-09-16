@@ -3,6 +3,7 @@ name: mongodb_service_adapter
 
 packages:
   - mongodb-service-adapter
+  - versions
 
 templates:
   cacert.pem.erb: config/cacert.pem

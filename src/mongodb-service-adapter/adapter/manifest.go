@@ -135,11 +135,23 @@ func (m ManifestGenerator) GenerateManifest(
 	var engineVersion string
 	version := getArbitraryParam("version", "engine_version", arbitraryParams, previousMongoProperties)
 	if version == nil {
-		engineVersion = oc.GetLatestVersion(group.ID)
-	} else {
-		engineVersion, err = oc.ValidateVersion(group.ID, version.(string))
+		engineVersion, err = oc.GetLatestVersion(group.ID)
 		if err != nil {
-			return serviceadapter.GenerateManifestOutput{}, err
+			return serviceadapter.GenerateManifestOutput{}, fmt.Errorf("unable to find the latest MongoDB version from the MongoDB Ops Manager API. Please contact your system administrator to ensure versions are available in the Version Manager for project '%s' in MongoDB Ops Manager. If your MongoDB Ops Manager is running in Local Mode, then after validating versions are available, please indicate a specific MongoDB version using 'version’ paramater when calling 'create-service'", group.Name)
+		}
+	} else {
+		skipVersionValidation := false
+		e := getArbitraryParam("skip_version_check", "skip_version_check", arbitraryParams, previousMongoProperties)
+		if e != nil {
+			skipVersionValidation = e.(bool)
+		}
+		if !skipVersionValidation {
+			engineVersion, err = oc.ValidateVersionManifest(version.(string))
+			if err != nil {
+				return serviceadapter.GenerateManifestOutput{}, err
+			}
+		} else {
+			engineVersion = version.(string)
 		}
 	}
 

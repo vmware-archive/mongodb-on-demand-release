@@ -321,7 +321,9 @@ var plansRaw = map[string]string{
 
     "replicaSets": [{
         "_id": "{{$.ID}}_config",
+        {{if eq $.CompatibilityVersion "4.0"}}
 				"protocolVersion": 1,
+				{{end}}
         "members": [
             {{range $i, $node := .Cluster.ConfigServers}}{{if $i}},{{end}}{
                 "_id": {{$i}},
@@ -336,7 +338,9 @@ var plansRaw = map[string]string{
     }
     {{range $i, $shard := .Cluster.Shards}},{
         "_id": "{{$.ID}}_shard_{{$i}}",
+        {{if eq $.CompatibilityVersion "4.0"}}
 				"protocolVersion": 1,
+				{{end}}
         "members": [{{range $i, $node := $shard}}
             {{if $i}},{{end}}{
                 "_id": {{$i}},
@@ -516,7 +520,9 @@ var plansRaw = map[string]string{
   ],
     "replicaSets": [{
         "_id": "pcf_repl",
+        {{if eq $.CompatibilityVersion "4.0"}}
 				"protocolVersion": 1,
+				{{end}}
         "members": [
           {{range $i, $node := .Nodes}}
           {{if $i}},{{end}}{
