@@ -99,6 +99,19 @@ func (oc *OMClient) LoadDoc(p string, ctx *DocContext) (string, error) {
 	return b.String(), nil
 }
 
+//GetGroupByName returns group if found.
+func (oc *OMClient) GetGroupByName(name string) (Group, error) {
+	var group Group
+	b, err := oc.doRequest("GET", fmt.Sprintf("/api/public/v1.0/groups/byName/%s", name), nil)
+	if err != nil {
+		return group, err
+	}
+	if err = json.Unmarshal(b, &group); err != nil {
+		return group, err
+	}
+	return group, nil
+}
+
 func (oc *OMClient) CreateGroup(id string, request GroupCreateRequest) (Group, error) {
 	var group Group
 
@@ -108,6 +121,15 @@ func (oc *OMClient) CreateGroup(id string, request GroupCreateRequest) (Group, e
 	req, err := json.Marshal(request)
 	if err != nil {
 		return group, err
+	}
+
+	group, err = oc.GetGroupByName(request.Name)
+	if err != nil {
+		return group, err
+	}
+	if group.Name == request.Name {
+		log.Printf("Continue with existing group %q", group.ID)
+		return group, nil
 	}
 	b, err := oc.doRequest("POST", "/api/public/v1.0/groups", bytes.NewReader(req))
 	if err != nil {
