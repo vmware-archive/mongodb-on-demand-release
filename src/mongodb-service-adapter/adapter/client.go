@@ -348,7 +348,11 @@ func (oc *OMClient) doRequest(method string, path string, body io.Reader) ([]byt
 		return nil, err
 	}
 
-	if res.StatusCode < 200 || res.StatusCode >= 300 {
+	// oc.GetGroupByName return 404 if group not found
+	if res.StatusCode == 404 {
+		log.Printf("Received %d status code for %s path", res.StatusCode, path)
+		return b, nil
+	} else if res.StatusCode < 200 || res.StatusCode >= 300 {
 		return nil, fmt.Errorf("%s %s request error: code=%d body=%q", method, path, res.StatusCode, b)
 	}
 	return b, nil
