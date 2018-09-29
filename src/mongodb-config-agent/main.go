@@ -28,12 +28,13 @@ func main() {
 
 	nodes := strings.Split(config.NodeAddresses, ",")
 	ctx := &adapter.DocContext{
-		ID:            config.ID,
-		Key:           config.AuthKey,
-		AdminPassword: config.AdminPassword,
-		Nodes:         nodes,
-		Version:       config.EngineVersion,
-		RequireSSL:    config.RequireSSL,
+		ID:                      config.ID,
+		Key:                     config.AuthKey,
+		AdminPassword:           config.AdminPassword,
+		AutomationAgentPassword: config.AutomationAgentPassword,
+		Nodes:                   nodes,
+		Version:                 config.EngineVersion,
+		RequireSSL:              config.RequireSSL,
 	}
 
 	if config.PlanID == adapter.PlanShardedCluster {
@@ -63,24 +64,32 @@ func main() {
 	}
 	logger.Println(backupAgentDoc)
 
+	err = omClient.ConfigureGroup(doc, config.GroupID)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	err = omClient.ConfigureMonitoringAgent(monitoringAgentDoc, config.GroupID)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	err = omClient.ConfigureBackupAgent(backupAgentDoc, config.GroupID)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	logger.Printf("Configured group %s", config.GroupID)
+
 	for {
-		err = omClient.ConfigureGroup(doc, config.GroupID)
+		logger.Printf("Checking group %s", config.GroupID)
+		groupHosts, err := omClient.GetGroupHosts(config.GroupID)
 		if err != nil {
 			logger.Fatal(err)
 		}
-
-		err = omClient.ConfigureMonitoringAgent(monitoringAgentDoc, config.GroupID)
-		if err != nil {
-			logger.Fatal(err)
+		if groupHosts.TotalCount == 0 {
+			logger.Fatalf("Host count for %s is 0...", config.GroupID)
 		}
-
-		err = omClient.ConfigureBackupAgent(backupAgentDoc, config.GroupID)
-		if err != nil {
-			logger.Fatal(err)
-		}
-
-		logger.Printf("Configured group %s", config.GroupID)
-
 		time.Sleep(30 * time.Second)
 	}
 }
