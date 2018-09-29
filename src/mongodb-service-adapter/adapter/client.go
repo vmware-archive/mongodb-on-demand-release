@@ -129,6 +129,11 @@ func (oc *OMClient) CreateGroup(id string, request GroupCreateRequest) (Group, e
 	}
 	if group.Name == request.Name {
 		log.Printf("Continue with existing group %q", group.ID)
+		apiKey, err := oc.CreateGroupAPIKey(group.ID)
+		if err != nil {
+			return group, err
+		}
+		group.AgentAPIKey = apiKey
 		return group, nil
 	}
 	b, err := oc.doRequest("POST", "/api/public/v1.0/groups", bytes.NewReader(req))
@@ -140,6 +145,22 @@ func (oc *OMClient) CreateGroup(id string, request GroupCreateRequest) (Group, e
 		return group, err
 	}
 	return group, nil
+}
+
+func (oc *OMClient) CreateGroupAPIKey(groupID string) (string, error) {
+	desc := `{"desc": "MongoDB On-Demand broker generated Agent API Key"}`
+
+	b, err := oc.doRequest("POST", fmt.Sprintf("/api/public/v1.0/groups/%s/agentapikeys", groupID), strings.NewReader(desc))
+	if err != nil {
+		return "", fmt.Errorf("unable to create agent api key for group %q", groupID)
+	}
+
+	key := gjson.GetBytes(b, "key")
+	if key.String() == "" {
+		log.Fatalf("failed to create agent api key for group %s", groupID)
+	}
+
+	return key.String(), nil
 }
 
 func (oc *OMClient) UpdateGroup(id string, request GroupUpdateRequest) (Group, error) {
