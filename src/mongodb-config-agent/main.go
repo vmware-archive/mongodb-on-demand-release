@@ -64,34 +64,22 @@ func main() {
 	logger.Println(backupAgentDoc)
 
 	for {
-		logger.Printf("Checking group %s", config.GroupID)
-
-		groupHosts, err := omClient.GetGroupHosts(config.GroupID)
+		err = omClient.ConfigureGroup(doc, config.GroupID)
 		if err != nil {
 			logger.Fatal(err)
 		}
 
-		//	logger.Printf("total number of hosts *** %v", groupHosts.TotalCount)
-		if groupHosts.TotalCount == 0 {
-			logger.Printf("Host count for %s is 0, configuring...", config.GroupID)
-
-			err = omClient.ConfigureGroup(doc, config.GroupID)
-			if err != nil {
-				logger.Fatal(err)
-			}
-
-			err = omClient.ConfigureMonitoringAgent(monitoringAgentDoc, config.GroupID)
-			if err != nil {
-				logger.Fatal(err)
-			}
-
-			err = omClient.ConfigureBackupAgent(backupAgentDoc, config.GroupID)
-			if err != nil {
-				logger.Fatal(err)
-			}
-
-			logger.Printf("Configured group %s", config.GroupID)
+		err = omClient.ConfigureMonitoringAgent(monitoringAgentDoc, config.GroupID)
+		if err != nil {
+			logger.Fatal(err)
 		}
+
+		err = omClient.ConfigureBackupAgent(backupAgentDoc, config.GroupID)
+		if err != nil {
+			logger.Fatal(err)
+		}
+
+		logger.Printf("Configured group %s", config.GroupID)
 
 		time.Sleep(30 * time.Second)
 	}
