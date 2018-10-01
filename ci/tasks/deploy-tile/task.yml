@@ -12,5 +12,12 @@ inputs:
 - name: version
 - name: artifacts
 
+params:
+  PCF_URL:
+  PCF_USERNAME:
+  PCF_PASSWORD:
+  PRODUCT_PROPERTIES:
+  PRODUCT_NETWORK_AZS:
+
 run:
   path: mongodb-on-demand-release/ci/tasks/deploy-tile/run.sh
