@@ -10,7 +10,7 @@ om="om -t $PCF_URL -u $PCF_USERNAME -p $PCF_PASSWORD -k"
 
 echo "Retrieving current staged version of ${PRODUCT}"
 
-product_version=$(${om} -f json deployed-products | jq -r --arg product_name $PRODUCT '.[] | select(.name == $product_name) | .version')
+product_version=$(${om} deployed-products -f json | jq -r --arg product_name $PRODUCT '.[] | select(.name == $product_name) | .version')
 
 echo "Deleting product [${PRODUCT}], version [${product_version}] , from ${PCF_URL}"
 
