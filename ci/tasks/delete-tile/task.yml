@@ -9,5 +9,10 @@ image_resource:
 inputs:
 - name: mongodb-on-demand-release
 
+params:
+  PCF_URL:
+  PCF_USERNAME:
+  PCF_PASSWORD:
+
 run:
   path: mongodb-on-demand-release/ci/tasks/delete-tile/run.sh
