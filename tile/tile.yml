@@ -382,6 +382,38 @@ packages:
       release: on-demand-service-broker
     - name: mongodb_service_adapter
       release: mongodb
+    - name: register-broker
+      release: on-demand-service-broker
+      colocated: true
+      post_deploy: true
+      run_default: on
+      instances:
+      - broker/first
+      label: 'On Demand Service Broker Registrar'
+    - name: upgrade-all-service-instances
+      release: on-demand-service-broker
+      colocated: true
+      post_deploy: true
+      run_default: on
+      instances:
+      - broker/first
+      label: 'Upgrade all instances deployed by the On Demand Service Broker'
+    - name: delete-all-service-instances
+      release: on-demand-service-broker
+      colocated: true
+      pre_delete: true
+      run_default: on
+      instances:
+      - broker/first
+      label: 'Delete all instances deployed by the On Demand Service Broker'
+    - name: deregister-broker
+      release: on-demand-service-broker
+      colocated: true
+      pre_delete: true
+      run_default: on
+      instances:
+      - broker/first
+      label: 'On Demand Service Broker Deregistrar'
     max_in_flight: 1
     memory: 1024
     ephemeral_disk: 2048
@@ -392,6 +424,7 @@ packages:
     single_az_only: true
     instances: 1
     properties:
+      broker_name: mongodb-odb
       port: 8080
       username: (( .properties.broker_basic_auth.identity ))
       password: (( .properties.broker_basic_auth.password ))
@@ -405,6 +438,9 @@ packages:
             client_id: (( $self.uaa_client_name ))
             client_secret: (( $self.uaa_client_secret ))
       cf:
+        api_url: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
+        admin_username: (( ..cf.uaa.admin_credentials.identity ))
+        admin_password: (( ..cf.uaa.admin_credentials.password ))
         url: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
         authentication:
           url: "https://uaa.(( ..cf.cloud_controller.system_domain.value ))"
@@ -830,80 +866,3 @@ packages:
               tls_enabled: (( .properties.syslog_tls_enabled.value ))
               permitted_peer: (( .properties.syslog_permitted_peer.value ))
               ca_cert: (( .properties.syslog_ca_cert.value ))
-  - name: register_on_demand_service_broker
-    label: 'On Demand Service Broker Registrar'
-    lifecycle: errand
-    post_deploy: true
-    run_post_deploy_errand_default: true
-    templates:
-    - name: register-broker
-      release: on-demand-service-broker
-    max_in_flight: 1
-    memory: 1024
-    ephemeral_disk: 2048
-    persistent_disk: 0
-    cpu: 1
-    static_ip: 0
-    dynamic_ip: 1
-    single_az_only: true
-    instances: 1
-    properties:
-      broker_name: mongodb-odb
-      disable_ssl_cert_verification: (( ..cf.ha_proxy.skip_cert_verify.value ))
-      cf:
-        api_url: "https://api.(( ..cf.cloud_controller.system_domain.value ))"
-        admin_username: (( ..cf.uaa.admin_credentials.identity ))
-        admin_password: (( ..cf.uaa.admin_credentials.password ))
-  - name: upgrade_all_service_instances_on_demand_service_broker
-    label: 'Upgrade all instances deployed by the On Demand Service Broker'
-    lifecycle: errand
-    post_deploy: true
-    run_post_deploy_errand_default: true
-    templates:
-    - name: upgrade-all-service-instances
-      release: on-demand-service-broker
-    max_in_flight: 1
-    memory: 1024
-    ephemeral_disk: 2048
-    persistent_disk: 0
-    cpu: 1
-    static_ip: 0
-    dynamic_ip: 1
-    single_az_only: true
-    instances: 1
-    properties: {}
-  - name: delete_subdeployments_on_demand_service_broker
-    label: 'Delete all instances deployed by the On Demand Service Broker'
-    lifecycle: errand
-    pre_delete: true
-    templates:
-    - name: delete-all-service-instances
-      release: on-demand-service-broker
-    max_in_flight: 1
-    memory: 1024
-    ephemeral_disk: 2048
-    persistent_disk: 0
-    cpu: 1
-    static_ip: 0
-    dynamic_ip: 1
-    single_az_only: true
-    instances: 1
-    properties: {}
-  - name: unregister_on_demand_service_broker
-    label: 'On Demand Service Broker Deregistrar'
-    lifecycle: errand
-    pre_delete: true
-    templates:
-    - name: deregister-broker
-      release: on-demand-service-broker
-    max_in_flight: 1
-    memory: 1024
-    ephemeral_disk: 2048
-    persistent_disk: 0
-    cpu: 1
-    static_ip: 0
-    dynamic_ip: 1
-    single_az_only: true
-    instances: 1
-    properties:
-      broker_name: mongodb-odb
