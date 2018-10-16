@@ -431,10 +431,10 @@ func groupForMongoServer(mongoID string, oc *OMClient,
 
 	req := GroupCreateRequest{}
 	if name, found := arbitraryParams["projectName"]; found {
-		req.Name = strings.ToUpper(name.(string))
+		req.Name = name.(string)
 	}
 	if orgId, found := arbitraryParams["orgId"]; found {
-		req.OrgId = strings.ToUpper(orgId.(string))
+		req.OrgId = orgId.(string)
 	}
 	tags := planProperties["mongo_ops"].(map[string]interface{})["tags"]
 	if tags != nil {
