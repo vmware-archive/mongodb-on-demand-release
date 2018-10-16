@@ -361,7 +361,7 @@ runtime_configs:
 packages:
 - name: bpm
   type: bosh-release
-  path: resources/bpm-release-0.12.3-ubuntu-trusty-3586.43.tgz
+  path: resources/bpm-release-0.13.0-ubuntu-trusty-3586.46.tgz
 - name: pcf-mongodb-helpers
   type: bosh-release
   path: resources/pcf-mongodb-helpers-0.0.1.tgz
@@ -474,7 +474,7 @@ packages:
           jobs:
           - syslog_forwarder
         - name: bpm
-          version: "0.12.3"
+          version: "0.13.0"
           jobs:
           - bpm
         stemcell:
