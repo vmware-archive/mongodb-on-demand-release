@@ -71,6 +71,10 @@ func defaultRequestParams() serviceadapter.RequestParameters {
 	return serviceadapter.RequestParameters{"key": "foo", "bar": "baz"}
 }
 
+func defaultSecretParams() serviceadapter.ManifestSecrets {
+	return serviceadapter.ManifestSecrets{"((/a/secret/path))": "some r34||y s3cr3t v41", "((another))": "one"}
+}
+
 func defaultPlan() serviceadapter.Plan {
 	return serviceadapter.Plan{
 		InstanceGroups: []serviceadapter.InstanceGroup{{
@@ -158,7 +162,7 @@ func (c CLIErrorMatcher) Match(actual interface{}) (bool, error) {
 
 	theError, ok := actual.(serviceadapter.CLIHandlerError)
 	if !ok {
-		return false, errors.New("Expected error to be of type serviceadapter.CLIHandlerError")
+		return false, fmt.Errorf("Expected error to be of type serviceadapter.CLIHandlerError, instead got '%v'", actual)
 	}
 
 	if theError.ExitCode != c.exitCode {

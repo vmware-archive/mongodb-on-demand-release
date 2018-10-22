@@ -67,6 +67,9 @@ var _ = Describe("(de)serialising BOSH manifests", func() {
 							"another_link":   bosh.ConsumesLink{From: "jerb-link"},
 							"nullified_link": "nil",
 						},
+						CustomProviderDefinitions: []bosh.CustomProviderDefinition{
+							{Name: "some-custom-link", Type: "some-link-type", Properties: []string{"prop1", "url"}},
+						},
 						Properties: map[string]interface{}{
 							"some_property": "some_value",
 						},
@@ -135,6 +138,7 @@ var _ = Describe("(de)serialising BOSH manifests", func() {
 			UpdateWatchTime: "30000-180000",
 			MaxInFlight:     4,
 			Serial:          boolPointer(false),
+			VmStrategy:      "create-and-swap",
 		},
 		Variables: []bosh.Variable{
 			bosh.Variable{
@@ -146,8 +150,18 @@ var _ = Describe("(de)serialising BOSH manifests", func() {
 				Type: "certificate",
 				Options: map[string]interface{}{
 					"is_ca":             true,
-					"common_name":       "some-ca",
 					"alternative_names": []string{"some-other-ca"},
+				},
+				Consumes: &bosh.VariableConsumes{
+					AlternativeName: bosh.VariableConsumesLink{
+						From: "my-custom-app-server-address",
+					},
+					CommonName: bosh.VariableConsumesLink{
+						From: "my-custom-app-server-address",
+						Properties: map[string]interface{}{
+							"wildcard": true,
+						},
+					},
 				},
 			},
 		},
@@ -230,10 +244,12 @@ var _ = Describe("(de)serialising BOSH manifests", func() {
 		Expect(content).NotTo(ContainSubstring("migrated_from:"))
 		Expect(content).NotTo(ContainSubstring("tags:"))
 		Expect(content).NotTo(ContainSubstring("features:"))
+		Expect(content).NotTo(ContainSubstring("vm_strategy:"))
+		Expect(content).NotTo(ContainSubstring("custom_provider_definitions:"))
 		Expect(strings.Count(string(content), "update:")).To(Equal(1))
 	})
 
-	It("omits optional options from Variables", func() {
+	It("omits optional keys from Variables", func() {
 		emptyManifest := bosh.BoshManifest{
 			Variables: []bosh.Variable{
 				bosh.Variable{
@@ -246,6 +262,7 @@ var _ = Describe("(de)serialising BOSH manifests", func() {
 		content, err := yaml.Marshal(emptyManifest)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(content).NotTo(ContainSubstring("options:"))
+		Expect(content).NotTo(ContainSubstring("consumes:"))
 	})
 
 	It("includes set properties and omits unset properties in Features", func() {

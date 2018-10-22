@@ -37,15 +37,15 @@
   version = "v2.0.1"
 
 [[projects]]
-  digest = "1:cf1f6ff37be3fdd98e20c7945df2633e216d2eaaf310f112991239a7004090f2"
+  digest = "1:7528359c48316cdc61bd62d91e18bbd5d1bfabac983efb0580e4285dd4440cfa"
   name = "github.com/pivotal-cf/on-demand-services-sdk"
   packages = [
     "bosh",
     "serviceadapter",
   ]
   pruneopts = ""
-  revision = "eb8dd234a8c5b0d0b954e9fe1ed5f60a11e028ac"
-  version = "v0.22.0"
+  revision = "3f9c20bb8a17fb3a6a67075de90213e1321f3134"
+  version = "v0.23.0"
 
 [[projects]]
   digest = "1:7365acd48986e205ccb8652cc746f09c8b7876030d53710ea6ef7d0bd0dcd7ca"
